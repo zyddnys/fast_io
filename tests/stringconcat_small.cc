@@ -15,14 +15,14 @@ try
 
 	using namespace std::string_literals;
 	using namespace std::string_view_literals;
-	std::size_t constexpr N(10000000);
-	std::string const baseLocation(".\\folder\\b");
+	std::size_t constexpr N(50000000);
+	std::string const baseLocation;
 	{
 		cqw::timer t("std::string");
 		std::string fname;
 		for(std::size_t i(0);i!=N;++i)
 		{
-			fname.append(baseLocation + "_test_no." + std::to_string(i) + ".txt");
+			fname.append(baseLocation + std::to_string(i) + ".t");
 			fname.clear();
 		}
 	}
@@ -32,9 +32,8 @@ try
 		for(std::size_t i(0);i!=N;++i)
 		{
 			fname.append(baseLocation);
-			fname.append("_test_no."sv);
 			fname.append(std::to_string(i));
-			fname.append(".txt"sv);
+			fname.append(".t"sv);
 			fname.clear();
 		}
 	}
@@ -43,7 +42,7 @@ try
 		std::ostringstream sst;
 		for(std::size_t i(0);i!=N;++i)
 		{
-			sst<<baseLocation<<"_test_no"<<i<<".txt";
+			sst<<baseLocation<<i<<".t";
 			sst.clear();
 		}
 	}
@@ -52,21 +51,21 @@ try
 		for(std::size_t i(0);i!=N;++i)
 		{
 			std::array<char,255> fname{0};
-			snprintf(fname.data(), 255, "%s_test_no.%d.txt", baseLocation.c_str(), i);
+			snprintf(fname.data(), 255, "%s%d.t", baseLocation.c_str(), i);
 		}
 	}
 	{
 		cqw::timer t("snprintf2");
 		std::array<char,255> fname{0};
 		for(std::size_t i(0);i!=N;++i)
-			snprintf(fname.data(), 255, "%s_test_no.%d.txt", baseLocation.c_str(), i);
+			snprintf(fname.data(), 255, "%s%d.t", baseLocation.c_str(), i);
 	}
 	{
 		cqw::timer t("obuf_string");
 		fast_io::obuf_string obuf;
 		for(std::size_t i(0);i!=N;++i)
 		{
-			obuf<<baseLocation<<"_test_no."<<i<<".txt";
+			obuf<<baseLocation<<i<<".t";
 			obuf.clear();
 		}
 	}
@@ -75,14 +74,14 @@ try
 		fast_io::obuf_string obuf;
 		for(std::size_t i(0);i!=N;++i)
 		{
-			fprint(obuf,"%_test_no.%.txt",baseLocation,i);
+			fprint(obuf,"%%.t",baseLocation,i);
 			obuf.clear();
 		}
 	}
 	{
 		cqw::timer t("fast_io::concat");
 		for(std::size_t i(0);i!=N;++i)
-			fast_io::concat<std::string>(baseLocation,"_test_no.",i,".txt");
+			fast_io::concat<std::string>(baseLocation,i,".t");
 	}
 }
 catch(std::exception const& e)

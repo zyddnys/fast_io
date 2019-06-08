@@ -15,8 +15,8 @@ try
 
 	using namespace std::string_literals;
 	using namespace std::string_view_literals;
-	std::size_t constexpr N(10000000);
-	std::string const baseLocation(".\\folder\\b");
+	std::size_t constexpr N(100000);
+	std::string const baseLocation(10000,'1');
 	{
 		cqw::timer t("std::string");
 		std::string fname;

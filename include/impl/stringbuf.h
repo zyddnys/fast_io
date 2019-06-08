@@ -57,6 +57,8 @@ namespace fast_io
 		using traits_type = typename value_type::traits_type;
 		using int_type = typename traits_type::int_type;
 		using char_type = typename T::value_type;
+		template<typename... Args>
+		basic_obuf_string(Args&& ...args):s(std::forward<Args>(args)...){}
 		auto& str()
 		{
 			return s;
@@ -72,7 +74,16 @@ namespace fast_io
 			s.push_back(ch);
 		}
 		void flush(){}
+		void clear(){s.clear();}
 	};
+	
+	template<typename T=std::string,typename... Args>
+	inline T concat(Args&& ...args)
+	{
+		basic_obuf_string<T> t;
+		print(t,std::forward<Args>(args)...);
+		return std::move(t.str());
+	}
 }
 
 #endif
