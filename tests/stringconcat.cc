@@ -9,6 +9,8 @@
 #include<sstream>
 #include<string_view>
 
+inline fast_io::log mlog;
+
 int main()
 try
 {
@@ -23,7 +25,6 @@ try
 		{
 			auto fname(baseLocation + "_test_no." + std::to_string(i) + ".txt");
 		}
-	}
 	}
 	{
 		cqw::timer t("std::string spc");
@@ -92,8 +93,21 @@ try
 		for(std::size_t i(0);i!=N;++i)
 			fast_io::concat<std::string>(baseLocation,"_test_no.",i,".txt");
 	}
+	{
+		cqw::timer t("fast_io preconcat");
+		fast_io::obuf_string base(baseLocation);
+		base<<"_test_no."sv;
+		std::size_t pos(base.str().size());
+		for(std::size_t i(0);i!=N;++i)
+		{
+			base<<i;
+			base<<".txt"sv;
+			base.str().erase(pos);
+		}
+	}
 }
 catch(std::exception const& e)
 {
+	fprint(mlog,"%\n",e.what());
 	return 1;
 }
