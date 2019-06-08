@@ -19,6 +19,13 @@ try
 	std::string const baseLocation;
 	{
 		cqw::timer t("std::string");
+		for(std::size_t i(0);i!=N;++i)
+		{
+			auto fname(baseLocation + std::to_string(i) + ".t");
+		}
+	}
+	{
+		cqw::timer t("std::string spc");
 		std::string fname;
 		for(std::size_t i(0);i!=N;++i)
 		{

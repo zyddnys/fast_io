@@ -19,6 +19,14 @@ try
 	std::string const baseLocation(".\\folder\\b");
 	{
 		cqw::timer t("std::string");
+		for(std::size_t i(0);i!=N;++i)
+		{
+			auto fname(baseLocation + "_test_no." + std::to_string(i) + ".txt");
+		}
+	}
+	}
+	{
+		cqw::timer t("std::string spc");
 		std::string fname;
 		for(std::size_t i(0);i!=N;++i)
 		{
