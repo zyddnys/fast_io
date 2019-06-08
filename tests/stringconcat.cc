@@ -99,11 +99,7 @@ try
 		base<<"_test_no."sv;
 		std::size_t pos(base.str().size());
 		for(std::size_t i(0);i!=N;++i)
-		{
-			base<<i;
-			base<<".txt"sv;
-			base.str().erase(pos);
-		}
+			print(base,i,".txt"sv).str().erase(pos);
 	}
 }
 catch(std::exception const& e)
