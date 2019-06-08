@@ -27,7 +27,7 @@ try
 		}
 	}
 	{
-		cqw::timer t("std::string");
+		cqw::timer t("std::string append");
 		std::string fname;
 		for(std::size_t i(0);i!=N;++i)
 		{
