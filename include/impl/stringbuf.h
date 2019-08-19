@@ -84,6 +84,13 @@ namespace fast_io
 		print(t,std::forward<Args>(args)...);
 		return std::move(t.str());
 	}
+	template<typename T=std::string,typename... Args>
+	inline T format(std::string_view format,Args&& ...args)
+	{
+		basic_obuf_string<T> t;
+		fprint(t,format,std::forward<Args>(args)...);
+		return std::move(t.str());
+	}
 }
 
 #endif
