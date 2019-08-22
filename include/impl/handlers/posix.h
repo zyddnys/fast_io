@@ -1,6 +1,4 @@
-#ifdef _POSIX_C_SOURCE
-#ifndef FAST_IO_HANDLERS_POSIX_H
-#define FAST_IO_HANDLERS_POSIX_H
+#pragma once
 #include<unistd.h>
 #include<fcntl.h>
 #include<stdexcept>
@@ -10,138 +8,108 @@
 #include"../mode.h"
 #include"../concept.h"
 #include<system_error>
+#include<tuple>
 
 namespace fast_io
 {
-	using namespace std::string_literals;
+	
+namespace details
+{
 
-	namespace posix_file_details
+template<open_mode_interface inf>
+struct posix_file_open_mode
+{
+	static auto constexpr mode = []()
 	{
-		template<typename T>
-		class mode
+		std::tuple<int,int> tp;
+		if(inf::in()&&inf::out())
+			std::get<0>|=O_RDWR;
+		else
 		{
-		public:
-		};
-		template<>
-		class mode<fast_io::open_mode::in>
-		{
-		public:
-			static constexpr int flags()
-			{
-				return O_RDONLY|O_EXCL;
-			}
-			static constexpr int modes()
-			{
-				return 0;
-			}
+			if(inf::in())
+				std::get<0>|=O_RDONLY;
+			else
+				std::get<0>|=O_WRONLY;
+			//should not happen
+		}
+		if(inf::app())
+			md|=O_APPEND;
+		if(inf::ate())
+			md|=;
+		if(inf::trunc())
+			md|=;
+		return md;
+	}();
+};
+}
 
-		};
-		template<>
-		class mode<fast_io::open_mode::out>
-		{
-		public:
-			static constexpr int flags()
-			{
-				return O_WRONLY|O_CREAT;
-			}
-			static constexpr int modes()
-			{
-				return S_IRWXU | S_IRWXG | S_IRWXO;
-			}
-		};
-		template<>
-		class mode<fast_io::open_mode::app>
-		{
-		public:
-			static constexpr int flags()
-			{
-				return O_APPEND|O_CREAT;
-			}
-			static constexpr int modes()
-			{
-				return 0;
-			}
-		};
+class posix_file
+{
+	int fd;
+	void close_impl() noexcept
+	{
+		if(fd!=-1)
+			close(fd);
 	}
 
-	template<typename MODE>
-	class posix_file
+public:
+	using char_type = char;
+	using native_handle_type = int;
+	posix_file(std::string_view file,open_mode_interface interface):fd(open(file.data(),posix_file_open_flags<decltype(interface)>::mode,posix_file_open_flags<decltype(interface)>::flag))
 	{
-		int fd;
-		void _close() noexcept
+		if(fd==-1)
+			throw std::system_error(errno,std::generic_category());
+	}
+	template<typename ...Args>
+	posix_file(fast_io::native_interface_t,Args&& ...args):fd(open(std::forward<Args>(args)...))
+	{
+		if(fd==-1)
+			throw std::system_error(errno,std::generic_category());
+	}
+	posix_file(const posix_file&)=delete;
+	posix_file& operator=(const posix_file&)=delete;
+	posix_file(posix_file&& b) noexcept : fd(b.fd)
+	{
+		b.fd = -1;
+	}
+	posix_file& operator=(posix_file&& b) noexcept
+	{
+		if(&b!=this)
 		{
-			if(fd!=-1)
-				close(fd);
-		}
-		char* _read(char *begin,char *end)
-		{
-			ssize_t read_bytes(::read(fd,begin,end-begin));
-			if(read_bytes==-1)
-				throw std::system_error(errno,std::system_category());
-			return read_bytes+begin;
-		}
-		void _write(const char *begin,const char *end)
-		{
-			if(::write(fd,begin,end-begin)==-1)
-				throw std::system_error(errno,std::system_category());
-		}
-	public:
-		using char_type = char;
-
-		using native_handle_type = int;
-		posix_file(std::string_view file):
-			fd(open(file.data(),posix_file_details::mode<MODE>::flags(),
-			posix_file_details::mode<MODE>::modes()))
-		{
-			if(fd==-1)
-				throw std::system_error(errno,std::generic_category());
-		}
-		template<typename ...Args>
-		posix_file(fast_io::native_interface_t,Args&& ...args):
-			fd(open(std::forward<Args>(args)...))
-		{
-			if(fd==-1)
-				throw std::system_error(errno,std::generic_category());
-		}
-		posix_file(const posix_file&)=delete;
-		posix_file& operator=(const posix_file&)=delete;
-		posix_file(posix_file&& b) noexcept : fd(b.fd)
-		{
+			close_impl();
+			fd=b.fd;
 			b.fd = -1;
 		}
-		posix_file& operator=(posix_file&& b) noexcept
-		{
-			if(&b!=this)
-			{
-				_close();
-				fd=b.fd;
-				b.fd = -1;
-			}
-			return *this;
-		}
-		native_handle_type native_handle() const
-		{
-			return fd;
-		}
-		template<Pointer T>
-		T read(T begin,T end)
-		{
-			return reinterpret_cast<T>(_read(reinterpret_cast<char*>(begin),reinterpret_cast<char*>(end)));
-		}
-		void write(Pointer begin,Pointer end)
-		{
-			_write(reinterpret_cast<const char*>(begin),reinterpret_cast<const char*>(end));
-		}
-		void flush()
-		{
-			if(fsync(fd)==-1)
-				throw std::system_error(errno,std::system_category());
-		}
-		~posix_file()
-		{
-			_close();
-		}
-	};
+		return *this;
+	}
+	native_handle_type native_handle() const
+	{
+		return fd;
+	}
+	template<typename ContiguousIterator>
+	ContiguousIterator read(ContiguousIterator begin,ContiguousIterator end)
+	{
+		auto read_bytes(::read(fd,std::addressof(*begin),std::addressof(*end)-std::addressof(*begin)));
+		if(read_bytes==-1)
+			throw std::system_error(errno,std::system_category());
+		return begin+(read_bytes/sizeof(*begin));
+	}
+	template<typename ContiguousIterator>
+	ContiguousIterator write(ContiguousIterator begin,ContiguousIterator end)
+	{
+		auto write_bytes(::write(fd,std::addressof(*begin),std::addressof(*end)-std::addressof(*begin)));
+		if(write_bytes==-1)
+			throw std::system_error(errno,std::system_category());
+		return begin+(write_bytes/sizeof(*begin));
+	}
+	void flush()
+	{
+		if(fsync(fd)==-1)
+			throw std::system_error(errno,std::system_category());
+	}
+	~posix_file()
+	{
+		close_impl();
+	}
+};
 }
-#endif
-#endif

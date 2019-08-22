@@ -1,5 +1,4 @@
-#ifndef FAST_IO_IOBUF_H
-#define FAST_IO_IOBUF_H
+#pragma once
 
 #include<memory>
 #include<string>
@@ -17,13 +16,8 @@ namespace fast_io
 	class basic_buf_handler
 	{
 		Allocator alloc;
-		template<typename Ihandler,typename CharTA,typename Traits,typename Buf>
-		friend class basic_ibuf;
-		template<typename Ohandler,typename CharTA,typename Traits,typename Buf>
-		friend class basic_obuf;
-		CharT *beg,*curr,*end;
 	public:
-
+		CharT *beg,*curr,*end;
 		explicit basic_buf_handler():beg(alloc.allocate(buffer_size)),end(beg+buffer_size){}
 		basic_buf_handler& operator=(const basic_buf_handler&)=delete;
 		basic_buf_handler(const basic_buf_handler&)=delete;
@@ -50,8 +44,8 @@ namespace fast_io
 		}
 		Allocator get_allocator() const{	return alloc;}
 	};
-	
-	template<input_stream Ihandler,typename CharT,typename Traits = std::char_traits<CharT>,typename Buf=basic_buf_handler<CharT>>
+
+	template<input_stream Ihandler,typename CharT=Ihandler::char_type,typename Traits = std::char_traits<CharT>,typename Buf=basic_buf_handler<CharT>>
 	class basic_ibuf
 	{
 		Ihandler ih;
@@ -154,9 +148,9 @@ namespace fast_io
 			}
 			return *this;
 		}
-		void write(const CharT* cbegin,const CharT* cend)
+		void write(CharT const* cbegin,CharT const* cend)
 		{
-			const std::size_t n(bh.end-bh.curr);
+			std::size_t const n(bh.end-bh.curr);
 			if(n<cend-cbegin)
 			{
 				std::uninitialized_copy_n(cbegin,n,bh.curr);
@@ -192,5 +186,3 @@ namespace fast_io
 
 
 }
-
-#endif

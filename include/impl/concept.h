@@ -36,11 +36,7 @@ namespace fast_io
 	};
 
 	template<typename T>
-	concept bool mutex_input_stream()
-	{
-		return standard_input_stream<T>()&&mutex_stream<T>();
-	};
-
+	concept bool mutex_input_stream = standard_input_stream<T>()&&mutex_stream<T>();
 	
 	template<typename T>
 	concept bool output_stream()
@@ -51,6 +47,10 @@ namespace fast_io
 			{out.flush()}->void;
 		};
 	};
+
+	template<typename T>
+	concept bool io_stream() = input_stream<T>&&output_stream<T>();
+
 	template<typename T>
 	concept bool standard_output_stream()
 	{
@@ -63,10 +63,7 @@ namespace fast_io
 	};
 
 	template<typename T>
-	concept bool mutex_output_stream()
-	{
-		return standard_output_stream<T>()&&mutex_stream<T>();
-	};
+	concept bool mutex_output_stream() = standard_output_stream<T>()&&mutex_stream<T>();
 
 	template<typename T>
 	concept bool Integral = std::numeric_limits<T>::is_integer;
