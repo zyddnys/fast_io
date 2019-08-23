@@ -17,27 +17,27 @@ public:
 	using char_type = typename T::value_type;
 public:
 	template<typename ...Args>
-	basic_ibuf_string_view(Args&& ...args):s(std::forward<Args>(args)...){}
-	auto& str()
+	constexpr basic_ibuf_string_view(Args&& ...args):s(std::forward<Args>(args)...){}
+	constexpr auto& str()
 	{
 		return s;
 	}
-	bool eof() const
+	constexpr bool eof() const
 	{
 		return s.empty();
 	}
-	operator bool() const
+	constexpr operator bool() const
 	{
 		return !s.empty();
 	}
-	template<Pointer pointer>
-	pointer read(pointer begin,pointer end)
+	template<typename contiguous_iterator>
+	constexpr contiguous_iterator read(contiguous_iterator cbegin,contiguous_iterator cend)
 	{
 		std::size_t const cped(s.copy(begin,end-begin));
 		s.remove_prefix(cped);
 		return begin+cped;
 	}
-	int_type get()
+	constexpr int_type get()
 	{
 		if(eof())
 			return traits_type::eof();
@@ -75,6 +75,8 @@ public:
 	void flush(){}
 	void clear(){s.clear();}
 };
+
+//potential constexpr in the future if std::string can be constexpr
 
 template<typename T=std::string,typename... Args>
 inline T concat(Args&& ...args)

@@ -4,8 +4,7 @@
 #include"impl/handlers/std.h"
 #ifdef _WIN32_WINNT
 #include"impl/handlers/windows.h"
-#endif
-#ifdef _POSIX_C_SOURCE
+#elif _POSIX_C_SOURCE
 #include"impl/handlers/posix.h"	
 #endif
 #include"impl/concept.h"

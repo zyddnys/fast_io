@@ -1,115 +1,201 @@
 #pragma once
 #include<stdexcept>
 #include<string_view>
+#include <utility>
 
 namespace fast_io
 {
-enum class openmode:std::uint32_t
+
+namespace open
 {
-in=1,
-out=2,
-app=4,
-ate=8,
-trunc=16,
-no_overwrite=32//C++ iostream currently still does not support "x"
-//no binary since binary is ignored on most platforms.
+
+struct mode
+{
+	std::size_t value;
+	constexpr operator std::size_t() const
+	{
+		return value;
+	}
+	constexpr mode& operator|=(mode const& b)
+	{
+		value|=b.value;
+		return *this;
+	}
+	constexpr mode(std::size_t val=0):value(val){}
 };
 
-inline constexpr openmode& operator|=(openmode& a,openmode const& b)
-{
-	return (a=static_cast<openmode>(static_cast<std::uint32_t>(a)|static_cast<std::uint32_t>(b)));
-}
+inline static mode constexpr app{1};
+inline static mode constexpr ate{1<<1};
+inline static mode constexpr binary{1<<2};
+inline static mode constexpr in{1<<3};
+inline static mode constexpr no_overwrite{1<<4};//C++ iostream currently still does not support "x"
+inline static mode constexpr out{1<<5};
+inline static mode constexpr trunc{1<<6};
 
-inline constexpr openmode operator|(openmode const& a,openmode const& b)
+inline constexpr mode operator|(mode const& a,mode const& b)
 {
 	auto temp(a);
 	temp|=b;
 	return temp;
 }
 
+inline constexpr mode remove_ate(mode const& m)
+{
+	return {m.value&~ate.value};
+}
+inline constexpr mode remove_binary(mode const& m)
+{
+	return {m.value&~binary.value};
+}
 
-template<openmode om>
-struct open_interface_t
+inline constexpr bool with_ate(mode const& m)
 {
-constexpr open_interface_t()
+	return m.value&ate.value;
+}
+inline constexpr bool with_binary(mode const& m)
 {
-//https://en.cppreference.com/w/cpp/io/basic_filebuf/open
-	switch(static_cast<openmode>(static_cast<std::uint32_t>(om)&~static_cast<std::uint32_t>(openmode::ate)))
+	return m.value&binary.value;
+}
+
+inline auto constexpr c_style(mode const& m)
+{
+	using namespace std::string_view_literals;
+	switch(remove_ate(m))
 	{
 //Action if file already exists;	Action if file does not exist;	c-style mode;	Explanation
 //Read from start;	Failure to open;	"r";	Open a file for reading
-	case openmode::in:
+	case in:
+		return "r"sv;
 //Destroy contents;	Create new;	"w";	Create a file for writing
-	case openmode::out:
-	case openmode::out|openmode::trunc:
+	case out:
+	case out|trunc:
+		return "w"sv;
 //Append to file;	Create new;	"a";	Append to a file
-	case openmode::app:
-	case openmode::out|openmode::app:
+	case app:
+	case out|app:
+		return "a"sv;
 //Read from start;	Error;	"r+";		Open a file for read/write
-	case openmode::out|openmode::in:
+	case out|in:
+		return "r+"sv;
 //Destroy contents;	Create new;	"w+";	Create a file for read/write
-	case openmode::out|openmode::in|openmode::trunc:
+	case out|in|trunc:
+		return "w+"sv;
 //Write to end;	Create new;	"a+";	Open a file for read/write
-	case openmode::out|openmode::in|openmode::app:
-	case openmode::in|openmode::app:
-
+	case out|in|app:
+	case in|app:
+		return "a+"sv;
 //Destroy contents;	Error;	"wx";	Create a file for writing
-	case openmode::out|openmode::no_overwrite:
-	case openmode::out|openmode::trunc|openmode::no_overwrite:
+	case out|no_overwrite:
+	case out|trunc|no_overwrite:
+		return "wx"sv;
 //Append to file;	Error;	"ax";	Append to a file
-	case openmode::app|openmode::no_overwrite:
-	case openmode::out|openmode::app|openmode::no_overwrite:
+	case app|no_overwrite:
+	case out|app|no_overwrite:
+		return "ax"sv;
 //Destroy contents;	Error;	"w+x";	Create a file for read/write
-	case openmode::out|openmode::in|openmode::trunc|openmode::no_overwrite:
+	case out|in|trunc|no_overwrite:
+		return "w+x"sv;
 //Write to end;	Error;	"a+x";	Open a file for read/write
-	case openmode::out|openmode::in|openmode::app|openmode::no_overwrite:
-	case openmode::in|openmode::app|openmode::no_overwrite:
+	case out|in|app|no_overwrite:
+	case in|app|no_overwrite:
+		return "a+x"sv;
+	break;
+	
+//binary support
+
+//Action if file already exists;	Action if file does not exist;	c-style mode;	Explanation
+//Read from start;	Failure to open;	"rb";	Open a file for reading
+	case in|binary:
+		return "rb"sv;
+//Destroy contents;	Create new;	"wb";	Create a file for writing
+	case out|binary:
+	case out|trunc|binary:
+		return "wb"sv;
+//Append to file;	Create new;	"ab";	Append to a file
+	case app|binary:
+	case out|app|binary:
+		return "ab"sv;
+//Read from start;	Error;	"r+b";		Open a file for read/write
+	case out|in|binary:
+		return "r+b"sv;
+//Destroy contents;	Create new;	"w+b";	Create a file for read/write
+	case out|in|trunc|binary:
+		return "w+b"sv;
+//Write to end;	Create new;	"a+b";	Open a file for read/write
+	case out|in|app|binary:
+	case in|app|binary:
+		return "a+b"sv;
+//Destroy contents;	Error;	"wxb";	Create a file for writing
+	case out|no_overwrite|binary:
+	case out|trunc|no_overwrite|binary:
+		return "wxb"sv;
+//Append to file;	Error;	"axb";	Append to a file
+	case app|no_overwrite|binary:
+	case out|app|no_overwrite|binary:
+		return "axb"sv;
+//Destroy contents;	Error;	"w+xb";	Create a file for read/write
+	case out|in|trunc|no_overwrite|binary:
+		return "w+xb"sv;
+//Write to end;	Error;	"a+xb";	Open a file for read/write
+	case out|in|app|no_overwrite|binary:
+	case in|app|no_overwrite|binary:
+		return "a+xb"sv;
 	break;
 	default:
 		throw std::runtime_error("unknown open mode");
 	}
 }
-};
 
-template<openmode om>
-inline open_interface_t<om> constexpr open_interface;
-
-auto constexpr c_style_openmode(std::string_view c_style_mode)
+inline auto constexpr c_style(std::string_view csm)
 {
-	openmode v{};
+	mode v{};
 	bool extended(false);
-	for(auto const& e : c_style_mode)
+	for(auto const& e : csm)
 		if(e=='+')
 			extended=true;
-	for(auto const& e : c_style_mode)
+	for(auto const& e : csm)
 		switch(e)
 		{
-			case 'r':
-				v|=openmode::in;
+			case 'a':
+				v|=app;
 				if(extended)
-					v|=openmode::out;
+					v|=in|out;
+			break;
+			case 'b':
+				v|=binary;
+			break;
+			case 'r':
+				v|=in;
+				if(extended)
+					v|=out;
 			break;
 			case 'w':
-				v|=openmode::out;
+				v|=out;
 				if(extended)
-					v|=openmode::in|openmode::trunc;
-			break;
-			case 'a':
-				v|=openmode::app;
-				if(extended)
-					v|=openmode::in|openmode::out;
+					v|=in|trunc;
 			break;
 			case 'x':
-				v|=openmode::no_overwrite;
+				v|=no_overwrite;
 			break;
 			case '+':
 			break;
-			case 'b':
-			break;//ignore 'b'
 			default:
 				throw std::runtime_error("unknown C-style open mode");
 		}
 	return v;
+}
+
+
+template<std::size_t om>
+struct interface_t
+{
+inline static fast_io::open::mode constexpr mode = {om};
+inline static auto constexpr c_style = fast_io::open::c_style(mode);
+};
+
+template<std::size_t om>
+inline interface_t<om> constexpr interface;
+
 }
 
 class native_interface_t{}native_interface;
