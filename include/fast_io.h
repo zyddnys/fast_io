@@ -2,8 +2,12 @@
 #define FAST_IO_H
 #include"impl/mode.h"
 #include"impl/handlers/std.h"
+#ifdef _WIN32_WINNT
 #include"impl/handlers/windows.h"
+#endif
+#ifdef _POSIX_C_SOURCE
 #include"impl/handlers/posix.h"	
+#endif
 #include"impl/concept.h"
 #include"impl/rd_type.h"
 #include"impl/read_write.h"

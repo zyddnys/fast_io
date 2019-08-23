@@ -1,5 +1,4 @@
-#ifndef FAST_IO_RD_TYPE_H
-#define FAST_IO_RD_TYPE_H
+#pragma once
 #include<type_traits>
 #include<array>
 #include<stdexcept>
@@ -63,6 +62,10 @@ namespace fast_io
 	{
 		out.write(str.data(),str.data()+str.size());
 		return out;
+	}
+	inline output_stream& operator<<(output_stream& out,std::exception const &e)
+	{
+		out<<e.what();
 	}
 	standard_input_stream& operator>>(standard_input_stream& in,std::string &str)
 	{
@@ -141,4 +144,3 @@ namespace fast_io
 		return print(out<<cr,std::forward<Args>(args)...);
 	}
 }
-#endif

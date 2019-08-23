@@ -22,22 +22,7 @@ struct posix_file_open_mode
 	static auto constexpr mode = []()
 	{
 		std::tuple<int,int> tp;
-		if(inf::in()&&inf::out())
-			std::get<0>|=O_RDWR;
-		else
-		{
-			if(inf::in())
-				std::get<0>|=O_RDONLY;
-			else
-				std::get<0>|=O_WRONLY;
-			//should not happen
-		}
-		if(inf::app())
-			md|=O_APPEND;
-		if(inf::ate())
-			md|=;
-		if(inf::trunc())
-			md|=;
+
 		return md;
 	}();
 };
@@ -55,7 +40,11 @@ class posix_file
 public:
 	using char_type = char;
 	using native_handle_type = int;
-	posix_file(std::string_view file,open_mode_interface interface):fd(open(file.data(),posix_file_open_flags<decltype(interface)>::mode,posix_file_open_flags<decltype(interface)>::flag))
+	template<typename T>
+	posix_file(std::string_view file,open_interface_t<T>):fd(std::apply([&file](auto mode,auto flag)
+	{
+		return ::open(file.data(),mode,flag);
+	})(posix_file_open_flags<T>::mode))//open(file.data(),posix_file_open_flags<decltype(interface)>::mode,posix_file_open_flags<decltype(interface)>::flag))
 	{
 		if(fd==-1)
 			throw std::system_error(errno,std::generic_category());

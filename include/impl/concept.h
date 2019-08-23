@@ -1,5 +1,4 @@
-#ifndef FAST_IO_CONCEPT_H
-#define FAST_IO_CONCEPT_H
+#pragma once
 
 #include<limits>
 #include<type_traits>
@@ -20,12 +19,12 @@ namespace fast_io
 		{
 			typename T::char_type;
 			typename T::int_type;
-			{in.get()};
+			{in.get()}->typename T::char_type;
 			{in.eof()}->bool;
 			{in}->bool;
 		};
 	};
-	
+
 	template<typename T>
 	concept bool mutex_stream()
 	{
@@ -44,12 +43,12 @@ namespace fast_io
 		return requires(T out)
 		{
 			{out.write};
-			{out.flush()}->void;
+			{out.flush()};
 		};
 	};
 
 	template<typename T>
-	concept bool io_stream() = input_stream<T>&&output_stream<T>();
+	concept bool io_stream = input_stream<T>&&output_stream<T>;
 
 	template<typename T>
 	concept bool standard_output_stream()
@@ -58,25 +57,35 @@ namespace fast_io
 		{
 			typename T::char_type;
 			typename T::int_type;
-			{out.put};
+			{out.put(T::int_type)};
 		};
 	};
 
 	template<typename T>
-	concept bool mutex_output_stream() = standard_output_stream<T>()&&mutex_stream<T>();
+	concept bool standard_io_stream = input_stream<T>&&output_stream<T>&&io_stream<T>;
+
+	template<typename T>
+	concept bool mutex_output_stream = standard_output_stream<T>&&mutex_stream<T>;
+
+	template<typename T>
+	concept bool mutex_io_stream = input_stream<T>&&output_stream<T>&&io_stream<T>;
+
+/*	template<typename T>
+	concept bool random_access_input_stream()
+	{
+		return input_stream<T>()&&requires(T in)
+		{
+			{in.seek}
+		};
+	};*/
+
 
 	template<typename T>
 	concept bool Integral = std::numeric_limits<T>::is_integer;
-	
+
 	template<typename T>
-	concept bool Signed_integer=Integral<T>&&
-						std::numeric_limits<T>::is_signed;
-	
+	concept bool Signed_integer=Integral<T>&&std::numeric_limits<T>::is_signed;
+
 	template<typename T>
-	concept bool Unsigned_integer=Integral<T>&&
-						!std::numeric_limits<T>::is_signed;
-	
-	template<typename T>
-	concept bool Pointer = std::is_pointer<T>::value;
+	concept bool Unsigned_integer=Integral<T>&&!Signed_integer<T>;
 }
-#endif
