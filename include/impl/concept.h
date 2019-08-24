@@ -9,6 +9,7 @@ namespace fast_io
 	{
 		return requires(T in)
 		{
+			typename T::traits_type;
 			{in.read};
 		};
 	};
@@ -17,8 +18,7 @@ namespace fast_io
 	{
 		return input_stream<T>()&&requires(T in)
 		{
-			T::traits_type;
-			{in.get()}->typename T::traits_type::int_type;
+			{in.get()};
 			{in.eof()}->bool;
 		};
 	};
@@ -40,6 +40,7 @@ namespace fast_io
 	{
 		return requires(T out)
 		{
+			typename T::traits_type;
 			{out.write};
 			{out.flush()};
 		};
@@ -53,8 +54,8 @@ namespace fast_io
 	{
 		return output_stream<T>()&&requires(T out)
 		{
-			T::traits_type;
-			{out.put(T::traits_type::int_type)};
+			typename T::traits_type;
+			{out.put};
 		};
 	};
 
@@ -85,4 +86,5 @@ namespace fast_io
 
 	template<typename T>
 	concept bool Unsigned_integer=Integral<T>&&!Signed_integer<T>;
+	
 }

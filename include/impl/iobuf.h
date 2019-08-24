@@ -85,7 +85,8 @@ public:
 	template<typename Contiguous_Iterator>
 	auto read(Contiguous_Iterator begin,Contiguous_Iterator end)
 	{
-		return mread(static_cast<char_type*>(static_cast<void*>(std::addressof(*begin))),static_cast<char_type*>(static_cast<void*>(std::addressof(*end))));
+		auto bgchadd(static_cast<char_type*>(static_cast<void*>(std::addressof(*begin))));
+		return begin+(mread(bgchadd,static_cast<char_type*>(static_cast<void*>(std::addressof(*end))))-bgchadd)/sizeof(*begin);
 	}
 	bool eof() const
 	{
@@ -174,9 +175,9 @@ public:
 		return *this;
 	}
 	template<typename Contiguous_Iterator>
-	auto write(Contiguous_Iterator cbegin,Contiguous_Iterator cend)
+	void write(Contiguous_Iterator cbegin,Contiguous_Iterator cend)
 	{
-		return mwrite(static_cast<char_type const*>(static_cast<void*>(std::addressof(*cbegin))),static_cast<char_type const*>(static_cast<void*>(std::addressof(*cend))));
+		mwrite(static_cast<char_type const*>(static_cast<void const*>(std::addressof(*cbegin))),static_cast<char_type const*>(static_cast<void const*>(std::addressof(*cend))));
 	}
 	void put(int_type ch)
 	{
