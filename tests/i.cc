@@ -24,7 +24,7 @@ try
 		(obuf<<i).put('\n');
 	}
 	{
-	cqw::timer t("hacked c_style file");
+	cqw::timer t("c_style file");
 	fast_io::c_style_file csf("hack.txt",fast_io::open::interface<fast_io::open::out|fast_io::open::binary>);
 	for(std::size_t i(0);i!=N;++i)
 		(csf<<i).put('\n');

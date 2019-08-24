@@ -29,6 +29,7 @@ namespace fast_io
 		using default_input = std_file<open_mode::in>;
 		using default_output = std_file<open_mode::out>;
 	#endif*/
+	using system_io_handle = c_style_io_handle;
 	using system_file = c_style_file;
 	using isystem_file = input_wrapper<system_file>;
 	using osystem_file = output_wrapper<system_file>;
@@ -54,4 +55,8 @@ namespace fast_io
 	inline std_in in;//stdin
 	inline std_out out;//stdout
 	inline std_err err;//stderr*/
+	
+	inline c_style_io_handle out(stdout);
+	inline fast_io::tie<c_style_io_handle,c_style_io_handle> in(out,stdin);
+	inline fast_io::tie<c_style_io_handle,c_style_io_handle> err(out,stderr);
 }

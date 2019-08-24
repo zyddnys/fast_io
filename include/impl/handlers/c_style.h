@@ -12,7 +12,7 @@ class c_style_io_handle
 {
 	std::FILE *fp;
 protected:
-	native_handle_type& protected_native_handle()
+	auto& protected_native_handle()
 	{
 		return fp;
 	}
@@ -47,7 +47,7 @@ public:
 	}
 	traits_type::int_type get()
 	{
-		return hacking::filestar_fast_get(fp);
+		return fgetc(fp);
 	}
 	void put(traits_type::int_type ch)
 	{
