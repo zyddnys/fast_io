@@ -46,16 +46,8 @@ namespace fast_io
 	using iobuf_mutex = basic_iomutex<iobuf>;
 	using ibuf_string_view_mutex = basic_imutex<ibuf_string_view>;
 	using obuf_string_mutex = basic_omutex<obuf_string>;
-/*	using inbuf = basic_ibuf<std_in,char>;
-	using outbuf = basic_obuf<std_out,char>;
-	using inbuf_mutex = basic_imutex<inbuf>;
-	using outbuf_mutex = basic_omutex<outbuf>;
-	using log = basic_obuf<std_err,char>;
-	using log_mutex = basic_omutex<log>;
-	inline std_in in;//stdin
-	inline std_out out;//stdout
-	inline std_err err;//stderr*/
-	
+
+//Due to history reason. Nearly every program is using either iostream or FILE*. We can't break code by using other io handle by default.
 	inline c_style_io_handle out(stdout);
 	inline fast_io::tie<c_style_io_handle,c_style_io_handle> in(out,stdin);
 	inline fast_io::tie<c_style_io_handle,c_style_io_handle> err(out,stderr);
