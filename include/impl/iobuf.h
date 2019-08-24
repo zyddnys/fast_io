@@ -12,7 +12,7 @@ class basic_ibuf;
 template<output_stream Ohandler,typename Buf>
 class basic_obuf;
 
-template<typename CharT,typename Allocator = std::allocator<CharT>,std::size_t buffer_size = 4096>
+template<typename CharT,typename Allocator = std::allocator<CharT>,std::size_t buffer_size = 1048576>
 class basic_buf_handler
 {
 	Allocator alloc;
