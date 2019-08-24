@@ -33,9 +33,9 @@ public:
 	template<typename contiguous_iterator>
 	constexpr contiguous_iterator read(contiguous_iterator cbegin,contiguous_iterator cend)
 	{
-		std::size_t const cped(s.copy(begin,end-begin));
+		std::size_t const cped(s.copy(std::addressof(*cbegin),cend-cbegin));
 		s.remove_prefix(cped);
-		return begin+cped;
+		return cbegin+cped;
 	}
 	constexpr int_type get()
 	{
@@ -103,9 +103,10 @@ inline void inplace_to(T& t,Args&& ...args)
 template<typename... Args>
 inline void in_place_to(std::string& t,Args&& ...args)
 {
-	basic_obuf_string<std::string&> os(t);
+	basic_obuf_string<std::string> os(std::move(t));
 	os.clear();
 	print(os,std::forward<Args>(args)...);
+	t=std::move(os.str());
 }
 
 template<typename T,typename... Args>
