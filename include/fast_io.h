@@ -2,7 +2,8 @@
 #include"impl/mode.h"
 #include"impl/handlers/c_style.h"
 #ifdef _WIN32_WINNT
-#elif _POSIX_C_SOURCE
+#endif
+#if _POSIX_C_SOURCE
 #include"impl/handlers/posix.h"	
 #endif
 #include"impl/concept.h"
@@ -17,16 +18,10 @@
 
 namespace fast_io
 {
-#ifdef _WIN32_WINNT
-	using system_io_handle = c_style_io_handle;
-	using system_file = c_style_file;
-#elif _POSIX_C_SOURCE
+#if _POSIX_C_SOURCE
 	using system_io_handle = posix_io_handle;
 	using system_file = posix_file;
 
-inline basic_obuf<system_io_handle> system_out(1);
-inline tie<basic_ibuf<system_io_handle>,basic_obuf<system_io_handle>> system_in(system_out,0);
-inline tie<basic_obuf<system_io_handle>,basic_obuf<system_io_handle>> system_err(system_out,2);
 #else
 	using system_io_handle = c_style_io_handle;
 	using system_file = c_style_file;
@@ -52,4 +47,7 @@ inline c_style_io_handle out(stdout);
 inline tie<c_style_io_handle,c_style_io_handle> in(out,stdin);
 inline tie<c_style_io_handle,c_style_io_handle> err(out,stderr);
 
+inline basic_obuf<system_io_handle> system_out(1);
+inline tie<basic_ibuf<system_io_handle>,basic_obuf<system_io_handle>> system_in(system_out,0);
+inline tie<basic_obuf<system_io_handle>,basic_obuf<system_io_handle>> system_err(system_out,2);
 }
