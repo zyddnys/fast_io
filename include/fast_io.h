@@ -1,5 +1,4 @@
-#ifndef FAST_IO_H
-#define FAST_IO_H
+#pragma once
 #include"impl/mode.h"
 #include"impl/handlers/c_style_file.h"
 /*
@@ -48,4 +47,3 @@ namespace fast_io
 	inline std_out out;//stdout
 	inline std_err err;//stderr*/
 }
-#endif

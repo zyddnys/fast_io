@@ -105,7 +105,7 @@ namespace fast_io
 	{
 		return Container<Cont>() && requires(Cont c)
 		{
-			{c.resize};
+			{c.insert};
 			{size(c)};
 		};
 	};
