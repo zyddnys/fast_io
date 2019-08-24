@@ -69,7 +69,7 @@ namespace fast_io
 	}
 	inline output_stream& operator<<(output_stream& out,std::exception const &e)
 	{
-		out<<e.what();
+		return out<<e.what();
 	}
 	standard_input_stream& operator>>(standard_input_stream& in,std::string &str)
 	{
