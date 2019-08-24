@@ -41,3 +41,13 @@ g++ -o example example.cc -O2 -std=c++17 -fconcepts
 Compiler recommendation under windows:
 
 https://gcc-mcf.lhmouse.com/
+
+
+
+Benchmark
+root@XXXXXX:/mnt/d/hg/fast_io/tests# ./i
+std::FILE*:     1.03459230s
+std::ofstream:  0.59182820s
+std::ofstream with tricks:      0.39233580s
+obuf:   0.13328110s
+obuf_mutex:     0.13685030s
