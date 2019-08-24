@@ -1,6 +1,5 @@
 #include"timer.h"
 #include<fstream>
-#include<iostream>
 #include"../include/fast_io.h"
 #include<exception>
 #include<cmath>
@@ -18,25 +17,36 @@ try
 		fprintf(fp.get(),"%zu\n",i);
 	}
 	{
+	cqw::timer t("std::ofstream");
+	std::ofstream fout("ofstream.txt",std::ofstream::binary);
+	for(std::size_t i(0);i!=N;++i)
+		fout<<i<<'\n';
+	}
+	{
+	cqw::timer t("std::ofstream with tricks");
+	std::ofstream fout("ofstreamtricks.txt",std::ofstream::binary);
+	auto &rdbuf(*fout.rdbuf());
+	for(std::size_t i(0);i!=N;++i)
+	{
+		fout<<i;
+		rdbuf.sputc('\n');
+	}
+	}
+	{
 	cqw::timer t("obuf");
 	fast_io::obuf obuf("obuf.txt",fast_io::open::interface<fast_io::open::binary>);
 	for(std::size_t i(0);i!=N;++i)
 		(obuf<<i).put('\n');
 	}
 	{
-	cqw::timer t("c_style file");
-	fast_io::c_style_file csf("hack.txt",fast_io::open::interface<fast_io::open::out|fast_io::open::binary>);
-	for(std::size_t i(0);i!=N;++i)
-		(csf<<i).put('\n');
-	}
-/*	{
 	cqw::timer t("obuf_mutex");
-	fast_io::obuf_mutex obuf("obuf_mutex.txt");
+	fast_io::obuf_mutex obuf("obuf_mutex.txt",fast_io::open::interface<fast_io::open::binary>);
 	for(std::size_t i(0);i!=N;++i)
 		print(obuf,i,fast_io::character('\n'));
-	}*/
+	}
 }
 catch(std::exception const& e)
 {
+	fast_io::err<<e<<"\n";
 	return 1;
 }
