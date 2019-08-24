@@ -1,12 +1,7 @@
 #include<iostream>
 #include<iomanip>
-#include"handlers/c_style.h"
-#include"wrapper.h"
-#include"iomutex.h"
-#include"iobuf.h"
-#include"stringbuf.h"
+#include"../include/fast_io.h"
 #include<string>
-#include"read_write.h"
 #include<array>
 #include<vector>
 #include<deque>
@@ -15,19 +10,18 @@
 
 int main()
 {
-	using namespace fast_io;
 	{
 	std::vector<std::array<std::array<std::size_t,3>,2>> arr{std::array<std::array<std::size_t,3>,2>{std::array<std::size_t,3>{12142141,2,3},std::array<std::size_t,3>{4,5,6}}};
-	output_wrapper<c_style_file> out("a.txt");
+	fast_io::obuf out("binary_serialization.txt");
 	write(out,arr);
 	std::array<std::string,1> ar{"abcdef\n dsjfgoisdjgoisdjgdiso"};
 	write(out,ar);
 	std::vector<std::deque<std::list<std::array<std::unordered_set<std::size_t>,3>>>> lol;
 	write(out,lol);
-	}
+	}//auto release the file handle by destructor
 	{
 	std::deque<std::array<std::array<std::size_t,3>,2>> arr;
-	input_wrapper<c_style_file> in("a.txt");
+	fast_io::ibuf in("binary_serialization.txt");
 	read(in,arr);
 	for(auto const& e : arr)
 		for(auto const& e1:e)
