@@ -106,23 +106,31 @@ namespace fast_io
 	{
 		output_stream& fprint(output_stream &out,std::string_view format)
 		{
-			auto const percent_pos(format.find('%'));
+			std::size_t percent_pos;
+			for(;(percent_pos=format.find('%'))!=std::string_view::npos&&percent_pos+1!=format.size()&&format[percent_pos+1]=='%';format.remove_prefix(percent_pos+2))
+				out.write(format.cbegin(),format.cbegin()+percent_pos+1);
 			if(percent_pos!=std::string_view::npos)
 				throw std::runtime_error("fprint() format error");
-			out.write(format.data(),format.data()+format.size());
+			out.write(format.cbegin(),format.cend());
 			return out;
 		}
 		template<typename T,typename ...Args>
 		output_stream& fprint(output_stream &out,std::string_view format,T const& cr,Args&& ...args)
 		{
-			auto const percent_pos(format.find('%'));
+			std::size_t percent_pos;
+			for(;(percent_pos=format.find('%'))!=std::string_view::npos&&percent_pos+1!=format.size()&&format[percent_pos+1]=='%';format.remove_prefix(percent_pos+2))
+				out.write(format.cbegin(),format.cbegin()+percent_pos+1);
 			if(percent_pos==std::string_view::npos)
 			{
-				out.write(format.data(),format.data()+format.size());
+				out.write(format.cbegin(),format.cend());
 				return out;
 			}
-			out.write(format.data(),format.data()+percent_pos);
-			return fprint(out << cr,format.substr(percent_pos+1),std::forward<Args>(args)...);
+			else
+			{
+				out.write(format.cbegin(),format.cbegin()+percent_pos);
+				format.remove_prefix(percent_pos+1);
+			}
+			return fprint(out << cr,format,std::forward<Args>(args)...);
 		}
 	}
 
