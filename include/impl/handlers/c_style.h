@@ -54,12 +54,6 @@ public:
 		if(fputc(ch,fp)==EOF)
 			throw std::system_error(errno,std::system_category());
 	}
-	template<typename ...Args>
-	void printf(Args&& ...args)
-	{
-		if(std::fprintf(fp,std::forward<Args>(args)...)<0)
-			throw std::system_error(errno,std::system_category());		
-	}
 	void flush()
 	{
 		if(std::fflush(fp))
