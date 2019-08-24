@@ -68,48 +68,22 @@ struct posix_file_openmode
 };
 }
 
-class posix_file
+class posix_io_handle
 {
 	int fd;
-	void close_impl() noexcept
+protected:
+	auto& protected_native_handle()
 	{
-		if(fd!=-1)
-			close(fd);
+		return fp;
 	}
-
 public:
-	using char_type = char;
+	using traits_type = std::char_traits<char>;
 	using native_handle_type = int;
-	template<typename ...Args>
-	posix_file(native_interface_t,Args&& ...args):fd(::open(std::forward<Args>(args)...))
-	{
-		if(fd==-1)
-			throw std::system_error(errno,std::generic_category());
-	}
-	template<std::size_t om>
-	posix_file(std::string_view file,open::interface_t<om>):posix_file(native_interface,file.data(),details::posix_file_openmode<om>::mode,600){}
-	posix_file(std::string_view file,open::mode const& m):posix_file(native_interface,file.data(),details::calculate_posix_open_mode(m),600){}
-	posix_file(std::string_view file,std::string_view mode):posix_file(file,fast_io::open::c_style(mode)){}
-	posix_file(const posix_file&)=delete;
-	posix_file& operator=(const posix_file&)=delete;
-	posix_file(fast_io::posix_file&& b) noexcept : fd(b.fd)
-	{
-		b.fd = -1;
-	}
-	posix_file& operator=(posix_file&& b) noexcept
-	{
-		if(&b!=this)
-		{
-			close_impl();
-			fd=b.fd;
-			b.fd = -1;
-		}
-		return *this;
-	}
 	native_handle_type native_handle() const
 	{
 		return fd;
 	}
+	posix_io_handle(int fdd):fd(fdd){}
 	template<typename ContiguousIterator>
 	ContiguousIterator read(ContiguousIterator begin,ContiguousIterator end)
 	{
@@ -130,6 +104,44 @@ public:
 	{
 		if(::fsync(fd)==-1)
 			throw std::system_error(errno,std::system_category());
+	}
+};
+
+class posix_file:public posix_io_handle
+{
+	void close_impl() noexcept
+	{
+		if(native_handle()!=-1)
+			close(native_handle());
+	}
+public:
+	using traits_type = posix_io_handle::traits_type;
+	using native_handle_type = posix_io_handle::native_handle_type;
+	template<typename ...Args>
+	posix_file(native_interface_t,Args&& ...args):posix_io_handle(::open(std::forward<Args>(args)...))
+	{
+		if(native_handle()==-1)
+			throw std::system_error(errno,std::generic_category());
+	}
+	template<std::size_t om>
+	posix_file(std::string_view file,open::interface_t<om>):posix_file(native_interface,file.data(),details::posix_file_openmode<om>::mode,600){}
+	posix_file(std::string_view file,open::mode const& m):posix_file(native_interface,file.data(),details::calculate_posix_open_mode(m),600){}
+	posix_file(std::string_view file,std::string_view mode):posix_file(file,fast_io::open::c_style(mode)){}
+	posix_file(posix_file const&)=delete;
+	posix_file& operator=(posix_file const&)=delete;
+	posix_file(fast_io::posix_file&& b) noexcept : fd(b.protected_native_handle())
+	{
+		b.protected_native_handle() = -1;
+	}
+	posix_file& operator=(posix_file&& b) noexcept
+	{
+		if(&b!=this)
+		{
+			close_impl();
+			protected_native_handle()=b.protected_native_handle();
+			b.protected_native_handle() = -1;
+		}
+		return *this;
 	}
 	~posix_file()
 	{
