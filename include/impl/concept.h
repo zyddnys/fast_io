@@ -46,7 +46,7 @@ namespace fast_io
 	};
 
 	template<typename T>
-	concept bool io_stream = input_stream<T>&&output_stream<T>;
+	concept bool io_stream = input_stream<T>()&&output_stream<T>();
 
 	template<typename T>
 	concept bool standard_output_stream()
@@ -59,13 +59,13 @@ namespace fast_io
 	};
 
 	template<typename T>
-	concept bool standard_io_stream = input_stream<T>&&output_stream<T>&&io_stream<T>;
+	concept bool standard_io_stream = input_stream<T>()&&output_stream<T>()&&io_stream<T>;
 
 	template<typename T>
-	concept bool mutex_output_stream = standard_output_stream<T>&&mutex_stream<T>;
+	concept bool mutex_output_stream = standard_output_stream<T>()&&mutex_stream<T>();
 
 	template<typename T>
-	concept bool mutex_io_stream = input_stream<T>&&output_stream<T>&&io_stream<T>;
+	concept bool mutex_io_stream = input_stream<T>()&&output_stream<T>()&&io_stream<T>;
 
 /*	template<typename T>
 	concept bool random_access_input_stream()

@@ -7,9 +7,9 @@
 
 namespace fast_io
 {
-template<input_stream Ihandler,typename CharT,typename Traits,typename Buf>
+template<input_stream Ihandler,typename Buf>
 class basic_ibuf;
-template<output_stream Ohandler,typename CharT,typename Traits,typename Buf>
+template<output_stream Ohandler,typename Buf>
 class basic_obuf;
 
 template<typename CharT,typename Allocator = std::allocator<CharT>,std::size_t buffer_size = 4096>
@@ -45,19 +45,18 @@ public:
 	Allocator get_allocator() const{	return alloc;}
 };
 
-template<input_stream Ihandler,typename CharT=Ihandler::char_type,typename Traits = std::char_traits<CharT>,typename Buf=basic_buf_handler<CharT>>
+template<input_stream Ihandler,typename Buf=basic_buf_handler<typename Ihandler::traits_type::char_type>>
 class basic_ibuf
 {
 	Ihandler ih;
 	Buf bh;
 public:
-	using handle_type = Ihandler;
-	using char_type = CharT;
-	using char_traits = Traits;
-	using int_type = typename Traits::int_type;
-	template<typename... Args>
-	basic_ibuf(Args&&... args):ih(std::forward<Args>(args)...){bh.curr=bh.end;}
-	CharT* read(CharT* begin,CharT* end)
+	using native_handle_type = Ihandler;
+	using traits_type = typename native_handle_type::traits_type;
+private:
+	using char_type = typename traits_type::char_type;
+	using int_type = typename traits_type::int_type;
+	char_type* mread(char_type* begin,char_type* end)
 	{
 		std::size_t n(end-begin);
 		if(bh.end-bh.curr<n)			//cache miss
@@ -80,10 +79,13 @@ public:
 		bh.curr+=n;
 		return begin;
 	}
+public:
+	template<typename... Args>
+	basic_ibuf(Args&&... args):ih(std::forward<Args>(args)...){bh.curr=bh.end;}
 	template<typename Contiguous_Iterator>
 	auto read(Contiguous_Iterator begin,Contiguous_Iterator end)
 	{
-		return read(static_cast<char_type*>(static_cast<void*>(std::addressof(*begin))),static_cast<char_type*>(static_cast<void*>(std::addressof(*end))));
+		return mread(static_cast<char_type*>(static_cast<void*>(std::addressof(*begin))),static_cast<char_type*>(static_cast<void*>(std::addressof(*end))));
 	}
 	bool eof() const
 	{
@@ -98,23 +100,21 @@ public:
 		if(bh.end==bh.curr)		//cache miss
 		{
 			if((bh.end=ih.read(bh.beg,bh.beg+Buf::size()))==bh.beg)
-				return Traits::eof();
+				return traits_type::eof();
 			bh.curr=bh.beg;
 		}
-		return *bh.curr++;
+		return traits_type::to_int_type(*bh.curr++);
 	}
 	auto& native_handle()
 	{
 		return ih;
 	}
 };
-
-template<output_stream Ohandler,typename CharT,typename Traits = std::char_traits<CharT>,typename Buf=basic_buf_handler<CharT>>
+template<output_stream Ohandler,typename Buf=basic_buf_handler<typename Ohandler::traits_type::char_type>>
 class basic_obuf
 {
 	Ohandler oh;
 	Buf bh;
-	
 	void close_impl() noexcept
 	try
 	{
@@ -124,9 +124,30 @@ class basic_obuf
 	catch(...){}
 public:
 	using native_handle_type = Ohandler;
-	using char_type = CharT;
-	using char_traits = Traits;
-	using int_type = typename Traits::int_type;
+	using traits_type = typename native_handle_type::traits_type;
+private:
+	using char_type = typename traits_type::char_type;
+	using int_type = typename traits_type::int_type;
+	void mwrite(char_type const* cbegin,char_type const* cend)
+	{
+		std::size_t const n(bh.end-bh.curr);
+		if(n<cend-cbegin)
+		{
+			std::uninitialized_copy_n(cbegin,n,bh.curr);
+			cbegin+=n;
+			oh.write(bh.beg,bh.end);
+			if(cbegin+Buf::size()<cend)
+			{
+				oh.write(cbegin,cend);
+				bh.curr=bh.beg;
+			}
+			else
+				bh.curr=std::uninitialized_copy(cbegin,cend,bh.beg);
+		}
+		else
+			bh.curr=std::uninitialized_copy(cbegin,cend,bh.curr);
+	}
+public:
 	template<typename... Args>
 	basic_obuf(Args&&... args):oh(std::forward<Args>(args)...){bh.curr=bh.beg;}
 	void flush()
@@ -152,29 +173,10 @@ public:
 		}
 		return *this;
 	}
-	void write(CharT const* cbegin,CharT const* cend)
-	{
-		std::size_t const n(bh.end-bh.curr);
-		if(n<cend-cbegin)
-		{
-			std::uninitialized_copy_n(cbegin,n,bh.curr);
-			cbegin+=n;
-			oh.write(bh.beg,bh.end);
-			if(cbegin+Buf::size()<cend)
-			{
-				oh.write(cbegin,cend);
-				bh.curr=bh.beg;
-			}
-			else
-				bh.curr=std::uninitialized_copy(cbegin,cend,bh.beg);
-		}
-		else
-			bh.curr=std::uninitialized_copy(cbegin,cend,bh.curr);
-	}
 	template<typename Contiguous_Iterator>
 	auto write(Contiguous_Iterator cbegin,Contiguous_Iterator cend)
 	{
-		return write(static_cast<char_type const*>(static_cast<void*>(std::addressof(*cbegin))),static_cast<char_type const*>(static_cast<void*>(std::addressof(*cend))));
+		return mwrite(static_cast<char_type const*>(static_cast<void*>(std::addressof(*cbegin))),static_cast<char_type const*>(static_cast<void*>(std::addressof(*cend))));
 	}
 	void put(int_type ch)
 	{
@@ -183,7 +185,7 @@ public:
 			oh.write(bh.beg,bh.end);
 			bh.curr=bh.beg;
 		}
-		*bh.curr++=ch;
+		*bh.curr++=traits_type::to_char_type(ch);
 	}
 	auto& native_handle()
 	{
@@ -193,27 +195,32 @@ public:
 
 namespace details
 {
-template<io_stream io_handler,typename CharT,typename Traits = std::char_traits<CharT>,typename Buf=basic_buf_handler<CharT>>
-struct fake_basic_ihandler:basic_obuf<io_handler,CharT,Traits,Buf>
+template<io_stream io_handler,typename Buf>
+struct fake_basic_ihandler:basic_obuf<io_handler,Buf>
 {
+template<typename ...Args>
+fake_basic_ihandler(Args&& ...args):basic_obuf<io_handler,Buf>(std::forward<Args>(args)...){}
 template<typename ...Args>
 auto read(Args&& ...args)
 {
-	return native_handle().read(std::forward<Args>(args)...);
+	return this->native_handle().read(std::forward<Args>(args)...);
 }
 };
 }
 
-
-template<io_stream io_handler,typename CharT,typename Traits = std::char_traits<CharT>,typename Buf=basic_buf_handler<CharT>>
+template<io_stream io_handler,typename Buf=basic_buf_handler<typename io_handler::traits_type::char_type>>
 class basic_iobuf
 {
-	basic_ibuf<details::fake_basic_ihandler<io_handler,CharT,Traits,Buf>> ibf;
-public:	
+public:
 	using native_handle_type = io_handler;
-	using char_type = CharT;
-	using char_traits = Traits;
-	using int_type = typename Traits::int_type;
+	using traits_type = typename native_handle_type::traits_type;
+private:
+	using char_type = typename traits_type::char_type;
+	using int_type = typename traits_type::int_type;
+	basic_ibuf<details::fake_basic_ihandler<native_handle_type,Buf>> ibf;
+public:
+	template<typename ...Args>
+	basic_iobuf(Args&& ...args):ibf(std::forward<Args>(args)...){}
 	auto& native_handle()
 	{
 		return ibf.native_handle().native_handle();
@@ -227,9 +234,9 @@ public:
 		ibf.native_handle().put(ch);
 	}
 	template<typename ...Args>
-	auto write(Args&& ...args)
+	void write(Args&& ...args)
 	{
-		return ibf.native_handle().write(std::forward<Args>(args)...);
+		ibf.native_handle().write(std::forward<Args>(args)...);
 	}
 	template<typename ...Args>
 	auto read(Args&& ...args)
