@@ -229,6 +229,8 @@ output& operator<<(output& out,details::floating_point_default const &a)
 	if(str.find('.')!=std::string::npos)
 	{
 		for(;!str.empty()&&str.back()=='0';str.pop_back());
+		if(!str.empty()&&str.back()=='.')
+			str.pop_back();
 		out<<str;
 	}
 	if(fix)
