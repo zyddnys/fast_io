@@ -15,6 +15,7 @@
 #include"impl/iobuf.h"
 #include"impl/iomutex.h"
 #include"impl/wrapper.h"
+#include"impl/tie.h"
 
 namespace fast_io
 {
@@ -41,6 +42,7 @@ namespace fast_io
 	using obuf_string = basic_obuf_string<std::string>;
 	using ibuf_mutex = basic_imutex<ibuf>;
 	using obuf_mutex = basic_omutex<obuf>;
+	using iobuf_mutex = basic_iomutex<iobuf>;
 	using ibuf_string_view_mutex = basic_imutex<ibuf_string_view>;
 	using obuf_string_mutex = basic_omutex<obuf_string>;
 /*	using inbuf = basic_ibuf<std_in,char>;
