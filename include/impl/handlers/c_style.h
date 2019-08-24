@@ -16,9 +16,7 @@ class c_style_file
 			std::fclose(fp);
 	}
 public:
-	using char_type = char;
-	using int_type = int;
-	using char_traits = std::char_traits<char_type>;
+	using traits_type = std::char_traits<char>;
 	using native_handle_type = std::FILE*;
 	template<typename ...Args>
 	c_style_file(native_interface_t,Args&& ...args):fp(std::fopen(std::forward<Args>(args)...))
@@ -74,11 +72,11 @@ public:
 		if(std::fwrite(std::addressof(*begin),sizeof(*begin),count,fp)<count)
 			throw std::system_error(errno,std::generic_category());
 	}
-	int_type get()
+	traits_type::int_type get()
 	{
 		return fgetc(fp);
 	}
-	void put(int_type ch)
+	void put(traits_type::int_type ch)
 	{
 		if(fputc(ch,fp)==EOF)
 			throw std::system_error(errno,std::system_category());

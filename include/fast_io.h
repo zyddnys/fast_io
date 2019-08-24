@@ -1,12 +1,13 @@
 #ifndef FAST_IO_H
 #define FAST_IO_H
 #include"impl/mode.h"
-#include"impl/handlers/std.h"
+#include"impl/handlers/c_style_file.h"
+/*
 #ifdef _WIN32_WINNT
 #include"impl/handlers/windows.h"
 #elif _POSIX_C_SOURCE
 #include"impl/handlers/posix.h"	
-#endif
+#endif*/
 #include"impl/concept.h"
 #include"impl/rd_type.h"
 #include"impl/read_write.h"
@@ -17,7 +18,7 @@
 
 namespace fast_io
 {
-	#ifdef _WIN32_WINNT
+/*	#ifdef _WIN32_WINNT
 		using default_input = windows_file<open_mode::in>;
 		using default_output = windows_file<open_mode::out>;
 	#elif _POSIX_C_SOURCE
@@ -26,7 +27,9 @@ namespace fast_io
 	#else
 		using default_input = std_file<open_mode::in>;
 		using default_output = std_file<open_mode::out>;
-	#endif
+	#endif*/
+	using default_input = std_file<open_mode::in>;
+	using default_output = std_file<open_mode::out>;
 	using ibuf = basic_ibuf<default_input,char>;
 	using obuf = basic_obuf<default_output,char>;
 	using ibuf_string_view = basic_ibuf_string_view<std::string_view>;
@@ -35,7 +38,7 @@ namespace fast_io
 	using obuf_mutex = basic_omutex<obuf>;
 	using ibuf_string_view_mutex = basic_imutex<ibuf_string_view>;
 	using obuf_string_mutex = basic_omutex<obuf_string>;
-	using inbuf = basic_ibuf<std_in,char>;
+/*	using inbuf = basic_ibuf<std_in,char>;
 	using outbuf = basic_obuf<std_out,char>;
 	using inbuf_mutex = basic_imutex<inbuf>;
 	using outbuf_mutex = basic_omutex<outbuf>;
@@ -43,6 +46,6 @@ namespace fast_io
 	using log_mutex = basic_omutex<log>;
 	inline std_in in;//stdin
 	inline std_out out;//stdout
-	inline std_err err;//stderr
+	inline std_err err;//stderr*/
 }
 #endif

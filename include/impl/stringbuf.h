@@ -107,7 +107,9 @@ inline void in_place_to(std::string& t,Args&& ...args)
 	os.clear();
 	print(os,std::forward<Args>(args)...);
 	t=std::move(os.str());
-}
+} 
+
+
 
 template<typename T,typename... Args>
 inline auto to(Args&& ...args)

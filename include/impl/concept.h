@@ -17,11 +17,9 @@ namespace fast_io
 	{
 		return input_stream<T>()&&requires(T in)
 		{
-			typename T::char_type;
-			typename T::int_type;
-			{in.get()}->typename T::char_type;
+			T::traits_type;
+			{in.get()}->typename T::traits_type::int_type;
 			{in.eof()}->bool;
-			{in}->bool;
 		};
 	};
 
@@ -55,9 +53,8 @@ namespace fast_io
 	{
 		return output_stream<T>()&&requires(T out)
 		{
-			typename T::char_type;
-			typename T::int_type;
-			{out.put(T::int_type)};
+			T::traits_type;
+			{out.put(T::traits_type::int_type)};
 		};
 	};
 
