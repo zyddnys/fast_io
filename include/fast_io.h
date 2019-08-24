@@ -1,6 +1,6 @@
 #pragma once
 #include"impl/mode.h"
-#include"impl/handlers/c_style_file.h"
+#include"impl/handlers/c_style.h"
 /*
 #ifdef _WIN32_WINNT
 #include"impl/handlers/windows.h"
@@ -14,6 +14,7 @@
 #include"impl/stringbuf.h"
 #include"impl/iobuf.h"
 #include"impl/iomutex.h"
+#include"impl/wrapper.h"
 
 namespace fast_io
 {
@@ -27,10 +28,15 @@ namespace fast_io
 		using default_input = std_file<open_mode::in>;
 		using default_output = std_file<open_mode::out>;
 	#endif*/
-	using default_input = std_file<open_mode::in>;
-	using default_output = std_file<open_mode::out>;
-	using ibuf = basic_ibuf<default_input,char>;
-	using obuf = basic_obuf<default_output,char>;
+	using system_file = c_style_file;
+	using isystem_file = input_wrapper<c_style_file>;
+	using osystem_file = output_wrapper<c_style_file>;
+	using iosystem_file = io_wrapper<c_style_file>;
+
+	using ibuf = basic_ibuf<isystem_file>;
+	using obuf = basic_obuf<osystem_file>;
+	using iobuf = basic_iobuf<iosystem_file>;
+
 	using ibuf_string_view = basic_ibuf_string_view<std::string_view>;
 	using obuf_string = basic_obuf_string<std::string>;
 	using ibuf_mutex = basic_imutex<ibuf>;
