@@ -74,7 +74,7 @@ class posix_io_handle
 protected:
 	auto& protected_native_handle()
 	{
-		return fp;
+		return fd;
 	}
 public:
 	using traits_type = std::char_traits<char>;
@@ -129,7 +129,7 @@ public:
 	posix_file(std::string_view file,std::string_view mode):posix_file(file,fast_io::open::c_style(mode)){}
 	posix_file(posix_file const&)=delete;
 	posix_file& operator=(posix_file const&)=delete;
-	posix_file(fast_io::posix_file&& b) noexcept : fd(b.protected_native_handle())
+	posix_file(fast_io::posix_file&& b) noexcept : posix_io_handle(b.protected_native_handle())
 	{
 		b.protected_native_handle() = -1;
 	}

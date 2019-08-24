@@ -1,12 +1,10 @@
 #pragma once
 #include"impl/mode.h"
 #include"impl/handlers/c_style.h"
-/*
 #ifdef _WIN32_WINNT
-#include"impl/handlers/windows.h"
 #elif _POSIX_C_SOURCE
 #include"impl/handlers/posix.h"	
-#endif*/
+#endif
 #include"impl/concept.h"
 #include"impl/rd_type.h"
 #include"impl/read_write.h"
@@ -19,18 +17,19 @@
 
 namespace fast_io
 {
-/*	#ifdef _WIN32_WINNT
-		using default_input = windows_file<open_mode::in>;
-		using default_output = windows_file<open_mode::out>;
+	#ifdef _WIN32_WINNT
+		using system_io_handle = c_style_io_handle;
+		using system_file = c_style_file;
 	#elif _POSIX_C_SOURCE
-		using default_input = posix_file<open_mode::in>;
-		using default_output = posix_file<open_mode::out>;
+		using system_io_handle = posix_io_handle;
+		using system_file = posix_file;
+		inline system_io_handle system_out(STDOUT_FILENO);
+		inline fast_io::tie<system_io_handle,system_io_handle> system_in(system_out,STDIN_FILENO);
+		inline fast_io::tie<system_io_handle,system_io_handle> system_err(system_out,STDERR_FILENO);
 	#else
-		using default_input = std_file<open_mode::in>;
-		using default_output = std_file<open_mode::out>;
-	#endif*/
-	using system_io_handle = c_style_io_handle;
-	using system_file = c_style_file;
+		using system_io_handle = c_style_io_handle;
+		using system_file = c_style_file;
+	#endif
 	using isystem_file = input_wrapper<system_file>;
 	using osystem_file = output_wrapper<system_file>;
 	using iosystem_file = io_wrapper<system_file>;
@@ -51,4 +50,5 @@ namespace fast_io
 	inline c_style_io_handle out(stdout);
 	inline fast_io::tie<c_style_io_handle,c_style_io_handle> in(out,stdin);
 	inline fast_io::tie<c_style_io_handle,c_style_io_handle> err(out,stderr);
+
 }
