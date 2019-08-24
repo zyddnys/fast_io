@@ -10,13 +10,15 @@ Design goal.
 4. As safe as possible.
 5. Binary serialization for trivially copyable types and C++ standard library containers. Serialization methods like JSON are slow and tedious for machines. read/write
 6. Native mutex support
-7. Unicode/UTF-8 support
+7. Native Unicode/UTF-8 support
 8. Compatible with C stdio/ C++ iostream
 9. Native Handle Interface
 10. support C style io format (fprint). C++ style io format (<<,>>). Basic Language format (print, scan)
 11. Compilation time open mode parse. Supports C style open mode and C++ style open mode.
 12. No internal iomanip states (since it creates security issues)
 13. Extremely easy to support custom devices
+14. No stupid stuff like std::endl
+15. No integrated locale
 
 Future Plan After C++ 20
 1. Module support
