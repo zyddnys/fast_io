@@ -245,7 +245,9 @@ output& operator<<(output& out,details::floating_point_default const &a)
 	return out<<static_cast<std::uint64_t>(x);
 }
 
-standard_output_stream& operator<<(standard_output_stream& out,double v)
+template<typename T>
+requires std::numeric_limits<T>::is_iec559
+standard_output_stream& operator<<(standard_output_stream& out,T v)
 {
 	return out<<floating_point_default(v,14);
 }

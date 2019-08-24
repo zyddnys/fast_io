@@ -82,7 +82,7 @@ namespace fast_io
 	}
 
 	template<standard_output_stream output>
-	standard_output_stream& operator<<(standard_output_stream& out,Signed_integer a)
+	output& operator<<(output& out,Signed_integer a)
 	{
 		if(a)
 		{
