@@ -13,7 +13,7 @@ class unicode_view
 public:
 	using native_handle_type = in&;
 	using char_type = CharT;
-	using char_traits = Traits;
+	using traits_type = in;
 	using int_type = typename Traits::int_type;
 	constexpr unicode_view(in& ibv):ib(ibv){}
 	constexpr auto& native_handle()
@@ -23,10 +23,6 @@ public:
 	constexpr auto eof() const requires(standard_input_stream<in>())
 	{
 		return ib.eof();
-	}
-	constexpr operator bool() const requires(standard_input_stream<in>())
-	{
-		return !ib;
 	}
 	constexpr int_type get() requires(standard_input_stream<in>())
 	{
