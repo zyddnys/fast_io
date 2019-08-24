@@ -29,9 +29,9 @@ namespace fast_io
 		using default_output = std_file<open_mode::out>;
 	#endif*/
 	using system_file = c_style_file;
-	using isystem_file = input_wrapper<c_style_file>;
-	using osystem_file = output_wrapper<c_style_file>;
-	using iosystem_file = io_wrapper<c_style_file>;
+	using isystem_file = input_wrapper<system_file>;
+	using osystem_file = output_wrapper<system_file>;
+	using iosystem_file = io_wrapper<system_file>;
 
 	using ibuf = basic_ibuf<isystem_file>;
 	using obuf = basic_obuf<osystem_file>;
