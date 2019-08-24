@@ -1,12 +1,12 @@
 #pragma once
 #include"concept.h"
 #include<cstddef>
+#include<vector>
 
 namespace fast_io
 {
-template<typename T>
-requires std::is_trivially_copyable_v<T>
-inline standard_input_stream& read(standard_input_stream& in,T& v)
+
+inline standard_input_stream& read(standard_input_stream& in,Trivial_copyable& v)
 {
 	auto address(std::addressof(v));
 	if(in.read(address,address+1)!=(address+1))
@@ -14,9 +14,7 @@ inline standard_input_stream& read(standard_input_stream& in,T& v)
 	return in;
 }
 
-template<typename T>
-requires std::is_trivially_copyable_v<T>
-inline standard_output_stream& write(standard_output_stream& out,T const& v)
+inline standard_output_stream& write(standard_output_stream& out,Trivial_copyable const& v)
 {
 	auto address(std::addressof(v));
 	out.write(address,address+1);
@@ -55,5 +53,48 @@ inline output& write_size(output& out,std::size_t size)
 	out.put(size);
 	return out;
 }
+
+inline standard_input_stream& read(standard_input_stream& in,Dynamic_size_container& v)
+{
+	std::size_t size;
+	read_size(in,size);
+	v.resize(size);
+	for(auto & e : v)
+		read(in,e);
+	return in;
+}
+
+inline standard_input_stream& read(standard_input_stream& in,Contiguous_trivial_dynamic_size_container& v)
+{
+	std::size_t size;
+	read_size(in,size);
+	v.resize(size);
+	if(in.read(v.begin(),v.end())!=v.end())
+		throw std::runtime_error("read contiguous trivial containers error");
+	return in;
+}
+
+inline standard_output_stream& write(standard_output_stream& out,Contiguous_trivial_dynamic_size_container const& v)
+{
+	write_size(out,v.size());
+	out.write(v.begin(),v.end());
+	return out;
+}
+
+inline standard_output_stream& write(standard_output_stream& out,Dynamic_size_container const& v)
+{
+	write_size(out,v.size());
+	for(auto const& e : v)
+		write(out,e);
+	return out;
+}
+
+inline standard_output_stream& write(standard_output_stream& out,Contiguous_fixed_size_none_trivial_copyable_container const& v)
+{
+	for(auto const& e : v)
+		write(out,e);
+	return out;
+}
+
 
 }
