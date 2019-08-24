@@ -3,6 +3,7 @@
 #include<cstddef>
 #include"../mode.h"
 #include<system_error>
+#include"exploiting_file_ptr.h"
 
 namespace fast_io
 {
@@ -74,12 +75,13 @@ public:
 	}
 	traits_type::int_type get()
 	{
-		return fgetc(fp);
+		return hacking::filestar_fast_get(fp);
 	}
 	void put(traits_type::int_type ch)
 	{
-		if(fputc(ch,fp)==EOF)
-			throw std::system_error(errno,std::system_category());
+		hacking::filestar_fast_put(fp,ch);
+//		if(fputc(ch,fp)==EOF)
+//			throw std::system_error(errno,std::system_category());
 	}
 	template<typename ...Args>
 	void printf(Args&& ...args)
