@@ -20,9 +20,9 @@ namespace fast_io
 {
 using system_io_handle = posix_io_handle;
 using system_file = posix_file;
-inline basic_obuf<system_io_handle> out(1);
-inline tie<basic_ibuf<system_io_handle>,basic_obuf<system_io_handle>> in(out,0);
-inline tie<basic_obuf<system_io_handle>,basic_obuf<system_io_handle>> err(out,2);
+inline basic_obuf<posix_io_handle> out(1);
+inline tie<basic_ibuf<posix_io_handle>,basic_obuf<posix_io_handle>> in(out,0);
+inline tie<basic_obuf<posix_io_handle>,basic_obuf<posix_io_handle>> err(out,2);
 
 using isystem_file = input_wrapper<system_file>;
 using osystem_file = output_wrapper<system_file>;
