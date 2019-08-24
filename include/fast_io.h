@@ -23,9 +23,10 @@ namespace fast_io
 #elif _POSIX_C_SOURCE
 	using system_io_handle = posix_io_handle;
 	using system_file = posix_file;
-	inline system_io_handle system_out(STDOUT_FILENO);
-	inline fast_io::tie<system_io_handle,system_io_handle> system_in(system_out,STDIN_FILENO);
-	inline fast_io::tie<system_io_handle,system_io_handle> system_err(system_out,STDERR_FILENO);
+
+inline basic_obuf<system_io_handle> system_out(1);
+inline tie<basic_ibuf<system_io_handle>,basic_obuf<system_io_handle>> system_in(system_out,0);
+inline tie<basic_obuf<system_io_handle>,basic_obuf<system_io_handle>> system_err(system_out,2);
 #else
 	using system_io_handle = c_style_io_handle;
 	using system_file = c_style_file;
@@ -48,7 +49,7 @@ using obuf_string_mutex = basic_omutex<obuf_string>;
 
 //Due to history reason. Nearly every program is using either iostream or FILE*. We can't break code by using other io handle by default.
 inline c_style_io_handle out(stdout);
-inline fast_io::tie<c_style_io_handle,c_style_io_handle> in(out,stdin);
-inline fast_io::tie<c_style_io_handle,c_style_io_handle> err(out,stderr);
+inline tie<c_style_io_handle,c_style_io_handle> in(out,stdin);
+inline tie<c_style_io_handle,c_style_io_handle> err(out,stderr);
 
 }

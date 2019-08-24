@@ -102,8 +102,9 @@ public:
 	}
 	void flush()
 	{
-		if(::fsync(fd)==-1)
-			throw std::system_error(errno,std::system_category());
+		// no need fsync. OS can deal with it
+//		if(::fsync(fd)==-1)
+//			throw std::system_error(errno,std::system_category());
 	}
 };
 
