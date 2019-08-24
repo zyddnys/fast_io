@@ -24,17 +24,19 @@ namespace fast_io
 		}
 	}
 
-	standard_input_stream& operator>>(standard_input_stream& in,Unsigned_integer& a)
+	template<standard_input_stream input>
+	input& operator>>(input& in,Unsigned_integer& a)
 	{
-		typename std::remove_reference<decltype(in)>::type::int_type ch;
+		typename input::traits_type::int_type ch;
 		for(;!details::isdigit(ch=in.get()););
 		for(a=ch-48;details::isdigit(ch=in.get());a=a*10+ch-48);
 		return in;
 	}
-	
-	standard_input_stream& operator>>(standard_input_stream& in,Signed_integer& a)
+
+	template<standard_input_stream input>
+	input& operator>>(input& in,Signed_integer& a)
 	{
-		typename std::remove_reference<decltype(in)>::type::int_type ch;
+		typename input::traits_type::int_type ch;
 		for(;!details::isdigit_or_minus(ch=in.get()););
 		if(ch==45)
 		{
@@ -45,11 +47,13 @@ namespace fast_io
 			for(a=ch-48;details::isdigit(ch=in.get());a=a*10+ch-48);
 		return in;
 	}
-	standard_output_stream& operator<<(standard_output_stream& out,Unsigned_integer a)
+	
+	template<standard_output_stream output>
+	output& operator<<(output& out,Unsigned_integer a)
 	{
 		if(a)
 		{
-			std::array<typename std::remove_reference<decltype(out)>::type::char_type,sizeof(a)*8> v;
+			std::array<typename output::traits_type::char_type,sizeof(a)*8> v;
 			auto ed(v.data()+v.size());
 			for(*--ed=a%10+48;a/=10;*--ed=a%10+48);
 			out.write(ed,v.data()+v.size());
@@ -76,6 +80,8 @@ namespace fast_io
 			for(str.push_back(ch);!details::isspace(ch=in.get())&&!in.eof();str.push_back(ch));
 		return in;
 	}
+
+	template<standard_output_stream output>
 	standard_output_stream& operator<<(standard_output_stream& out,Signed_integer a)
 	{
 		if(a)
@@ -85,7 +91,7 @@ namespace fast_io
 				out.put('-');
 				a=-a;
 			}
-			std::array<typename std::remove_reference<decltype(out)>::type::char_type,sizeof(a)*8> v;
+			std::array<typename output::traits_type::char_type,sizeof(a)*8> v;
 
 			auto ed(v.data()+v.size());
 			for(*--ed=a%10+48;a/=10;*--ed=a%10+48);

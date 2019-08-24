@@ -124,17 +124,19 @@ namespace fast_io
 	{
 		return details::setw_fill_t<T,decltype(ch)>(width,t,ch);
 	}
-	standard_output_stream& operator<<(standard_output_stream& out,const details::setw_fill_t<auto,Integral> &a)
+	template<standard_output_stream output>
+	output& operator<<(output& out,const details::setw_fill_t<auto,Integral> &a)
 	{
-		basic_obuf_string<std::basic_string<typename std::remove_reference<decltype(out)>::type::char_type>> bas;
+		basic_obuf_string<std::basic_string<typename output::traits_type::char_type>> bas;
 		bas<<a.reference;
 		for(std::size_t i(bas.str().size());i<a.width;++i)
 			out.put(a.ch);
 		return out<<bas.str();
 	}
-	standard_output_stream& operator<<(standard_output_stream& out,const details::setw_t<auto> &a)
+	template<standard_output_stream output>
+	output& operator<<(output& out,const details::setw_t<auto> &a)
 	{
-		basic_obuf_string<std::basic_string<typename std::remove_reference<decltype(out)>::type::char_type>> bas;
+		basic_obuf_string<std::basic_string<typename output::traits_type::char_type>> bas;
 		bas<<a.reference;
 		for(std::size_t i(bas.str().size());i<a.width;++i)
 			out.put(' ');
@@ -204,7 +206,8 @@ standard_output_stream& operator<<(standard_output_stream& out,details::scientif
 	return out<<static_cast<std::uint64_t>(x);
 }
 
-standard_output_stream& operator<<(standard_output_stream& out,details::floating_point_default const &a)
+template<standard_output_stream output>
+output& operator<<(output& out,details::floating_point_default const &a)
 {
 	auto e(a.reference);
 	if(e<0)
@@ -217,7 +220,7 @@ standard_output_stream& operator<<(standard_output_stream& out,details::floating
 		++x;
 	{
 	auto fix(std::fabs(x)<=a.precision);
-	basic_obuf_string<std::basic_string<typename std::remove_reference<decltype(out)>::type::char_type>> bas;
+	basic_obuf_string<std::basic_string<typename output::traits_type::char_type>> bas;
 	if(fix)
 		bas<<fixed(e,a.precision);
 	else

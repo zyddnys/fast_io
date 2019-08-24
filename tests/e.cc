@@ -6,7 +6,6 @@
 #include<iomanip>
 #include<memory>
 #include<cstdio>
-#include"iomutex2.h"
 
 int main()
 try
@@ -45,13 +44,6 @@ try
 	{
 	cqw::timer t("obuf_mutex");
 	fast_io::obuf_mutex obuf("obuf_mutex.txt");
-	for(std::size_t i(0);i!=N;++i)
-		print(obuf,fast_io::fixed(pi,10),fast_io::character('\n'));
-	}
-	
-	{
-	cqw::timer t("obuf_mutex2");
-	fast_io::obuf_mutex2 obuf("obuf_mutex2.txt");
 	for(std::size_t i(0);i!=N;++i)
 		print(obuf,fast_io::fixed(pi,10),fast_io::character('\n'));
 	}
