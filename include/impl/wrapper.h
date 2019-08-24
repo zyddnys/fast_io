@@ -1,3 +1,4 @@
+#pragma once
 #include"concept.h"
 #include"mode.h"
 
@@ -48,6 +49,5 @@ public:
 	constexpr io_wrapper(std::string_view file,open::mode const& m):T(file,m|fast_io::open::in|fast_io::open::out){}
 	constexpr io_wrapper(std::string_view file,std::string_view mode):io_wrapper(file,fast_io::open::c_style(mode)){}
 };
-
 
 }

@@ -1,5 +1,4 @@
-#ifndef FAST_IO_MUTEX_H__
-#define FAST_IO_MUTEX_H__
+#pragma once
 #include"concept.h"
 #include<mutex>
 #include<memory>
@@ -10,33 +9,33 @@ namespace fast_io
 template<standard_input_stream T>
 class basic_imutex
 {
-	std::unique_ptr<std::mutex> _mtx;
+	std::unique_ptr<std::mutex> mtx;
 	T handler;
 public:
-	using input_handle_type = T;
-	using char_type = typename T::char_type;
-	using int_type = typename T::int_type;
-	T& handle()
+	using native_handle_type = T;
+	using traits_type = typename T::traits_type;
+	T& native_handle()
 	{
 		return handler;
 	}
 	std::mutex& mutex()
 	{
-		return *_mtx;
+		return *mtx;
 	}
 	template<typename ...Args>
-	basic_imutex(Args&& ...args):_mtx(std::make_unique<std::mutex>()),handler(std::forward<Args>(args)...){}
-	Pointer read(Pointer begin,Pointer end)
+	basic_imutex(Args&& ...args):mtx(std::make_unique<std::mutex>()),handler(std::forward<Args>(args)...){}
+	template<typename Contiguous_iterator>
+	Contiguous_iterator read(Contiguous_iterator begin,Contiguous_iterator end)
 	{
 		std::lock_guard<std::mutex> lg(mutex());
 		return handler.read(begin,end);
 	}
-	int_type get()
+	auto get()
 	{
 		std::lock_guard<std::mutex> lg(mutex());
 		return handler.get();
 	}
-	bool eof()
+	auto eof()
 	{
 		return handler.eof();
 	}
@@ -54,7 +53,7 @@ template<typename T,typename ...Args>
 mutex_input_stream& scan(mutex_input_stream &in,T& cr,Args&& ...args)
 {
 	std::lock_guard lg(in.mutex());
-	scan(in.handle(),cr,std::forward<Args>(args)...);
+	scan(in.native_handle(),cr,std::forward<Args>(args)...);
 	return in;
 }
 
@@ -62,40 +61,39 @@ template<typename ...Args>
 mutex_input_stream& scan(mutex_input_stream &imtx,Args&& ...args)
 {
 	std::lock_guard lg(imtx.mutex());
-	scan(imtx.handle(),std::forward<Args>(args)...);
+	scan(imtx.native_handle(),std::forward<Args>(args)...);
 	return imtx;
 }
 
 template<standard_output_stream T>
 class basic_omutex
 {
-	std::unique_ptr<std::mutex> _mtx;
+	std::unique_ptr<std::mutex> mtx;
 	T handler;
 public:
-	using output_handle_type = T;
-	using char_type = typename T::char_type;
-	using int_type = typename T::int_type;
-	
+	using native_handle_type = T;
+	using traits_type = typename T::traits_type;
 	template<typename ...Args>
-	basic_omutex(Args&& ...args):_mtx(std::make_unique<std::mutex>()),handler(std::forward<Args>(args)...){}
-	T& handle()
+	basic_omutex(Args&& ...args):mtx(std::make_unique<std::mutex>()),handler(std::forward<Args>(args)...){}
+	T& native_handle()
 	{
 		return handler;
 	}
 	std::mutex& mutex()
 	{
-		return *_mtx;
+		return *mtx;
 	}
-	template<Pointer p>
-	void write(p begin,p end)
+	template<typename Contiguous_iterator>
+	void write(Contiguous_iterator begin,Contiguous_iterator end)
 	{
 		std::lock_guard lg(mutex());
 		handler.write(begin,end);
 	}
-	void put(int_type ch)
+	template<typename ...Args>
+	void put(Args&& ...args)
 	{
 		std::lock_guard lg(mutex());
-		return handler.put(ch);
+		handler.put(std::forward<Args>(args)...);
 	}
 	void flush()
 	{
@@ -103,11 +101,69 @@ public:
 		handler.flush();
 	}
 };
+
+template<standard_io_stream T>
+class basic_iomutex
+{
+	std::unique_ptr<std::mutex> mtx;
+	T handler;
+public:
+	using native_handle_type = T;
+	using traits_type = typename T::traits_type;
+	template<typename ...Args>
+	basic_iomutex(Args&& ...args):mtx(std::make_unique<std::mutex>()),handler(std::forward<Args>(args)...){}
+	T& native_handle()
+	{
+		return handler;
+	}
+	std::mutex& mutex()
+	{
+		return *mtx;
+	}
+	template<typename Contiguous_iterator>
+	void write(Contiguous_iterator begin,Contiguous_iterator end)
+	{
+		std::lock_guard lg(mutex());
+		handler.write(begin,end);
+	}
+	template<typename ...Args>
+	void put(Args&& ...args)
+	{
+		std::lock_guard lg(mutex());
+		handler.put(std::forward<Args>(args)...);
+	}
+	void flush()
+	{
+		std::lock_guard lg(mutex());
+		handler.flush();
+	}
+	template<typename Contiguous_iterator>
+	Contiguous_iterator read(Contiguous_iterator begin,Contiguous_iterator end)
+	{
+		std::lock_guard<std::mutex> lg(mutex());
+		return handler.read(begin,end);
+	}
+	auto get()
+	{
+		std::lock_guard<std::mutex> lg(mutex());
+		return handler.get();
+	}
+	auto eof()
+	{
+		return handler.eof();
+	}
+	operator bool() const
+	{
+		return handler;
+	}
+};
+
+
 template<typename ...Args>
 mutex_output_stream& print(mutex_output_stream &omtx,Args&& ...args)
 {
 	std::lock_guard lg(omtx.mutex());
-	print(omtx.handle(),std::forward<Args>(args)...);
+	print(omtx.native_handle(),std::forward<Args>(args)...);
 	return omtx;
 }
 
@@ -115,7 +171,7 @@ template<typename ...Args>
 mutex_output_stream& fprint(mutex_output_stream &omtx,std::string_view format,Args&& ...args)
 {
 	std::lock_guard lg(omtx.mutex());
-	fprint(omtx.handle(),format,std::forward<Args>(args)...);
+	fprint(omtx.native_handle(),format,std::forward<Args>(args)...);
 	return omtx;
 }
 
@@ -123,8 +179,7 @@ template<typename ...Args>
 mutex_output_stream& fprint(mutex_output_stream &omtx,Args&& ...args)
 {
 	std::lock_guard lg(omtx.mutex());
-	fprint(omtx.handle(),std::forward<Args>(args)...);
+	fprint(omtx.native_handle(),std::forward<Args>(args)...);
 	return omtx;
 }
 }
-#endif
