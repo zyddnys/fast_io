@@ -147,22 +147,55 @@ inline constexpr auto utf8_to_unicode(std::string_view view)
 	return t;
 }
 
+namespace details
+{
 template<typename T>
-inline void in_place_unicode_to_utf8(std::string& v,T const& view)
+inline void in_place_unicode_to_utf8(std::string& v,std::basic_string_view<T> view)
 {
 	basic_obuf_string<std::string> obsv(std::move(v));
-	unicode_view<decltype(obsv),typename T::value_type> uv(obsv);
+	unicode_view<decltype(obsv),T> uv(obsv);
 	uv<<view;
 	v=std::move(obsv.str());
 }
 
 template<typename T>
-inline std::string unicode_to_utf8(T const& view)
+inline std::string unicode_to_utf8(std::basic_string_view<T> view)
 {
 	basic_obuf_string<std::string> obsv;
-	unicode_view<decltype(obsv),typename T::value_type> uv(obsv);
+	unicode_view<decltype(obsv),T> uv(obsv);
 	uv<<view;
 	return std::move(obsv.str());
+}
+}
+
+inline void in_place_unicode_to_utf8(std::string& v,std::wstring_view view)
+{
+	details::in_place_unicode_to_utf8(v,view);
+}
+
+inline std::string unicode_to_utf8(std::wstring_view v)
+{
+	return details::unicode_to_utf8(v);
+}
+
+inline void in_place_unicode_to_utf8(std::string& v,std::u16string_view view)
+{
+	details::in_place_unicode_to_utf8(v,view);
+}
+
+inline std::string unicode_to_utf8(std::u16string_view v)
+{
+	return details::unicode_to_utf8(v);
+}
+
+inline void in_place_unicode_to_utf8(std::string& v,std::u32string_view	view)
+{
+	details::in_place_unicode_to_utf8(v,view);
+}
+
+inline std::string unicode_to_utf8(std::u32string_view v)
+{
+	return details::unicode_to_utf8(v);
 }
 
 }
