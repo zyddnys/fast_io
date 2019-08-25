@@ -109,6 +109,22 @@ inline output& operator<<(output& out,Signed_integer a)
 	return out;
 }
 
+template<standard_input_stream input>
+inline input& getline(input& in,std::basic_string<typename input::traits_type::char_type> &str)
+{
+	str.clear();
+	for(typename input::traits_type::int_type ch;(ch=in.get())!=input::traits_type::eof()||ch!='\n';str.push_back(input::traits_type::to_char_type(ch)));
+	return in;
+}
+
+template<standard_input_stream input>
+inline input& getwhole(input& in,std::basic_string<typename input::traits_type::char_type> &str)
+{
+	str.clear();
+	for(typename input::traits_type::int_type ch;(ch=in.get())!=input::traits_type::eof();str.push_back(input::traits_type::to_char_type(ch)));
+	return in;
+}
+
 namespace details
 {
 	inline output_stream& fprint(output_stream &out,std::string_view format)

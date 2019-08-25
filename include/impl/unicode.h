@@ -3,6 +3,7 @@
 #include<bitset>
 #include<stdexcept>
 #include<array>
+#include"stringbuf.h"
 
 namespace fast_io
 {
@@ -124,10 +125,44 @@ public:
 		for(auto pi(pb),pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));pi!=pe;++pi)
 			put(traits_type::to_int_type(*pi));
 	}
-	void flush() requires standard_output_stream<T>()
+	constexpr void flush() requires standard_output_stream<T>()
 	{
 		ib.flush();
 	}
 };
+
+template<typename T>
+inline constexpr void in_place_utf8_to_unicode(T& t,std::string_view view)
+{
+	basic_ibuf_string_view<std::string_view> ibsv(view);
+	unicode_view<decltype(ibsv),typename T::value_type> uv(ibsv);
+	getwhole(uv,t);
+}
+
+template<typename T=std::wstring>
+inline constexpr auto utf8_to_unicode(std::string_view view)
+{
+	T t;
+	in_place_utf8_to_unicode(t,view);
+	return t;
+}
+
+template<typename T>
+inline void in_place_unicode_to_utf8(std::string& v,T const& view)
+{
+	basic_obuf_string<std::string> obsv(std::move(v));
+	unicode_view<decltype(obsv),typename T::value_type> uv(obsv);
+	uv<<view;
+	v=std::move(obsv.str());
+}
+
+template<typename T>
+inline std::string unicode_to_utf8(T const& view)
+{
+	basic_obuf_string<std::string> obsv;
+	unicode_view<decltype(obsv),typename T::value_type> uv(obsv);
+	uv<<view;
+	return std::move(obsv.str());
+}
 
 }
