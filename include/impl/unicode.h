@@ -13,26 +13,30 @@ class unicode_view
 	T& ib;
 public:
 	using native_interface_t = T;
-	using traits_type = typename native_interface_t::traits_type;
+	using traits_type = Traits;
+	using native_traits_type = typename native_interface_t::traits_type;
 private:
 	using char_type = typename traits_type::char_type;
 	using int_type = typename traits_type::int_type;
+
+	using native_char_type = typename native_traits_type::char_type;
+	using native_int_type = typename native_traits_type::int_type;
 public:
 	constexpr unicode_view(T& ibv):ib(ibv){}
 	constexpr auto& native_handle()
 	{
 		return ib;
 	}
-	constexpr auto eof() const requires(standard_input_stream<T>())
+	constexpr auto eof() const requires standard_input_stream<T>()
 	{
 		return ib.eof();
 	}
-	constexpr int_type get() requires(standard_input_stream<T>())
+	constexpr int_type get() requires standard_input_stream<T>()
 	{
 		auto ch(ib.get());
 		if(ch==traits_type::eof())
 			return traits_type::eof();
-		auto constexpr ch_bits(sizeof(ch)*8);
+		auto constexpr ch_bits(sizeof(native_char_type)*8);
 		using fake_char_t = std::make_unsigned_t<char_type>;
 		union
 		{
@@ -65,39 +69,15 @@ public:
 	template<typename Contiguous_iterator>
 	constexpr Contiguous_iterator read(Contiguous_iterator b,Contiguous_iterator e) requires input_stream<T>()
 	{
-		for(auto i(b);i!=e;++i)
-		{
-			union
-			{
-				std::array<decltype(*b),sizeof(char_type)> a;
-				std::array<char_type,sizeof(decltype(*b))> b;
-			}v;
-			auto j(v.b.begin()),je(std::min(j+(e-i)*sizeof(decltype(*b))/sizeof(char),b.end()));
-			for(;j!=je;++j)
-			{
-				auto ch(get());
-				if(ch==traits_type::eof())
-					break;
-				*j=ch;
-			}
-			auto pj(v.a.begin()+(j-v.b.begin())*sizeof(char)/sizeof(decltype(*b)));
-			for(auto j(v.a.begin());j!=pj;++j)
-			{
-				*i=std::move(*j);
-				++i;
-			}
-			if(j!=je)
-				return i;
-		}
-		return ib.read(b,e);
+		auto pb(static_cast<char_type*>(static_cast<void*>(std::addressof(*b))));
+		auto pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));
+		auto pi(pb);
+		for(;pi!=pe;++pi)
+			*pb=get();
+		return b+(pi-pb)*sizeof(char_type)/sizeof(*b);
 	}
+	
 };
 
-/*
-template<standard_output_stream out,typename CharT,typename Traits = std::char_traits<CharT>>
-class ounicode_view
-{
-	
-};*/
 
 }
