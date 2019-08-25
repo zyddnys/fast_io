@@ -41,12 +41,12 @@ public:
 	}
 };
 
-mutex_input_stream& scan(mutex_input_stream &in)
+inline mutex_input_stream& scan(mutex_input_stream &in)
 {
 	return in;
 }
 template<typename T,typename ...Args>
-mutex_input_stream& scan(mutex_input_stream &in,T& cr,Args&& ...args)
+inline mutex_input_stream& scan(mutex_input_stream &in,T& cr,Args&& ...args)
 {
 	std::lock_guard lg(in.mutex());
 	scan(in.native_handle(),cr,std::forward<Args>(args)...);
@@ -54,7 +54,7 @@ mutex_input_stream& scan(mutex_input_stream &in,T& cr,Args&& ...args)
 }
 
 template<typename ...Args>
-mutex_input_stream& scan(mutex_input_stream &imtx,Args&& ...args)
+inline mutex_input_stream& scan(mutex_input_stream &imtx,Args&& ...args)
 {
 	std::lock_guard lg(imtx.mutex());
 	scan(imtx.native_handle(),std::forward<Args>(args)...);
@@ -156,7 +156,7 @@ public:
 
 
 template<typename ...Args>
-mutex_output_stream& print(mutex_output_stream &omtx,Args&& ...args)
+inline mutex_output_stream& print(mutex_output_stream &omtx,Args&& ...args)
 {
 	std::lock_guard lg(omtx.mutex());
 	print(omtx.native_handle(),std::forward<Args>(args)...);
@@ -164,7 +164,7 @@ mutex_output_stream& print(mutex_output_stream &omtx,Args&& ...args)
 }
 
 template<typename ...Args>
-mutex_output_stream& fprint(mutex_output_stream &omtx,std::string_view format,Args&& ...args)
+inline mutex_output_stream& fprint(mutex_output_stream &omtx,std::string_view format,Args&& ...args)
 {
 	std::lock_guard lg(omtx.mutex());
 	fprint(omtx.native_handle(),format,std::forward<Args>(args)...);
@@ -172,7 +172,7 @@ mutex_output_stream& fprint(mutex_output_stream &omtx,std::string_view format,Ar
 }
 
 template<typename ...Args>
-mutex_output_stream& fprint(mutex_output_stream &omtx,Args&& ...args)
+inline mutex_output_stream& fprint(mutex_output_stream &omtx,Args&& ...args)
 {
 	std::lock_guard lg(omtx.mutex());
 	fprint(omtx.native_handle(),std::forward<Args>(args)...);

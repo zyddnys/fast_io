@@ -142,7 +142,7 @@ namespace details
 }
 
 template<typename ...Args>
-output_stream& fprint(output_stream &out,std::string_view format,Args&& ...args)
+inline output_stream& fprint(output_stream &out,std::string_view format,Args&& ...args)
 {
 	return details::fprint(out,format,std::forward<Args>(args)...);
 }
