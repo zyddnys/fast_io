@@ -28,7 +28,9 @@ template<standard_input_stream input>
 input& operator>>(input& in,Unsigned_integer& a)
 {
 	typename input::traits_type::int_type ch;
-	for(;!details::isdigit(ch=in.get()););
+	for(;!details::isdigit(ch=in.get());)
+		if(ch==input::traits_type::eof())
+			throw std::runtime_error("Try to read data from EOF stream");
 	for(a=ch-48;details::isdigit(ch=in.get());a=a*10+ch-48);
 	return in;
 }
@@ -37,7 +39,9 @@ template<standard_input_stream input>
 input& operator>>(input& in,Signed_integer& a)
 {
 	typename input::traits_type::int_type ch;
-	for(;!details::isdigit_or_minus(ch=in.get()););
+	for(;!details::isdigit_or_minus(ch=in.get());)
+		if(ch==input::traits_type::eof())
+			throw std::runtime_error("Try to read data from EOF stream");
 	if(ch==45)
 	{
 		for(;details::isdigit(ch=in.get());a=a*10+ch-48);

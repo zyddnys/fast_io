@@ -27,10 +27,6 @@ public:
 	{
 		return s.empty();
 	}
-	constexpr operator bool() const
-	{
-		return !s.empty();
-	}
 	template<typename contiguous_iterator>
 	constexpr contiguous_iterator read(contiguous_iterator cbegin,contiguous_iterator cend)
 	{
@@ -95,7 +91,7 @@ inline constexpr T format(std::string_view format,Args&& ...args)
 	return std::move(t.str());
 }
 template<typename T,typename... Args>
-inline constexpr void inplace_to(T& t,Args&& ...args)
+inline constexpr void in_place_to(T& t,Args&& ...args)
 {
 	basic_obuf_string<std::string> os;
 	basic_ibuf_string_view<std::string_view> is(print(os,std::forward<Args>(args)...).str());
@@ -110,8 +106,6 @@ inline constexpr void in_place_to(std::string& t,Args&& ...args)
 	print(os,std::forward<Args>(args)...);
 	t=std::move(os.str());
 } 
-
-
 
 template<typename T,typename... Args>
 inline constexpr auto to(Args&& ...args)

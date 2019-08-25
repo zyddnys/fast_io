@@ -39,10 +39,6 @@ public:
 	{
 		return handler.eof();
 	}
-	operator bool() const
-	{
-		return handler;
-	}
 };
 
 mutex_input_stream& scan(mutex_input_stream &in)
