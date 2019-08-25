@@ -3,6 +3,7 @@
 #include<bitset>
 #include<stdexcept>
 #include<array>
+
 namespace fast_io
 {
 
@@ -93,13 +94,7 @@ public:
 		auto constexpr limit2(static_cast<std::size_t>(1)<<lshift2);
 		auto constexpr limitm2(limit2-1);
 
-/*		auto constexpr lshift(bytes-2);
-		auto constexpr limitm1((static_cast<std::size_t>(1)<<lshift)-1);
-		for(;limitm1<ch;ch>>=lshift)
-			out.put((ch&limitm1)|limit);
-		out.put(ch);*/
-		
-		std::array<typename native_traits_type::char_type,sizeof(native_traits_type::char_type)*4/3+1> a;
+		std::array<native_char_type,sizeof(native_char_type)*8> a{};
 		auto i(a.size()-1);
 		for(;i<a.size()&&ch;--i)
 		{
@@ -108,8 +103,8 @@ public:
 		}
 		if(a.size()<=++i)
 			throw std::runtime_error("incorrect character");
-		std::size_t pos(8*sizeof(native_traits_type::char_type)-(a.size()-i)-1);
-		using fake_char_t = std::make_unsigned_t<typename native_traits_type::char_type>;
+		std::size_t pos(i-1);
+		using fake_char_t = std::make_unsigned_t<native_char_type>;
 		fake_char_t v(0);
 		v=~v;
 		v>>=pos;
