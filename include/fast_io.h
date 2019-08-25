@@ -17,9 +17,9 @@ namespace fast_io
 {
 using system_io_handle = posix_io_handle;
 using system_file = posix_file;
-inline basic_obuf<posix_io_handle> out(1);
-inline tie<basic_ibuf<posix_io_handle>,basic_obuf<posix_io_handle>> in(out,0);
-inline tie<basic_obuf<posix_io_handle>,basic_obuf<posix_io_handle>> err(out,2);
+inline basic_obuf<posix_io_handle> system_out(1);
+inline tie<basic_ibuf<posix_io_handle>,basic_obuf<posix_io_handle>> system_in(system_out,0);
+inline tie<basic_obuf<posix_io_handle>,basic_obuf<posix_io_handle>> system_err(system_out,2);
 
 using isystem_file = input_wrapper<system_file>;
 using osystem_file = output_wrapper<system_file>;
@@ -37,9 +37,9 @@ using iobuf_mutex = basic_iomutex<iobuf>;
 using ibuf_string_view_mutex = basic_imutex<ibuf_string_view>;
 using obuf_string_mutex = basic_omutex<obuf_string>;
 
-inline c_style_io_handle c_out(stdout);
-inline tie<c_style_io_handle,c_style_io_handle> c_in(c_out,stdin);
-inline tie<c_style_io_handle,c_style_io_handle> c_err(c_out,stderr);
+inline c_style_io_handle out(stdout);
+inline tie<c_style_io_handle,c_style_io_handle> in(out,stdin);
+inline tie<c_style_io_handle,c_style_io_handle> err(out,stderr);
 
 }
 
