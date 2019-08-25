@@ -25,7 +25,7 @@ namespace details
 }
 
 template<standard_input_stream input>
-input& operator>>(input& in,Unsigned_integer& a)
+inline input& operator>>(input& in,Unsigned_integer& a)
 {
 	typename input::traits_type::int_type ch;
 	for(;!details::isdigit(ch=in.get());)
@@ -36,7 +36,7 @@ input& operator>>(input& in,Unsigned_integer& a)
 }
 
 template<standard_input_stream input>
-input& operator>>(input& in,Signed_integer& a)
+inline input& operator>>(input& in,Signed_integer& a)
 {
 	typename input::traits_type::int_type ch;
 	for(;!details::isdigit_or_minus(ch=in.get());)
@@ -53,7 +53,7 @@ input& operator>>(input& in,Signed_integer& a)
 }
 
 template<standard_output_stream output>
-output& operator<<(output& out,Unsigned_integer a)
+inline output& operator<<(output& out,Unsigned_integer a)
 {
 	if(a)
 	{
@@ -78,7 +78,7 @@ inline output_stream& operator<<(output_stream& out,std::exception const &e)
 	return out<<e.what();
 }
 template<standard_input_stream input>
-input& operator>>(input& in,std::basic_string<typename input::traits_type::char_type> &str)
+inline input& operator>>(input& in,std::basic_string<typename input::traits_type::char_type> &str)
 {
 	str.clear();
 	decltype(in.get()) ch;
@@ -89,7 +89,7 @@ input& operator>>(input& in,std::basic_string<typename input::traits_type::char_
 }
 
 template<standard_output_stream output>
-output& operator<<(output& out,Signed_integer a)
+inline output& operator<<(output& out,Signed_integer a)
 {
 	if(a)
 	{
@@ -111,7 +111,7 @@ output& operator<<(output& out,Signed_integer a)
 
 namespace details
 {
-	output_stream& fprint(output_stream &out,std::string_view format)
+	inline output_stream& fprint(output_stream &out,std::string_view format)
 	{
 		std::size_t percent_pos;
 		for(;(percent_pos=format.find('%'))!=std::string_view::npos&&percent_pos+1!=format.size()&&format[percent_pos+1]=='%';format.remove_prefix(percent_pos+2))
@@ -122,7 +122,7 @@ namespace details
 		return out;
 	}
 	template<typename T,typename ...Args>
-	output_stream& fprint(output_stream &out,std::string_view format,T const& cr,Args&& ...args)
+	inline output_stream& fprint(output_stream &out,std::string_view format,T const& cr,Args&& ...args)
 	{
 		std::size_t percent_pos;
 		for(;(percent_pos=format.find('%'))!=std::string_view::npos&&percent_pos+1!=format.size()&&format[percent_pos+1]=='%';format.remove_prefix(percent_pos+2))
@@ -147,21 +147,21 @@ output_stream& fprint(output_stream &out,std::string_view format,Args&& ...args)
 	return details::fprint(out,format,std::forward<Args>(args)...);
 }
 
-input_stream& scan(input_stream &in)
+inline input_stream& scan(input_stream &in)
 {
 	return in;
 }
 template<typename T,typename ...Args>
-input_stream& scan(input_stream &in,T& cr,Args&& ...args)
+inline input_stream& scan(input_stream &in,T& cr,Args&& ...args)
 {
 	return scan(in>>cr,std::forward<Args>(args)...);
 }
-output_stream& print(output_stream &out)
+inline output_stream& print(output_stream &out)
 {
 	return out;
 }
 template<typename T,typename ...Args>
-output_stream& print(output_stream &out,const T& cr,Args&& ...args)
+inline output_stream& print(output_stream &out,const T& cr,Args&& ...args)
 {
 	return print(out<<cr,std::forward<Args>(args)...);
 }
