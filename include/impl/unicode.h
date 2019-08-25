@@ -117,14 +117,17 @@ public:
 	template<typename Contiguous_iterator>
 	constexpr void write(Contiguous_iterator b,Contiguous_iterator e) requires standard_output_stream<T>()
 	{
-		auto pb(static_cast<char_type*>(static_cast<void*>(std::addressof(*b))));
+		auto pb(static_cast<char_type const*>(static_cast<void const*>(std::addressof(*b))));
 		if constexpr(sizeof(*b)%sizeof(char_type))
 			if((e-b)*sizeof(*b)%sizeof(char_type))
 				throw std::runtime_error("incorrect write size");
 		for(auto pi(pb),pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));pi!=pe;++pi)
 			put(traits_type::to_int_type(*pi));
 	}
+	void flush() requires standard_output_stream<T>()
+	{
+		ib.flush();
+	}
 };
-
 
 }
