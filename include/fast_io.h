@@ -19,12 +19,14 @@ namespace fast_io
 {
 using system_io_handle = posix_io_handle;
 using system_file = posix_file;
+using system_ohandle = ierasure<system_io_handle>;
+using system_ihandle = oerasure<system_io_handle>;
 
 struct system_io_collections
 {
-basic_obuf<posix_io_handle> out;
-tie<basic_ibuf<posix_io_handle>,basic_obuf<posix_io_handle>> in;
-tie<immediately_flush<posix_io_handle>,basic_obuf<posix_io_handle>> err;
+basic_obuf<system_ohandle> out;
+tie<basic_ibuf<posix_io_handle>,decltype(out)> in;
+tie<immediately_flush<decltype(out)>,decltype(out)> err;
 system_io_collections():out(1),in(out,0),err(out,2){}
 };
 
