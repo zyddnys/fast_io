@@ -2,5 +2,6 @@
 
 int main()
 {
-	fast_io::system_out<<"Hello World\n";
+	fast_io::system_io_collections collections;
+	collections.out<<"Hello World\n";
 }

@@ -17,9 +17,15 @@ namespace fast_io
 {
 using system_io_handle = posix_io_handle;
 using system_file = posix_file;
-inline basic_obuf<posix_io_handle> system_out(1);
-inline tie<basic_ibuf<posix_io_handle>,basic_obuf<posix_io_handle>> system_in(system_out,0);
-inline tie<basic_obuf<posix_io_handle>,basic_obuf<posix_io_handle>> system_err(system_out,2);
+
+struct system_io_collections
+{
+basic_obuf<posix_io_handle> out;
+tie<basic_ibuf<posix_io_handle>,basic_obuf<posix_io_handle>> in;
+tie<basic_obuf<posix_io_handle>,basic_obuf<posix_io_handle>> err;
+basic_obuf<posix_io_handle> log;
+system_io_collections():out(1),in(out,0),err(out,2),log(2){}
+};
 
 using isystem_file = input_wrapper<system_file>;
 using osystem_file = output_wrapper<system_file>;
