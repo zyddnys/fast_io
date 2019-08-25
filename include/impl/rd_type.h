@@ -109,14 +109,15 @@ template<standard_input_stream input>
 inline input& getline(input& in,std::basic_string<typename input::char_type> &str)
 {
 	str.clear();
-	for(decltype(in.get()) ch;(ch=in.get())!='\n';str.push_back(ch));
+	for(decltype(in.try_get()) ch;!(ch=in.try_get()).second&&ch.first!='\n';str.push_back(ch.first));
 	return in;
 }
 
 template<standard_input_stream input>
 inline input& getwhole(input& in,std::basic_string<typename input::char_type> &str)
 {
-	for(str.clear();!in.eof();str.push_back(in.get()));
+	str.clear();
+	for(decltype(in.try_get()) ch;!(ch=in.try_get()).second;str.push_back(ch.first));
 	return in;
 }
 

@@ -50,9 +50,9 @@ public:
 		auto ch(fgetc(fp));
 		if(ch==EOF)
 		{
-			if(ferror(fp))
-				throw std::system_error(errno,std::system_category());
-			return {0,true};
+			if(feof(fp))
+				return {0,true};
+			throw std::system_error(errno,std::system_category());
 		}
 		return {ch,false};
 	}
