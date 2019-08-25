@@ -18,7 +18,7 @@ protected:
 	}
 public:
 	c_style_io_handle(std::FILE* fpp):fp(fpp){}
-	using char_type = unsigned char;
+	using char_type = char;
 	using native_handle_type = std::FILE*;
 	native_handle_type native_handle() const
 	{
@@ -72,8 +72,8 @@ class c_style_file:public c_style_io_handle
 			std::fclose(native_handle());
 	}
 public:
-	using char_type = char;
-	using native_handle_type = std::FILE*;
+	using char_type = c_style_io_handle::char_type;
+	using native_handle_type = c_style_io_handle::native_handle_type;
 	template<typename ...Args>
 	c_style_file(native_interface_t,Args&& ...args):c_style_io_handle(std::fopen(std::forward<Args>(args)...))
 	{
