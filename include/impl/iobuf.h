@@ -4,6 +4,7 @@
 #include<string>
 #include<cstddef>
 #include"concept.h"
+#include"write_precondition.h"
 
 namespace fast_io
 {
@@ -169,6 +170,7 @@ public:
 	template<typename Contiguous_Iterator>
 	void write(Contiguous_Iterator cbegin,Contiguous_Iterator cend)
 	{
+		write_precondition<char_type>(cbegin,cend);
 		mwrite(static_cast<char_type const*>(static_cast<void const*>(std::addressof(*cbegin))),static_cast<char_type const*>(static_cast<void const*>(std::addressof(*cend))));
 	}
 	void put(char_type ch)
