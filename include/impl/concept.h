@@ -1,5 +1,5 @@
 #pragma once
-
+#include<utility>
 #include<limits>
 #include<type_traits>
 #include"before_cpp20_concept.h"
@@ -21,6 +21,7 @@ concept bool standard_input_stream()
 	return input_stream<T>()&&requires(T in)
 	{
 		{in.get()};
+		{in.try_get()}->std::pair<decltype(in.get()),bool>;
 		{in.eof()}->bool;
 	};
 };
@@ -50,6 +51,9 @@ concept bool output_stream()
 
 template<typename T>
 concept bool io_stream = input_stream<T>()&&output_stream<T>();
+
+template<typename T>
+concept bool stream = input_stream<T>()||output_stream<T>();
 
 template<typename T>
 concept bool standard_output_stream()

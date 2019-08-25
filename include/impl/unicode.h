@@ -8,8 +8,7 @@
 namespace fast_io
 {
 
-template<typename T,typename CharT>
-requires input_stream<T>()||output_stream<T>()
+template<stream T,typename CharT>
 class unicode_view
 {
 	T& ib;
@@ -50,8 +49,6 @@ public:
 		char_type converted_ch(u.fake_char);
 		for(std::size_t i(0);i!=bytes;++i)
 		{
-			if(ib.eof())
-				throw std::runtime_error("end of file before complete reading a utf8 character");
 			std::make_unsigned_t<decltype(ib.get())> t(ib.get());
 			if((t>>ch_bits_m2)==2)
 				converted_ch=(converted_ch<<ch_bits_m2)|(t&limitm1);

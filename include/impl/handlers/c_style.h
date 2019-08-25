@@ -45,6 +45,17 @@ public:
 		if(std::fwrite(std::addressof(*begin),sizeof(*begin),count,fp)<count)
 			throw std::system_error(errno,std::generic_category());
 	}
+	std::pair<char_type,bool> try_get()
+	{
+		auto ch(fgetc(fp));
+		if(ch==EOF)
+		{
+			if(ferror(fp))
+				throw std::system_error(errno,std::system_category());
+			return {0,true};
+		}
+		return {ch,false};
+	}
 	char_type get()
 	{
 		auto ch(fgetc(fp));

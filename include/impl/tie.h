@@ -23,6 +23,11 @@ public:
 		o.flush();
 		return t.get();
 	}
+	constexpr auto try_get() requires standard_input_stream<T>()
+	{
+		o.flush();
+		return t.try_get();
+	}
 	constexpr void put(char_type ch) requires standard_output_stream<T>()
 	{
 		o.flush();
@@ -45,7 +50,7 @@ public:
 		return t.read(begin,end);
 	}
 	template<typename Contiguous_iterator>
-	constexpr void write(Contiguous_iterator begin,Contiguous_iterator end)	requires output_stream<T>()
+	constexpr void write(Contiguous_iterator begin,Contiguous_iterator end) requires output_stream<T>()
 	{
 		o.flush();
 		return t.write(begin,end);

@@ -91,6 +91,16 @@ public:
 	{
 		return bh.beg==bh.end;
 	}
+	std::pair<char_type,bool> try_get()
+	{
+		if(bh.end==bh.curr)		//cache miss
+		{
+			if((bh.end=ih.read(bh.beg,bh.beg+Buf::size()))==bh.beg)
+				return {0,true};
+			bh.curr=bh.beg;
+		}
+		return {*bh.curr++,false};
+	}
 	char_type get()
 	{
 		if(bh.end==bh.curr)		//cache miss
@@ -239,6 +249,10 @@ public:
 	auto get()
 	{
 		return ibf.get();
+	}
+	auto try_get()
+	{
+		return ibf.try_get();
 	}
 	bool eof() const
 	{

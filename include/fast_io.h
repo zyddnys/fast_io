@@ -13,6 +13,7 @@
 #include"impl/wrapper.h"
 #include"impl/tie.h"
 #include"impl/immediately_flush.h"
+#include"impl/erasure.h"
 
 namespace fast_io
 {
@@ -37,15 +38,17 @@ using iobuf = basic_iobuf<iosystem_file>;
 
 using ibuf_string_view = basic_ibuf_string_view<std::string_view>;
 using obuf_string = basic_obuf_string<std::string>;
-using ibuf_mutex = basic_imutex<ibuf>;
-using obuf_mutex = basic_omutex<obuf>;
+using ibuf_mutex = basic_iomutex<ibuf>;
+using obuf_mutex = basic_iomutex<obuf>;
 using iobuf_mutex = basic_iomutex<iobuf>;
-using ibuf_string_view_mutex = basic_imutex<ibuf_string_view>;
-using obuf_string_mutex = basic_omutex<obuf_string>;
+using ibuf_string_view_mutex = basic_iomutex<ibuf_string_view>;
+using obuf_string_mutex = basic_iomutex<obuf_string>;
 
-inline c_style_io_handle out(stdout);
-inline tie<c_style_io_handle,c_style_io_handle> in(out,stdin);
-inline tie<immediately_flush<c_style_io_handle>,c_style_io_handle> err(out,stderr);
+using c_style_ohandle = ierasure<c_style_io_handle>;
+using c_style_ihandle = oerasure<c_style_io_handle>;
+inline c_style_ohandle out(stdout);
+inline tie<c_style_ihandle,decltype(out)> in(out,stdin);
+inline tie<immediately_flush<decltype(out)>,decltype(out)> err(out,stderr);
 
 }
 

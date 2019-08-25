@@ -41,6 +41,14 @@ public:
 		s.remove_prefix(1);
 		return ch;
 	}
+	constexpr std::pair<char_type,bool> try_get()
+	{
+		if(s.empty())
+			return {0,true};
+		auto ch(s.front());
+		s.remove_prefix(1);
+		return {ch,false};
+	}
 };
 
 template< typename T>
