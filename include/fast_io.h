@@ -15,6 +15,7 @@
 #include"impl/iomutex.h"
 #include"impl/wrapper.h"
 #include"impl/tie.h"
+#include"impl/unicode.h"
 
 namespace fast_io
 {

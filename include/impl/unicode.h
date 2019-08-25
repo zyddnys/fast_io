@@ -6,31 +6,34 @@
 namespace fast_io
 {
 
-template<typename in,typename CharT,typename Traits = std::char_traits<CharT>>
+template<typename T,typename CharT,typename Traits = std::char_traits<CharT>>
+requires input_stream<T>()||output_stream<T>()
 class unicode_view
 {
-	in& ib;
+	T& ib;
 public:
-	using native_handle_type = in&;
-	using char_type = CharT;
-	using traits_type = in;
-	using int_type = typename Traits::int_type;
-	constexpr unicode_view(in& ibv):ib(ibv){}
+	using native_interface_t = T;
+	using traits_type = typename native_interface_t::traits_type;
+private:
+	using char_type = typename traits_type::char_type;
+	using int_type = typename traits_type::int_type;
+public:
+	constexpr unicode_view(T& ibv):ib(ibv){}
 	constexpr auto& native_handle()
 	{
 		return ib;
 	}
-	constexpr auto eof() const requires(standard_input_stream<in>())
+	constexpr auto eof() const requires(standard_input_stream<T>())
 	{
 		return ib.eof();
 	}
-	constexpr int_type get() requires(standard_input_stream<in>())
+	constexpr int_type get() requires(standard_input_stream<T>())
 	{
 		auto ch(ib.get());
-		if(ch==in::char_traits::eof())
-			return char_traits::eof();
+		if(ch==traits_type::eof())
+			return traits_type::eof();
 		auto constexpr ch_bits(sizeof(ch)*8);
-		using fake_char_t = std::make_unsigned_t<typename in::char_type>;
+		using fake_char_t = std::make_unsigned_t<char_type>;
 		union
 		{
 			fake_char_t fake_char;
@@ -49,7 +52,7 @@ public:
 		for(std::size_t i(0);i!=bytes;++i)
 		{
 			auto c(ib.get());
-			if(c==in::char_traits::eof())
+			if(c==traits_type::eof())
 				throw std::runtime_error("end of file before complete reading a utf8 character");
 			fake_char_t t{static_cast<fake_char_t>(c)};
 			if((t>>ch_bits_m2)==2)
@@ -60,7 +63,7 @@ public:
 		return converted_ch;
 	}
 	template<typename Contiguous_iterator>
-	constexpr Contiguous_iterator read(Contiguous_iterator b,Contiguous_iterator e) requires(standard_input_stream<in>())
+	constexpr Contiguous_iterator read(Contiguous_iterator b,Contiguous_iterator e) requires input_stream<T>()
 	{
 		for(auto i(b);i!=e;++i)
 		{
@@ -73,7 +76,7 @@ public:
 			for(;j!=je;++j)
 			{
 				auto ch(get());
-				if(ch==char_traits::eof())
+				if(ch==traits_type::eof())
 					break;
 				*j=ch;
 			}
