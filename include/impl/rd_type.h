@@ -101,7 +101,7 @@ namespace fast_io
 			out.put(48);
 		return out;
 	}
-
+/*
 	namespace details
 	{
 		output_stream& fprint(output_stream &out,std::string_view format)
@@ -138,7 +138,7 @@ namespace fast_io
 	output_stream& fprint(output_stream &out,std::string_view format,Args&& ...args)
 	{
 		return details::fprint(out,format,std::forward<Args>(args)...);
-	}
+	}*/
 	input_stream& scan(input_stream &in)
 	{
 		return in;

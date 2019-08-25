@@ -166,7 +166,7 @@ mutex_output_stream& print(mutex_output_stream &omtx,Args&& ...args)
 	print(omtx.native_handle(),std::forward<Args>(args)...);
 	return omtx;
 }
-
+/*
 template<typename ...Args>
 mutex_output_stream& fprint(mutex_output_stream &omtx,std::string_view format,Args&& ...args)
 {
@@ -181,5 +181,5 @@ mutex_output_stream& fprint(mutex_output_stream &omtx,Args&& ...args)
 	std::lock_guard lg(omtx.mutex());
 	fprint(omtx.native_handle(),std::forward<Args>(args)...);
 	return omtx;
-}
+}*/
 }
