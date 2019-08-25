@@ -125,8 +125,8 @@ public:
 			throw std::system_error(errno,std::generic_category());
 	}
 	template<std::size_t om>
-	posix_file(std::string_view file,open::interface_t<om>):posix_file(native_interface,file.data(),details::posix_file_openmode<om>::mode,644){}		//potential support modification prv in the future
-	posix_file(std::string_view file,open::mode const& m):posix_file(native_interface,file.data(),details::calculate_posix_open_mode(m),644){}		//potential support modification prv in the future
+	posix_file(std::string_view file,open::interface_t<om>):posix_file(native_interface,file.data(),details::posix_file_openmode<om>::mode,420){}		//potential support modification prv in the future
+	posix_file(std::string_view file,open::mode const& m):posix_file(native_interface,file.data(),details::calculate_posix_open_mode(m),420){}		//potential support modification prv in the future
 	posix_file(std::string_view file,std::string_view mode):posix_file(file,fast_io::open::c_style(mode)){}
 	posix_file(posix_file const&)=delete;
 	posix_file& operator=(posix_file const&)=delete;
