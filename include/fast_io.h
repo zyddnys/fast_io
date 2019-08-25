@@ -23,8 +23,7 @@ struct system_io_collections
 basic_obuf<posix_io_handle> out;
 tie<basic_ibuf<posix_io_handle>,basic_obuf<posix_io_handle>> in;
 tie<basic_obuf<posix_io_handle>,basic_obuf<posix_io_handle>> err;
-basic_obuf<posix_io_handle> log;
-system_io_collections():out(1),in(out,0),err(out,2),log(2){}
+system_io_collections():out(1),in(out,0),err(out,2){}
 };
 
 using isystem_file = input_wrapper<system_file>;
