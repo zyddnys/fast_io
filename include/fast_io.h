@@ -12,6 +12,7 @@
 #include"impl/iomutex.h"
 #include"impl/wrapper.h"
 #include"impl/tie.h"
+#include"impl/immediately_flush.h"
 
 namespace fast_io
 {
@@ -22,7 +23,7 @@ struct system_io_collections
 {
 basic_obuf<posix_io_handle> out;
 tie<basic_ibuf<posix_io_handle>,basic_obuf<posix_io_handle>> in;
-tie<basic_obuf<posix_io_handle>,basic_obuf<posix_io_handle>> err;
+tie<immediately_flush<posix_io_handle>,basic_obuf<posix_io_handle>> err;
 system_io_collections():out(1),in(out,0),err(out,2){}
 };
 
@@ -44,7 +45,7 @@ using obuf_string_mutex = basic_omutex<obuf_string>;
 
 inline c_style_io_handle out(stdout);
 inline tie<c_style_io_handle,c_style_io_handle> in(out,stdin);
-inline tie<c_style_io_handle,c_style_io_handle> err(out,stderr);
+inline tie<immediately_flush<c_style_io_handle>,c_style_io_handle> err(out,stderr);
 
 }
 

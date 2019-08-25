@@ -6,15 +6,15 @@
 namespace fast_io
 {
 
-inline standard_input_stream& read(standard_input_stream& in,Trivial_copyable& v)
+inline input_stream& read(input_stream& in,Trivial_copyable& v)
 {
 	auto address(std::addressof(v));
 	if(in.read(address,address+1)!=(address+1))
-		throw std::runtime_error("cannot read data from standard_input_stream&");
+		throw std::runtime_error("cannot read data from input_stream&");
 	return in;
 }
 
-inline standard_output_stream& write(standard_output_stream& out,Trivial_copyable const& v)
+inline output_stream& write(output_stream& out,Trivial_copyable const& v)
 {
 	auto address(std::addressof(v));
 	out.write(address,address+1);

@@ -1,4 +1,5 @@
 #pragma once
+#include"concept.h"
 
 namespace fast_io
 {
@@ -10,7 +11,7 @@ public:
 	using native_handle_type = Ohandler;
 	using char_type = typename native_handle_type::char_type;
 	template<typename... Args>
-	constexpr immediately_flush(Args&&... args):oh(std::forward<Args>(args)...){bh.curr=bh.beg;}
+	constexpr immediately_flush(Args&&... args):oh(std::forward<Args>(args)...){}
 	constexpr void flush()
 	{
 		oh.flush();
