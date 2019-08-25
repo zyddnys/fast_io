@@ -46,4 +46,4 @@ inline tie<c_style_io_handle,c_style_io_handle> c_err(c_out,stderr);
 #include"impl/rd_type.h"
 #include"impl/manip.h"
 #include"impl/read_write.h"
-//#include"impl/unicode.h"
+#include"impl/unicode.h"

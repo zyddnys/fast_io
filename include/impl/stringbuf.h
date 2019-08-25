@@ -59,7 +59,7 @@ public:
 	template<typename contiguous_iterator>
 	constexpr void write(contiguous_iterator cbegin,contiguous_iterator cend)
 	{
-		write_precondition(cbegin,cend);
+		write_precondition<char_type>(cbegin,cend);
 		s.append(static_cast<char_type const*>(static_cast<void const*>(std::addressof(*cbegin))),static_cast<char_type const*>(static_cast<void const*>(std::addressof(*cend))));
 	}
 	constexpr void put(char_type ch)

@@ -29,11 +29,11 @@ public:
 	}
 	constexpr char_type get() requires standard_input_stream<T>()
 	{
-		auto ch(ib.get());
+		std::make_unsigned_t<decltype(ib.get())> ch(ib.get());
 		auto constexpr ch_bits(sizeof(native_char_type)*8);
 		union
 		{
-			decltype(ib.get()) ch;
+			std::make_unsigned_t<decltype(ib.get())> ch;
 			std::bitset<ch_bits> bts;
 		}u{ib.get()};
 		if(!u.bts.test(ch_bits-1))
@@ -52,7 +52,7 @@ public:
 		{
 			if(ib.eof())
 				throw std::runtime_error("end of file before complete reading a utf8 character");
-			auto t(ib.get());
+			std::make_unsigned_t<decltype(ib.get())> t(ib.get());
 			if((t>>ch_bits_m2)==2)
 				converted_ch=(converted_ch<<ch_bits_m2)|(t&limitm1);
 			else
@@ -106,7 +106,7 @@ public:
 	template<typename Contiguous_iterator>
 	constexpr void write(Contiguous_iterator b,Contiguous_iterator e) requires standard_output_stream<T>()
 	{
-		write_precondition(b,e);
+		write_precondition<char_type>(b,e);
 		auto pb(std::addressof(*b));
 		for(auto pi(pb),pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));pi!=pe;++pi)
 			put(*pi);

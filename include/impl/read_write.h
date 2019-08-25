@@ -44,7 +44,7 @@ inline input& read_size(input& in,std::size_t& size)
 template<standard_output_stream output>
 inline output& write_size(output& out,std::size_t size)
 {
-	auto constexpr bytes(sizeof(typename output::traits_type::char_type)*8);
+	auto constexpr bytes(sizeof(typename output::char_type)*8);
 	auto constexpr lshift(bytes-1);
 	auto constexpr limit(static_cast<std::size_t>(1)<<lshift);
 	auto constexpr limitm1(limit-1);
