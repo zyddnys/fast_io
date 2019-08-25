@@ -27,10 +27,8 @@ namespace details
 template<standard_input_stream input>
 inline input& operator>>(input& in,Unsigned_integer& a)
 {
-	typename input::traits_type::int_type ch;
-	for(;!details::isdigit(ch=in.get());)
-		if(ch==input::traits_type::eof())
-			throw std::runtime_error("Try to read data from EOF stream");
+	decltype(in.get()) ch;
+	while(!details::isdigit(ch=in.get()));
 	for(a=ch-48;details::isdigit(ch=in.get());a=a*10+ch-48);
 	return in;
 }
@@ -38,10 +36,8 @@ inline input& operator>>(input& in,Unsigned_integer& a)
 template<standard_input_stream input>
 inline input& operator>>(input& in,Signed_integer& a)
 {
-	typename input::traits_type::int_type ch;
-	for(;!details::isdigit_or_minus(ch=in.get());)
-		if(ch==input::traits_type::eof())
-			throw std::runtime_error("Try to read data from EOF stream");
+	decltype(in.get()) ch;
+	while(!details::isdigit_or_minus(ch=in.get()));
 	if(ch==45)
 	{
 		for(;details::isdigit(ch=in.get());a=a*10+ch-48);
@@ -57,7 +53,7 @@ inline output& operator<<(output& out,Unsigned_integer a)
 {
 	if(a)
 	{
-		std::array<typename output::traits_type::char_type,sizeof(a)*8> v;
+		std::array<typename output::char_type,sizeof(a)*8> v;
 		auto ed(v.data()+v.size());
 		for(*--ed=a%10+48;a/=10;*--ed=a%10+48);
 		out.write(ed,v.data()+v.size());
@@ -67,7 +63,7 @@ inline output& operator<<(output& out,Unsigned_integer a)
 	return out;
 }
 template<output_stream output>
-inline output& operator<<(output& out,std::basic_string_view<typename output::traits_type::char_type> str)
+inline output& operator<<(output& out,std::basic_string_view<typename output::char_type> str)
 {
 	out.write(str.cbegin(),str.cend());
 	return out;
@@ -78,13 +74,12 @@ inline output_stream& operator<<(output_stream& out,std::exception const &e)
 	return out<<e.what();
 }
 template<standard_input_stream input>
-inline input& operator>>(input& in,std::basic_string<typename input::traits_type::char_type> &str)
+inline input& operator>>(input& in,std::basic_string<typename input::char_type> &str)
 {
-	str.clear();
 	decltype(in.get()) ch;
 	for(;details::isspace(ch=in.get()););
-	if(!in.eof())
-		for(str.push_back(ch);!details::isspace(ch=in.get())&&!in.eof();str.push_back(ch));
+	str.clear();
+	for(str.push_back(ch);!details::isspace(ch=in.get());str.push_back(ch));
 	return in;
 }
 
@@ -98,7 +93,7 @@ inline output& operator<<(output& out,Signed_integer a)
 			out.put('-');
 			a=-a;
 		}
-		std::array<typename output::traits_type::char_type,sizeof(a)*8> v;
+		std::array<typename output::char_type,sizeof(a)*8> v;
 
 		auto ed(v.data()+v.size());
 		for(*--ed=a%10+48;a/=10;*--ed=a%10+48);
@@ -110,51 +105,50 @@ inline output& operator<<(output& out,Signed_integer a)
 }
 
 template<standard_input_stream input>
-inline input& getline(input& in,std::basic_string<typename input::traits_type::char_type> &str)
+inline input& getline(input& in,std::basic_string<typename input::char_type> &str)
 {
 	str.clear();
-	for(typename input::traits_type::int_type ch;(ch=in.get())!=input::traits_type::eof()||ch!='\n';str.push_back(input::traits_type::to_char_type(ch)));
+	for(decltype(in.get()) ch;(ch=in.get())!='\n';str.push_back(ch));
 	return in;
 }
 
 template<standard_input_stream input>
-inline input& getwhole(input& in,std::basic_string<typename input::traits_type::char_type> &str)
+inline input& getwhole(input& in,std::basic_string<typename input::char_type> &str)
 {
-	str.clear();
-	for(typename input::traits_type::int_type ch;(ch=in.get())!=input::traits_type::eof();str.push_back(input::traits_type::to_char_type(ch)));
+	for(str.clear();!in.eof();str.push_back(in.get()));
 	return in;
 }
 
 namespace details
 {
-	inline output_stream& fprint(output_stream &out,std::string_view format)
+inline output_stream& fprint(output_stream &out,std::string_view format)
+{
+	std::size_t percent_pos;
+	for(;(percent_pos=format.find('%'))!=std::string_view::npos&&percent_pos+1!=format.size()&&format[percent_pos+1]=='%';format.remove_prefix(percent_pos+2))
+		out.write(format.cbegin(),format.cbegin()+percent_pos+1);
+	if(percent_pos!=std::string_view::npos)
+		throw std::runtime_error("fprint() format error");
+	out.write(format.cbegin(),format.cend());
+	return out;
+}
+template<typename T,typename ...Args>
+inline output_stream& fprint(output_stream &out,std::string_view format,T const& cr,Args&& ...args)
+{
+	std::size_t percent_pos;
+	for(;(percent_pos=format.find('%'))!=std::string_view::npos&&percent_pos+1!=format.size()&&format[percent_pos+1]=='%';format.remove_prefix(percent_pos+2))
+		out.write(format.cbegin(),format.cbegin()+percent_pos+1);
+	if(percent_pos==std::string_view::npos)
 	{
-		std::size_t percent_pos;
-		for(;(percent_pos=format.find('%'))!=std::string_view::npos&&percent_pos+1!=format.size()&&format[percent_pos+1]=='%';format.remove_prefix(percent_pos+2))
-			out.write(format.cbegin(),format.cbegin()+percent_pos+1);
-		if(percent_pos!=std::string_view::npos)
-			throw std::runtime_error("fprint() format error");
 		out.write(format.cbegin(),format.cend());
 		return out;
 	}
-	template<typename T,typename ...Args>
-	inline output_stream& fprint(output_stream &out,std::string_view format,T const& cr,Args&& ...args)
+	else
 	{
-		std::size_t percent_pos;
-		for(;(percent_pos=format.find('%'))!=std::string_view::npos&&percent_pos+1!=format.size()&&format[percent_pos+1]=='%';format.remove_prefix(percent_pos+2))
-			out.write(format.cbegin(),format.cbegin()+percent_pos+1);
-		if(percent_pos==std::string_view::npos)
-		{
-			out.write(format.cbegin(),format.cend());
-			return out;
-		}
-		else
-		{
-			out.write(format.cbegin(),format.cbegin()+percent_pos);
-			format.remove_prefix(percent_pos+1);
-		}
-		return fprint(out << cr,format,std::forward<Args>(args)...);
+		out.write(format.cbegin(),format.cbegin()+percent_pos);
+		format.remove_prefix(percent_pos+1);
 	}
+	return fprint(out << cr,format,std::forward<Args>(args)...);
+}
 }
 
 template<typename ...Args>

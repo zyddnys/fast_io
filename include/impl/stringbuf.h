@@ -3,6 +3,7 @@
 #include<string>
 #include"concept.h"
 #include<string_view>
+#include"write_precondition.h"
 
 namespace fast_io
 {
@@ -12,11 +13,7 @@ class basic_ibuf_string_view
 	T s;
 public:
 	using value_type = T;
-	using traits_type = typename value_type::traits_type;
-private:
-	using int_type = typename traits_type::int_type;
-	using char_type = typename T::value_type;
-public:
+	using char_type = std::make_unsigned_t<typename T::value_type>;
 	template<typename ...Args>
 	constexpr basic_ibuf_string_view(Args&& ...args):s(std::forward<Args>(args)...){}
 	constexpr auto& str()
@@ -28,19 +25,21 @@ public:
 		return s.empty();
 	}
 	template<typename contiguous_iterator>
-	constexpr contiguous_iterator read(contiguous_iterator cbegin,contiguous_iterator cend)
+	constexpr contiguous_iterator read(contiguous_iterator begin,contiguous_iterator end)
 	{
-		std::size_t const cped(s.copy(std::addressof(*cbegin),cend-cbegin));
+		auto pb(static_cast<char_type*>(static_cast<void*>(std::addressof(*begin))));
+		auto pe(static_cast<char_type*>(static_cast<void*>(std::addressof(*end))));
+		std::size_t const cped(s.copy(pb,pe-pb));
 		s.remove_prefix(cped);
-		return cbegin+cped;
+		return begin+cped*sizeof(*begin)/sizeof(char_type);
 	}
-	constexpr int_type get()
+	constexpr char_type get()
 	{
-		if(eof())
-			return traits_type::eof();
-		int_type ch(s.front());
+		if(s.empty())
+			throw std::runtime_error("Try to read data from EOF ibuf string view");
+		auto ch(s.front());
 		s.remove_prefix(1);
-		return traits_type::to_int_type(ch);
+		return ch;
 	}
 };
 
@@ -50,11 +49,7 @@ class basic_obuf_string
 	T s;
 public:
 	using value_type = T;
-	using traits_type = typename value_type::traits_type;
-private:
-	using int_type = typename traits_type::int_type;
 	using char_type = typename T::value_type;
-public:
 	template<typename... Args>
 	constexpr basic_obuf_string(Args&& ...args):s(std::forward<Args>(args)...){}
 	constexpr auto& str()
@@ -64,11 +59,12 @@ public:
 	template<typename contiguous_iterator>
 	constexpr void write(contiguous_iterator cbegin,contiguous_iterator cend)
 	{
+		write_precondition(cbegin,cend);
 		s.append(static_cast<char_type const*>(static_cast<void const*>(std::addressof(*cbegin))),static_cast<char_type const*>(static_cast<void const*>(std::addressof(*cend))));
 	}
-	constexpr void put(int_type ch)
+	constexpr void put(char_type ch)
 	{
-		s.push_back(traits_type::to_char_type(ch));
+		s.push_back(ch);
 	}
 	constexpr void flush(){}
 	constexpr void clear(){s.clear();}
@@ -83,6 +79,7 @@ inline constexpr T concat(Args&& ...args)
 	print(t,std::forward<Args>(args)...);
 	return std::move(t.str());
 }
+
 template<typename T=std::string,typename... Args>
 inline constexpr T format(std::string_view format,Args&& ...args)
 {
@@ -90,6 +87,7 @@ inline constexpr T format(std::string_view format,Args&& ...args)
 	fprint(t,format,std::forward<Args>(args)...);
 	return std::move(t.str());
 }
+
 template<typename T,typename... Args>
 inline constexpr void in_place_to(T& t,Args&& ...args)
 {
@@ -105,7 +103,7 @@ inline constexpr void in_place_to(std::string& t,Args&& ...args)
 	os.clear();
 	print(os,std::forward<Args>(args)...);
 	t=std::move(os.str());
-} 
+}
 
 template<typename T,typename... Args>
 inline constexpr auto to(Args&& ...args)

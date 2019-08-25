@@ -1,4 +1,5 @@
 #pragma once
+#include"impl/concept.h"
 #include"impl/mode.h"
 #include"impl/handlers/c_style.h"
 #ifdef _WIN32_WINNT
@@ -6,16 +7,11 @@
 //#ifdef _POSIX_C_SOURCE
 #include"impl/handlers/posix.h"	
 //#endif
-#include"impl/concept.h"
-#include"impl/rd_type.h"
-#include"impl/read_write.h"
-#include"impl/manip.h"
 #include"impl/stringbuf.h"
 #include"impl/iobuf.h"
 #include"impl/iomutex.h"
 #include"impl/wrapper.h"
 #include"impl/tie.h"
-#include"impl/unicode.h"
 
 namespace fast_io
 {
@@ -46,3 +42,8 @@ inline tie<c_style_io_handle,c_style_io_handle> c_in(c_out,stdin);
 inline tie<c_style_io_handle,c_style_io_handle> c_err(c_out,stderr);
 
 }
+
+#include"impl/rd_type.h"
+#include"impl/manip.h"
+#include"impl/read_write.h"
+//#include"impl/unicode.h"

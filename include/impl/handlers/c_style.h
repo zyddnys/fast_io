@@ -18,7 +18,7 @@ protected:
 	}
 public:
 	c_style_io_handle(std::FILE* fpp):fp(fpp){}
-	using traits_type = std::char_traits<char>;
+	using char_type = unsigned char;
 	using native_handle_type = std::FILE*;
 	native_handle_type native_handle() const
 	{
@@ -45,11 +45,14 @@ public:
 		if(std::fwrite(std::addressof(*begin),sizeof(*begin),count,fp)<count)
 			throw std::system_error(errno,std::generic_category());
 	}
-	traits_type::int_type get()
+	char_type get()
 	{
-		return fgetc(fp);
+		auto ch(fgetc(fp));
+		if(ch==EOF)
+			throw std::system_error(errno,std::system_category());
+		return ch;
 	}
-	void put(traits_type::int_type ch)
+	void put(char_type ch)
 	{
 		if(fputc(ch,fp)==EOF)
 			throw std::system_error(errno,std::system_category());
@@ -69,7 +72,7 @@ class c_style_file:public c_style_io_handle
 			std::fclose(native_handle());
 	}
 public:
-	using traits_type = std::char_traits<char>;
+	using char_type = char;
 	using native_handle_type = std::FILE*;
 	template<typename ...Args>
 	c_style_file(native_interface_t,Args&& ...args):c_style_io_handle(std::fopen(std::forward<Args>(args)...))

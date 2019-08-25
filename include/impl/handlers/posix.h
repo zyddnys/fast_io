@@ -77,7 +77,7 @@ protected:
 		return fd;
 	}
 public:
-	using traits_type = std::char_traits<char>;
+	using char_type = char;
 	using native_handle_type = int;
 	native_handle_type native_handle() const
 	{
@@ -116,7 +116,7 @@ class posix_file:public posix_io_handle
 			close(native_handle());
 	}
 public:
-	using traits_type = posix_io_handle::traits_type;
+	using char_type = posix_io_handle::char_type;
 	using native_handle_type = posix_io_handle::native_handle_type;
 	template<typename ...Args>
 	posix_file(native_interface_t,Args&& ...args):posix_io_handle(::open(std::forward<Args>(args)...))

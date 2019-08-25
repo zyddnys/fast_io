@@ -9,7 +9,7 @@ template<input_stream T>
 class input_wrapper:public T
 {
 public:
-	using traits_type = typename T::traits_type;
+	using char_type = typename T::char_type;
 	using native_handle_type = typename T::native_handle_type;
 	template<typename ...Args>
 	constexpr input_wrapper(native_interface_t,Args&& ...args):T(std::forward<Args>(args)...){}
@@ -24,7 +24,7 @@ template<output_stream T>
 class output_wrapper:public T
 {
 public:
-	using traits_type = typename T::traits_type;
+	using char_type = typename T::char_type;
 	using native_handle_type = typename T::native_handle_type;
 	template<typename ...Args>
 	constexpr output_wrapper(native_interface_t,Args&& ...args):T(std::forward<Args>(args)...){}
@@ -39,7 +39,7 @@ template<io_stream T>
 class io_wrapper:public T
 {
 public:
-	using traits_type = typename T::traits_type;
+	using char_type = typename T::char_type;
 	using native_handle_type = typename T::native_handle_type;
 	template<typename ...Args>
 	constexpr io_wrapper(native_interface_t,Args&& ...args):T(std::forward<Args>(args)...){}

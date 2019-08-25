@@ -45,17 +45,15 @@ public:
 	Allocator get_allocator() const{	return alloc;}
 };
 
-template<input_stream Ihandler,typename Buf=basic_buf_handler<typename Ihandler::traits_type::char_type>>
+template<input_stream Ihandler,typename Buf=basic_buf_handler<typename Ihandler::char_type>>
 class basic_ibuf
 {
 	Ihandler ih;
 	Buf bh;
 public:
 	using native_handle_type = Ihandler;
-	using traits_type = typename native_handle_type::traits_type;
+	using char_type = typename native_handle_type::char_type;	
 private:
-	using char_type = typename traits_type::char_type;
-	using int_type = typename traits_type::int_type;
 	char_type* mread(char_type* begin,char_type* end)
 	{
 		std::size_t n(end-begin);
@@ -92,26 +90,22 @@ public:
 	{
 		return bh.beg==bh.end;
 	}
-	operator bool() const
-	{
-		return bh.beg!=bh.end;
-	}
-	int_type get()
+	char_type get()
 	{
 		if(bh.end==bh.curr)		//cache miss
 		{
 			if((bh.end=ih.read(bh.beg,bh.beg+Buf::size()))==bh.beg)
-				return traits_type::eof();
+				throw std::runtime_error("Try to read data from EOF stream");
 			bh.curr=bh.beg;
 		}
-		return traits_type::to_int_type(*bh.curr++);
+		return *bh.curr++;
 	}
 	auto& native_handle()
 	{
 		return ih;
 	}
 };
-template<output_stream Ohandler,typename Buf=basic_buf_handler<typename Ohandler::traits_type::char_type>>
+template<output_stream Ohandler,typename Buf=basic_buf_handler<typename Ohandler::char_type>>
 class basic_obuf
 {
 	Ohandler oh;
@@ -125,14 +119,12 @@ class basic_obuf
 	catch(...){}
 public:
 	using native_handle_type = Ohandler;
-	using traits_type = typename native_handle_type::traits_type;
+	using char_type = typename native_handle_type::char_type;
 private:
-	using char_type = typename traits_type::char_type;
-	using int_type = typename traits_type::int_type;
 	void mwrite(char_type const* cbegin,char_type const* cend)
 	{
 		std::size_t const n(bh.end-bh.curr);
-		if(n<cend-cbegin)
+		if(n<static_cast<std::size_t>(cend-cbegin))
 		{
 			std::uninitialized_copy_n(cbegin,n,bh.curr);
 			cbegin+=n;
@@ -179,14 +171,14 @@ public:
 	{
 		mwrite(static_cast<char_type const*>(static_cast<void const*>(std::addressof(*cbegin))),static_cast<char_type const*>(static_cast<void const*>(std::addressof(*cend))));
 	}
-	void put(int_type ch)
+	void put(char_type ch)
 	{
 		if(bh.curr==bh.end)		//buffer full
 		{
 			oh.write(bh.beg,bh.end);
 			bh.curr=bh.beg;
 		}
-		*bh.curr++=traits_type::to_char_type(ch);
+		*bh.curr++=ch;
 	}
 	auto& native_handle()
 	{
@@ -209,15 +201,13 @@ auto read(Args&& ...args)
 };
 }
 
-template<io_stream io_handler,typename Buf=basic_buf_handler<typename io_handler::traits_type::char_type>>
+template<io_stream io_handler,typename Buf=basic_buf_handler<typename io_handler::char_type>>
 class basic_iobuf
 {
 public:
 	using native_handle_type = io_handler;
-	using traits_type = typename native_handle_type::traits_type;
+	using char_type = typename native_handle_type::char_type;
 private:
-	using char_type = typename traits_type::char_type;
-	using int_type = typename traits_type::int_type;
 	basic_ibuf<details::fake_basic_ihandler<native_handle_type,Buf>> ibf;
 public:
 	template<typename ...Args>
@@ -230,7 +220,7 @@ public:
 	{
 		ibf.native_handle().flush();
 	}
-	void put(int_type ch)
+	void put(char_type ch)
 	{
 		ibf.native_handle().put(ch);
 	}
@@ -251,10 +241,6 @@ public:
 	bool eof() const
 	{
 		return ibf.eof();
-	}
-	operator bool() const
-	{
-		return !eof();
 	}
 };
 

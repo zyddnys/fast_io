@@ -24,13 +24,13 @@ inline standard_output_stream& write(standard_output_stream& out,Trivial_copyabl
 template<standard_input_stream input>
 inline input& read_size(input& in,std::size_t& size)
 {
-	auto constexpr bytes(sizeof(typename input::traits_type::char_type)*8);
+	auto constexpr bytes(sizeof(in.get())*8);
 	auto constexpr lshift(bytes-1);
 	auto constexpr limit(static_cast<std::size_t>(1)<<lshift);
 	auto constexpr limitm1(limit-1);
-	typename input::traits_type::int_type ch;
-	for(std::size_t temp(0),lsf(0);(ch=in.get())!=input::traits_type::eof()&&lsf<(sizeof(size)*8);lsf+=lshift)
+	for(std::size_t temp(0),lsf(0);lsf<sizeof(size)*8;lsf+=lshift)
 	{
+		std::make_unsigned_t<decltype(in.get())> ch(in.get());
 		temp|=(ch&limitm1)<<lsf;
 		if(ch<limit)
 		{

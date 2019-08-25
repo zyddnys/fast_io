@@ -13,7 +13,7 @@ class basic_imutex
 	T handler;
 public:
 	using native_handle_type = T;
-	using traits_type = typename T::traits_type;
+	using char_type = typename native_handle_type::char_type;
 	T& native_handle()
 	{
 		return handler;
@@ -68,7 +68,7 @@ class basic_omutex
 	T handler;
 public:
 	using native_handle_type = T;
-	using traits_type = typename T::traits_type;
+	using char_type = typename native_handle_type::char_type;
 	template<typename ...Args>
 	basic_omutex(Args&& ...args):mtx(std::make_unique<std::mutex>()),handler(std::forward<Args>(args)...){}
 	T& native_handle()
@@ -79,11 +79,11 @@ public:
 	{
 		return *mtx;
 	}
-	template<typename Contiguous_iterator>
-	void write(Contiguous_iterator begin,Contiguous_iterator end)
+	template<typename ...Args>
+	void write(Args&& ...args)
 	{
 		std::lock_guard lg(mutex());
-		handler.write(begin,end);
+		handler.write(std::forward<Args>(args)...);
 	}
 	template<typename ...Args>
 	void put(Args&& ...args)
@@ -105,7 +105,7 @@ class basic_iomutex
 	T handler;
 public:
 	using native_handle_type = T;
-	using traits_type = typename T::traits_type;
+	using char_type = typename native_handle_type::char_type;
 	template<typename ...Args>
 	basic_iomutex(Args&& ...args):mtx(std::make_unique<std::mutex>()),handler(std::forward<Args>(args)...){}
 	T& native_handle()
@@ -116,11 +116,11 @@ public:
 	{
 		return *mtx;
 	}
-	template<typename Contiguous_iterator>
-	void write(Contiguous_iterator begin,Contiguous_iterator end)
+	template<typename ...Args>
+	void write(Args&& ...args)
 	{
 		std::lock_guard lg(mutex());
-		handler.write(begin,end);
+		handler.write(std::forward<Args>(args)...);
 	}
 	template<typename ...Args>
 	void put(Args&& ...args)
@@ -153,7 +153,6 @@ public:
 		return handler;
 	}
 };
-
 
 template<typename ...Args>
 inline mutex_output_stream& print(mutex_output_stream &omtx,Args&& ...args)
