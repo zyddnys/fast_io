@@ -68,12 +68,12 @@ inline constexpr standard_input_stream& input_base_number(standard_input_stream&
 		}
 		else if constexpr (10 < base)
 		{
-			if(65<=ch&&ch<=65+base)
+			if(65<=ch&&ch<65+base)
 			{
 				a=ch-55;
 				break;
 			}
-			else if(97<=ch&&ch<=97+base)
+			else if(97<=ch&&ch<97+base)
 			{
 				a=ch-87;
 				break;
@@ -83,13 +83,13 @@ inline constexpr standard_input_stream& input_base_number(standard_input_stream&
 	while(true)
 	{
 		auto try_ch(in.try_get());
-		if(48<=try_ch.first&&try_ch.first<=baseed)
+		if(48<=try_ch.first&&try_ch.first<baseed)
 			a=a*base+try_ch.first-48;
 		else if constexpr (10 < base)
 		{
-			if(65<=try_ch.first&&try_ch.first<=65+base)
+			if(65<=try_ch.first&&try_ch.first<65+base)
 				a=a*base+try_ch.first-55;
-			else if(97<=try_ch.first&&try_ch.first<=97+base)
+			else if(97<=try_ch.first&&try_ch.first<97+base)
 				a=a*base+try_ch.first-87;
 			else
 				break;
@@ -107,7 +107,7 @@ inline constexpr standard_input_stream& input_base_number(standard_input_stream&
 	while(true)
 	{
 		auto ch(in.get());
-		if(48<=ch&&ch<=baseed)
+		if(48<=ch&&ch<baseed)
 		{
 			a=ch-48;
 			break;
@@ -120,12 +120,12 @@ inline constexpr standard_input_stream& input_base_number(standard_input_stream&
 		}
 		else if constexpr (10 < base)
 		{
-			if(65<=ch&&ch<=65+base)
+			if(65<=ch&&ch<65+base)
 			{
 				a=ch-55;
 				break;
 			}
-			else if(97<=ch&&ch<=97+base)
+			else if(97<=ch&&ch<97+base)
 			{
 				a=ch-87;
 				break;
@@ -135,13 +135,13 @@ inline constexpr standard_input_stream& input_base_number(standard_input_stream&
 	while(true)
 	{
 		auto try_ch(in.try_get());
-		if(48<=try_ch.first&&try_ch.first<=baseed)
+		if(48<=try_ch.first&&try_ch.first<baseed)
 			a=a*base+try_ch.first-48;
 		else if constexpr (10 < base)
 		{
-			if(65<=try_ch.first&&try_ch.first<=65+base)
+			if(65<=try_ch.first&&try_ch.first<65+base)
 				a=a*base+try_ch.first-55;
-			else if(97<=try_ch.first&&try_ch.first<=97+base)
+			else if(97<=try_ch.first&&try_ch.first<97+base)
 				a=a*base+try_ch.first-87;
 			else
 				break;

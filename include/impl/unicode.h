@@ -39,14 +39,17 @@ private:
 			u.bts.reset(pos);
 		std::size_t bytes(ch_bits_m2-pos);
 		char_type converted_ch(u.ch);
+		print(fast_io::out,fast_io::bin(converted_ch)).put('\t');
 		for(std::size_t i(0);i!=bytes;++i)
 		{
-			std::make_unsigned_t<decltype(ib.get())> t(ib.get());
+			unsigned_native_char_type t(ib.get());
+			print(fast_io::out,fast_io::bin(converted_ch)).put('\t');
 			if((t>>ch_bits_m2)==2)
 				converted_ch=(converted_ch<<ch_bits_m2)|(t&limitm1);
 			else
 				throw std::runtime_error("not a utf8 character");
 		}
+		println(fast_io::out);
 		return converted_ch;
 	}
 public:
