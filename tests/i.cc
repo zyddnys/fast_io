@@ -36,7 +36,13 @@ try
 	cqw::timer t("obuf");
 	fast_io::obuf obuf("obuf.txt",fast_io::open::interface<fast_io::open::binary>);
 	for(std::size_t i(0);i!=N;++i)
-		(obuf<<i).put('\n');
+		println(obuf,i);
+	}
+	{
+	cqw::timer t("obuf_mutex with dec(i)");
+	fast_io::obuf_mutex obuf("obuf_mutex.txt",fast_io::open::interface<fast_io::open::binary>);
+	for(std::size_t i(0);i!=N;++i)
+		println(obuf,fast_io::dec(i));
 	}
 	{
 	cqw::timer t("obuf_mutex");

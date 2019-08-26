@@ -35,17 +35,16 @@ template<typename T> inline constexpr details::base_t<10,false,T const> dec(T co
 template<typename T> inline constexpr details::base_t<2,false,T> bin(T& t){return {t};}
 template<typename T> inline constexpr details::base_t<2,false,T const> bin(T const& t) {return {t};}
 
-
 template<std::size_t base,bool uppercase>
-inline constexpr standard_output_stream& operator<<(standard_output_stream& out,details::base_t<base,uppercase,Unsigned_integer> v)
+inline constexpr standard_output_stream& operator<<(standard_output_stream& out,details::base_t<base,uppercase,Integral> v)
 {
-	return details::output_unsigned_base_number<base,uppercase>(out,v.reference);
+	return details::output_base_number<base,uppercase>(out,v.reference);
 }
 
 template<std::size_t base,bool uppercase>
-inline constexpr standard_output_stream& operator<<(standard_output_stream& out,details::base_t<base,uppercase,Signed_integer> v)
+inline constexpr standard_input_stream& operator>>(standard_input_stream& in,details::base_t<base,uppercase,Integral> v)
 {
-	return details::output_signed_base_number<base,uppercase>(out,v.reference);
+	return details::input_base_number<base>(in,v.reference);
 }
 
 }

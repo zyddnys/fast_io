@@ -24,8 +24,9 @@ inline bool isdigit_or_minus(Integral ch)
 }
 
 template<std::size_t base,bool uppercase,standard_output_stream output>
-inline output& output_unsigned_base_number(output& out,Unsigned_integer a)
+inline output& output_base_number(output& out,Unsigned_integer a)
 {
+//number: 0:48 9:57
 //upper: 65 :A 70: F
 //lower: 97 :a 102 :f
 	if(a)
@@ -59,15 +60,115 @@ inline output& output_unsigned_base_number(output& out,Unsigned_integer a)
 	return out;
 }
 
-template<std::size_t base,bool uppercase,Signed_integer T>
-inline standard_output_stream& output_signed_base_number(standard_output_stream& out,T a)
+template<char base,bool uppercase,Signed_integer T>
+inline standard_output_stream& output_base_number(standard_output_stream& out,T a)
 {
 	if(a<0)
 	{
 		out.put('-');
 		a=-a;
 	}
-	return output_unsigned_base_number<base,uppercase>(out,static_cast<std::make_unsigned_t<T>>(a));
+	return output_base_number<base,uppercase>(out,static_cast<std::make_unsigned_t<T>>(a));
+}
+
+template<char base>
+inline constexpr standard_input_stream& input_base_number(standard_input_stream& in,Unsigned_integer& a)
+{
+	auto constexpr baseed(48+base);
+	while(true)
+	{
+		auto ch(in.get());
+		if(48<=ch&&ch<=baseed)
+		{
+			a=ch-48;
+			break;
+		}
+		else if constexpr (10 < base)
+		{
+			if(65<=ch&&ch<=65+base)
+			{
+				a=ch-55;
+				break;
+			}
+			else if(97<=ch&&ch<=97+base)
+			{
+				a=ch-87;
+				break;
+			}
+		}
+	}
+	while(true)
+	{
+		auto try_ch(in.try_get());
+		if(48<=try_ch.first&&try_ch.first<=baseed)
+			a=a*base+try_ch.first-48;
+		else if constexpr (10 < base)
+		{
+			if(65<=try_ch.first&&try_ch.first<=65+base)
+				a=a*base+try_ch.first-55;
+			else if(97<=try_ch.first&&try_ch.first<=97+base)
+				a=a*base+try_ch.first-87;
+			else
+				break;
+		}
+		else
+			break;
+	}
+	return in;
+}
+template<std::size_t base>
+inline constexpr standard_input_stream& input_base_number(standard_input_stream& in,Signed_integer& a)
+{
+	auto constexpr baseed(48+base);
+	bool rev(false);
+	while(true)
+	{
+		auto ch(in.get());
+		if(48<=ch&&ch<=baseed)
+		{
+			a=ch-48;
+			break;
+		}
+		else if(ch==45)
+		{
+			a=0;
+			rev=true;
+			break;
+		}
+		else if constexpr (10 < base)
+		{
+			if(65<=ch&&ch<=65+base)
+			{
+				a=ch-55;
+				break;
+			}
+			else if(97<=ch&&ch<=97+base)
+			{
+				a=ch-87;
+				break;
+			}
+		}
+	}
+	while(true)
+	{
+		auto try_ch(in.try_get());
+		if(48<=try_ch.first&&try_ch.first<=baseed)
+			a=a*base+try_ch.first-48;
+		else if constexpr (10 < base)
+		{
+			if(65<=try_ch.first&&try_ch.first<=65+base)
+				a=a*base+try_ch.first-55;
+			else if(97<=try_ch.first&&try_ch.first<=97+base)
+				a=a*base+try_ch.first-87;
+			else
+				break;
+		}
+		else
+			break;
+	}
+	if(rev)
+		a=-a;
+	return in;
 }
 
 }
@@ -79,6 +180,12 @@ inline constexpr auto eat_space_get(standard_input_stream& in)
 	return ch;
 }
 
+template<standard_input_stream input>
+inline input& operator>>(input& in,Integral& a)
+{
+	return details::input_base_number<10>(in,a);
+}
+/*
 template<standard_input_stream input>
 inline input& operator>>(input& in,Unsigned_integer& a)
 {
@@ -106,13 +213,14 @@ inline input& operator>>(input& in,Signed_integer& a)
 		for(decltype(in.try_get()) ch;details::isdigit((ch=in.try_get()).first);a=a*10+ch.first-48);
 	}
 	return in;
-}
+}*/
 
 template<standard_output_stream output>
-inline constexpr output& operator<<(output& out,Unsigned_integer a)
+inline constexpr output& operator<<(output& out,Integral a)
 {
-	return details::output_unsigned_base_number<10,false>(out,a);
+	return details::output_base_number<10,false>(out,a);
 }
+
 template<output_stream output>
 inline output& operator<<(output& out,std::basic_string_view<typename output::char_type> str)
 {
@@ -131,11 +239,6 @@ inline input& operator>>(input& in,std::basic_string<typename input::char_type> 
 	str.push_back(eat_space_get(in));
 	for(decltype(in.try_get()) ch;!details::isspace((ch=in.try_get()).first);str.push_back(ch.first));
 	return in;
-}
-
-inline constexpr standard_output_stream& operator<<(standard_output_stream& out,Signed_integer a)
-{
-	return out<<details::output_signed_base_number<10,false>(out,a);
 }
 
 template<standard_input_stream input>
