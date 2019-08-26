@@ -14,14 +14,6 @@ inline bool isspace(Integral ch)
 {
 	return ch==0x20||ch==0x0a||ch==0x0d||ch==0x09||ch==0x0b;
 }
-inline bool isdigit(Integral ch)
-{
-	return 47<ch&&ch<58;
-}
-inline bool isdigit_or_minus(Integral ch)
-{
-	return (47<ch&&ch<58)||(ch==45);
-}
 
 template<char base,bool uppercase,standard_output_stream output>
 inline output& output_base_number(output& out,Unsigned_integer a)
