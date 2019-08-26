@@ -21,7 +21,7 @@ public:
 	CharT *beg,*curr,*end;
 	explicit basic_buf_handler():beg(alloc.allocate(buffer_size)),end(beg+buffer_size){}
 	basic_buf_handler& operator=(basic_buf_handler const&)=delete;
-	basic_buf_handler basic_buf_handler const&)=delete;
+	basic_buf_handler(basic_buf_handler const&)=delete;
 	static constexpr std::size_t size() {return buffer_size;}
 	basic_buf_handler(basic_buf_handler&& m) noexcept:beg(m.beg),curr(m.curr),end(m.end)
 	{
