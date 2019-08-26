@@ -3,5 +3,6 @@
 int main()
 {
 	fast_io::ibuf ib("sample.txt");
-	println(fast_io::out,fast_io::character(eat_space_get(ib)));
+	fast_io::out.put(eat_space_get(ib));
+	println(fast_io::out);
 }
