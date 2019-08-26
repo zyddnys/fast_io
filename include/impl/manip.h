@@ -127,7 +127,7 @@ inline details::setw_fill_t<T,Integral> setw(std::size_t width,const T &t,Integr
 template<standard_output_stream output>
 inline output& operator<<(output& out,const details::setw_fill_t<auto,Integral> &a)
 {
-	basic_obuf_string<std::basic_string<typename output::char_type>> bas;
+	basic_ostring<std::basic_string<typename output::char_type>> bas;
 	bas<<a.reference;
 	for(std::size_t i(bas.str().size());i<a.width;++i)
 		out.put(a.ch);
@@ -136,7 +136,7 @@ inline output& operator<<(output& out,const details::setw_fill_t<auto,Integral> 
 template<standard_output_stream output>
 output& operator<<(output& out,const details::setw_t<auto> &a)
 {
-	basic_obuf_string<std::basic_string<typename output::char_type>> bas;
+	basic_ostring<std::basic_string<typename output::char_type>> bas;
 	bas<<a.reference;
 	for(std::size_t i(bas.str().size());i<a.width;++i)
 		out.put(' ');
@@ -220,7 +220,7 @@ inline output& operator<<(output& out,details::floating_point_default const &a)
 		++x;
 	{
 	auto fix(std::fabs(x)<=a.precision);
-	basic_obuf_string<std::basic_string<typename output::char_type>> bas;
+	basic_ostring<std::basic_string<typename output::char_type>> bas;
 	if(fix)
 		bas<<fixed(e,a.precision);
 	else

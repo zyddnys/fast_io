@@ -38,13 +38,13 @@ using ibuf = basic_ibuf<isystem_file>;
 using obuf = basic_obuf<osystem_file>;
 using iobuf = basic_iobuf<iosystem_file>;
 
-using ibuf_string_view = basic_ibuf_string_view<std::string_view>;
-using obuf_string = basic_obuf_string<std::string>;
+using istring_view = basic_istring_view<std::string_view>;
+using ostring = basic_ostring<std::string>;
 using ibuf_mutex = basic_iomutex<ibuf>;
 using obuf_mutex = basic_iomutex<obuf>;
 using iobuf_mutex = basic_iomutex<iobuf>;
-using ibuf_string_view_mutex = basic_iomutex<ibuf_string_view>;
-using obuf_string_mutex = basic_iomutex<obuf_string>;
+using istring_view_mutex = basic_iomutex<istring_view>;
+using ostring_mutex = basic_iomutex<ostring>;
 
 using c_style_ohandle = ierasure<c_style_io_handle>;
 using c_style_ihandle = oerasure<c_style_io_handle>;

@@ -24,6 +24,13 @@ namespace details
 	}
 }
 
+inline constexpr auto eat_space_get(standard_input_stream& in)
+{
+	decltype(in.get()) ch(in.get());
+	for(;details::isspace(ch);ch=in.get());
+	return ch;
+}
+
 template<standard_input_stream input>
 inline input& operator>>(input& in,Unsigned_integer& a)
 {
@@ -81,10 +88,8 @@ inline output_stream& operator<<(output_stream& out,std::exception const &e)
 template<standard_input_stream input>
 inline input& operator>>(input& in,std::basic_string<typename input::char_type> &str)
 {
-	decltype(in.get()) ch;
-	for(;details::isspace(ch=in.get()););
 	str.clear();
-	str.push_back(ch);
+	str.push_back(eat_space_get(in));
 	for(decltype(in.try_get()) ch;!details::isspace((ch=in.try_get()).first);str.push_back(ch.first));
 	return in;
 }

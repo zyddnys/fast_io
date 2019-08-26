@@ -117,7 +117,7 @@ public:
 template<typename T>
 inline constexpr void in_place_utf8_to_unicode(T& t,std::string_view view)
 {
-	basic_ibuf_string_view<std::string_view> ibsv(view);
+	basic_istring_view<std::string_view> ibsv(view);
 	unicode_view<decltype(ibsv),typename T::value_type> uv(ibsv);
 	getwhole(uv,t);
 }
@@ -135,7 +135,7 @@ namespace details
 template<typename T>
 inline void in_place_unicode_to_utf8(std::string& v,std::basic_string_view<T> view)
 {
-	basic_obuf_string<std::string> obsv(std::move(v));
+	basic_ostring<std::string> obsv(std::move(v));
 	unicode_view<decltype(obsv),T> uv(obsv);
 	uv<<view;
 	v=std::move(obsv.str());
@@ -144,7 +144,7 @@ inline void in_place_unicode_to_utf8(std::string& v,std::basic_string_view<T> vi
 template<typename T>
 inline std::string unicode_to_utf8(std::basic_string_view<T> view)
 {
-	basic_obuf_string<std::string> obsv;
+	basic_ostring<std::string> obsv;
 	unicode_view<decltype(obsv),T> uv(obsv);
 	uv<<view;
 	return std::move(obsv.str());

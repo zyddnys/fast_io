@@ -8,14 +8,14 @@
 namespace fast_io
 {
 template< typename T>
-class basic_ibuf_string_view
+class basic_istring_view
 {
 	T s;
 public:
 	using value_type = T;
 	using char_type = std::make_unsigned_t<typename T::value_type>;
 	template<typename ...Args>
-	constexpr basic_ibuf_string_view(Args&& ...args):s(std::forward<Args>(args)...){}
+	constexpr basic_istring_view(Args&& ...args):s(std::forward<Args>(args)...){}
 	constexpr auto& str()
 	{
 		return s;
@@ -52,14 +52,14 @@ public:
 };
 
 template< typename T>
-class basic_obuf_string
+class basic_ostring
 {
 	T s;
 public:
 	using value_type = T;
 	using char_type = typename T::value_type;
 	template<typename... Args>
-	constexpr basic_obuf_string(Args&& ...args):s(std::forward<Args>(args)...){}
+	constexpr basic_ostring(Args&& ...args):s(std::forward<Args>(args)...){}
 	constexpr auto& str()
 	{
 		return s;
@@ -83,7 +83,7 @@ public:
 template<typename T=std::string,typename... Args>
 inline constexpr T concat(Args&& ...args)
 {
-	basic_obuf_string<T> t;
+	basic_ostring<T> t;
 	print(t,std::forward<Args>(args)...);
 	return std::move(t.str());
 }
@@ -91,7 +91,7 @@ inline constexpr T concat(Args&& ...args)
 template<typename T=std::string,typename... Args>
 inline constexpr T format(std::string_view format,Args&& ...args)
 {
-	basic_obuf_string<T> t;
+	basic_ostring<T> t;
 	fprint(t,format,std::forward<Args>(args)...);
 	return std::move(t.str());
 }
@@ -99,15 +99,15 @@ inline constexpr T format(std::string_view format,Args&& ...args)
 template<typename T,typename... Args>
 inline constexpr void in_place_to(T& t,Args&& ...args)
 {
-	basic_obuf_string<std::string> os;
-	basic_ibuf_string_view<std::string_view> is(print(os,std::forward<Args>(args)...).str());
+	basic_ostring<std::string> os;
+	basic_istring_view<std::string_view> is(print(os,std::forward<Args>(args)...).str());
 	is>>t;
 }
 
 template<typename... Args>
 inline constexpr void in_place_to(std::string& t,Args&& ...args)
 {
-	basic_obuf_string<std::string> os(std::move(t));
+	basic_ostring<std::string> os(std::move(t));
 	os.clear();
 	print(os,std::forward<Args>(args)...);
 	t=std::move(os.str());
