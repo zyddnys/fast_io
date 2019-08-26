@@ -8,6 +8,6 @@ try
 }
 catch(std::exception const &e)
 {
-	fast_io::err<<e<<"\n";
+	println(fast_io::err,e);
 	return 1;
 }
