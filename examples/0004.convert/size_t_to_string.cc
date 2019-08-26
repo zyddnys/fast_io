@@ -2,6 +2,7 @@
 
 int main()
 {
-	std::string str(fast_io::to<std::string>("23623643"));
-	println(fast_io::out,"convert from number 23623643: ",str);
+	std::size_t sz(23623643);
+	std::string str(fast_io::to<std::string>(sz));
+	println(fast_io::out,"convert from std::size_t 23623643: ",str);
 }
