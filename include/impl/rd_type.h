@@ -10,7 +10,7 @@ namespace fast_io
 {
 namespace details
 {
-inline bool isspace(Integral ch)
+inline constexpr bool isspace(Integral ch)
 {
 	return ch==0x20||ch==0x0a||ch==0x0d||ch==0x09||ch==0x0b;
 }
