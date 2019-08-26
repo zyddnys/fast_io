@@ -21,7 +21,7 @@ Design goal.
 15. No integrated locale
 16. No traits_type and EOF shit
 17. All fast_io devices can be natively put in C++ containers. std::vector<fast_io::obuf> is valid
-18. Providing RAII for FILE*
+18. Providing RAII for FILE*&POSIX file id
 
 Future Plan After C++ 20
 1. Module support
