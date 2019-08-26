@@ -73,6 +73,14 @@ inline constexpr mutex_output_stream& print(mutex_output_stream &out,auto&& cr,A
 }
 
 template<typename ...Args>
+inline constexpr mutex_output_stream& println(mutex_output_stream &out,Args&& ...args)
+{
+	std::lock_guard lg{out.mutex()};
+	println(out.native_handle(),std::forward<Args>(args)...);
+	return out;
+}
+
+template<typename ...Args>
 inline constexpr mutex_output_stream& fprint(mutex_output_stream &out,std::string_view format,Args&& ...args)
 {
 	std::lock_guard lg{out.mutex()};

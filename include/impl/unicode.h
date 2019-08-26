@@ -131,7 +131,6 @@ inline constexpr void in_place_utf8_to_unicode(T& t,std::string_view view)
 {
 	basic_istring_view<std::string_view> ibsv(view);
 	unicode_view<decltype(ibsv),typename T::value_type> uv(ibsv);
-	static_assert(standard_input_stream<decltype(uv)>(),"not a standard input stream");
 	getwhole(uv,t);
 }
 

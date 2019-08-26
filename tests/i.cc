@@ -42,7 +42,7 @@ try
 	cqw::timer t("obuf_mutex");
 	fast_io::obuf_mutex obuf("obuf_mutex.txt",fast_io::open::interface<fast_io::open::binary>);
 	for(std::size_t i(0);i!=N;++i)
-		print(obuf,i,fast_io::character('\n'));
+		println(obuf,i);
 	}
 }
 catch(std::exception const& e)

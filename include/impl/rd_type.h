@@ -10,18 +10,66 @@ namespace fast_io
 {
 namespace details
 {
-	inline bool isspace(Integral ch)
+inline bool isspace(Integral ch)
+{
+	return ch==0x20||ch==0x0a||ch==0x0d||ch==0x09||ch==0x0b;
+}
+inline bool isdigit(Integral ch)
+{
+	return 47<ch&&ch<58;
+}
+inline bool isdigit_or_minus(Integral ch)
+{
+	return (47<ch&&ch<58)||(ch==45);
+}
+
+template<std::size_t base,bool uppercase,standard_output_stream output>
+inline output& output_unsigned_base_number(output& out,Unsigned_integer a)
+{
+//upper: 65 :A 70: F
+//lower: 97 :a 102 :f
+	if(a)
 	{
-		return ch==0x20||ch==0x0a||ch==0x0d||ch==0x09||ch==0x0b;
+		std::array<typename output::char_type,sizeof(a)*8> v;
+		auto ed(v.data()+v.size());
+		do
+		{
+			if constexpr(10 < base)
+			{
+				--ed;
+				auto temp(a%base);
+				if(temp<10)
+					*ed = temp+48;
+				else
+				{
+					if constexpr (uppercase)
+						*ed = temp+55;	
+					else
+						*ed = temp+87;
+				}
+			}
+			else
+				*--ed = a%base+48;
+		}
+		while(a/=base);
+		out.write(ed,v.data()+v.size());
 	}
-	inline bool isdigit(Integral ch)
+	else
+		out.put(48);
+	return out;
+}
+
+template<std::size_t base,bool uppercase,Signed_integer T>
+inline standard_output_stream& output_signed_base_number(standard_output_stream& out,T a)
+{
+	if(a<0)
 	{
-		return 47<ch&&ch<58;
+		out.put('-');
+		a=-a;
 	}
-	inline bool isdigit_or_minus(Integral ch)
-	{
-		return (47<ch&&ch<58)||(ch==45);
-	}
+	return output_unsigned_base_number<base,uppercase>(out,static_cast<std::make_unsigned_t<T>>(a));
+}
+
 }
 
 inline constexpr auto eat_space_get(standard_input_stream& in)
@@ -61,9 +109,9 @@ inline input& operator>>(input& in,Signed_integer& a)
 }
 
 template<standard_output_stream output>
-inline output& operator<<(output& out,Unsigned_integer a)
+inline constexpr output& operator<<(output& out,Unsigned_integer a)
 {
-	if(a)
+/*	if(a)
 	{
 		std::array<typename output::char_type,sizeof(a)*8> v;
 		auto ed(v.data()+v.size());
@@ -72,7 +120,8 @@ inline output& operator<<(output& out,Unsigned_integer a)
 	}
 	else
 		out.put(48);
-	return out;
+	return out;*/
+	return details::output_unsigned_base_number<10,false>(out,a);
 }
 template<output_stream output>
 inline output& operator<<(output& out,std::basic_string_view<typename output::char_type> str)
@@ -94,25 +143,9 @@ inline input& operator>>(input& in,std::basic_string<typename input::char_type> 
 	return in;
 }
 
-template<standard_output_stream output>
-inline output& operator<<(output& out,Signed_integer a)
+inline constexpr standard_output_stream& operator<<(standard_output_stream& out,Signed_integer a)
 {
-	if(a)
-	{
-		if(a<0)
-		{
-			out.put('-');
-			a=-a;
-		}
-		std::array<typename output::char_type,sizeof(a)*8> v;
-
-		auto ed(v.data()+v.size());
-		for(*--ed=a%10+48;a/=10;*--ed=a%10+48);
-		out.write(ed,v.data()+v.size());
-	}
-	else
-		out.put(48);
-	return out;
+	return out<<details::output_signed_base_number<10,false>(out,a);
 }
 
 template<standard_input_stream input>
@@ -186,9 +219,9 @@ inline constexpr output_stream& print(output_stream &out)
 }
 
 template<typename T,typename ...Args>
-inline constexpr output_stream& print(output_stream &out,T&& cr,Args&& ...args)
+inline constexpr output_stream& print(output_stream &out,T const& cr,Args&& ...args)
 {
-	return print(out<<std::forward<T>(cr),std::forward<Args>(args)...);
+	return print(out<<cr,std::forward<Args>(args)...);
 }
 
 mutex_output_stream& operator<<(mutex_output_stream &omtx,auto const& args) = delete;
