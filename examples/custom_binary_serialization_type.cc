@@ -8,7 +8,7 @@ struct foo
 };
 
 // standard_input_stream is a CONCEPT. THIS IS NOT OBJECT ORIENTED PROGRAMMING!
-// code is very similiar with operator<< but with different names. read is machine friendly while operator<< is to be human readable.
+// code is very similiar to how operator>> are defined. read means to machine friendly while operator>> is to be human readable.
 inline fast_io::standard_input_stream& read(fast_io::standard_input_stream& in, foo& f)
 {
 // most standard library containers can all be directly read/write
