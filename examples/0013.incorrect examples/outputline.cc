@@ -7,6 +7,8 @@ int main()
 
 /*
 Correct examples:
+	println(fast_io::out,3);
+
 	fast_io::out<<3<<"\n";	
 
 	(fast_io::out<<3).put('\n');
