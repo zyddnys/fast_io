@@ -89,6 +89,14 @@ inline constexpr T concat(Args&& ...args)
 }
 
 template<typename T=std::string,typename... Args>
+inline constexpr T concatln(Args&& ...args)
+{
+	basic_ostring<T> t;
+	println(t,std::forward<Args>(args)...);
+	return std::move(t.str());
+}
+
+template<typename T=std::string,typename... Args>
 inline constexpr T format(std::string_view format,Args&& ...args)
 {
 	basic_ostring<T> t;
