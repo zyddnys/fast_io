@@ -1,5 +1,5 @@
-#include"../include/fast_io.h"
-#include"../include/impl/tie.h"
+#include"../../include/fast_io.h"
+#include"../../include/impl/tie.h"
 #include<exception>
 
 int main()

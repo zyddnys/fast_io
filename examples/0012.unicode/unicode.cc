@@ -1,4 +1,4 @@
-#include"../include/fast_io.h"
+#include"../../include/fast_io.h"
 int main()
 {
 	fast_io::obuf ob("unicode.txt");

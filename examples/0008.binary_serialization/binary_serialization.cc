@@ -1,6 +1,6 @@
 #include<iostream>
 #include<iomanip>
-#include"../include/fast_io.h"
+#include"../../include/fast_io.h"
 #include<string>
 #include<array>
 #include<vector>

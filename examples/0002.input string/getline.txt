@@ -1,0 +1,2 @@
+getline success
+getwhole success
