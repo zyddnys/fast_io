@@ -7,7 +7,7 @@ namespace details
 {
 
 template<std::size_t bs,bool uppercase,typename T>
-requires 2<=bs&&bs<=36&&((bs<10&&!uppercase)||10<=bs)
+requires 2<=bs&&bs<=36&&((bs<=10&&!uppercase)||10<bs)
 struct base_t
 {
 	T& reference;

@@ -111,16 +111,6 @@ inline input& operator>>(input& in,Signed_integer& a)
 template<standard_output_stream output>
 inline constexpr output& operator<<(output& out,Unsigned_integer a)
 {
-/*	if(a)
-	{
-		std::array<typename output::char_type,sizeof(a)*8> v;
-		auto ed(v.data()+v.size());
-		for(*--ed=a%10+48;a/=10;*--ed=a%10+48);
-		out.write(ed,v.data()+v.size());
-	}
-	else
-		out.put(48);
-	return out;*/
 	return details::output_unsigned_base_number<10,false>(out,a);
 }
 template<output_stream output>
