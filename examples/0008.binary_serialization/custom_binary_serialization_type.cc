@@ -13,8 +13,7 @@ struct foo
 inline fast_io::standard_input_stream& read(fast_io::standard_input_stream& in, foo& f)
 {
 // most standard library containers can all be directly read/write
-	read(in,f.str,f.vec);
-	return in;
+	return read(in,f.str,f.vec);
 }
 
 inline fast_io::standard_output_stream& write(fast_io::standard_output_stream& out, foo const& f)
