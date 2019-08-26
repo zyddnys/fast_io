@@ -1,12 +1,9 @@
 #include<iostream>
-#include<iomanip>
 #include"../../include/fast_io.h"
 #include<string>
 #include<array>
 #include<vector>
 #include<deque>
-#include<list>
-#include<unordered_set>
 
 int main()
 {
@@ -24,9 +21,9 @@ int main()
 	for(auto const& e : arr)
 		for(auto const& e1:e)
 			for(auto const & e2 : e1)
-				std::cout<<e2<<'\n';
+				fast_io::out<<e2<<"\n";
 	std::string str;
 	read(in,str);
-	std::cout<<str<<'\n';
+	fast_io::out<<str<<"\n";
 	}
 }

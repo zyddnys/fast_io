@@ -88,4 +88,20 @@ inline mutex_input_stream& scan(mutex_input_stream &in,T& cr,Args&& ...args)
 	return in;
 }
 
+template<typename ...Args>
+inline mutex_output_stream& write(mutex_output_stream& out,auto const& e,Args&& ...args)
+{
+	std::lock_guard lg(out.mutex());
+	write(write(out.native_handle(),e),std::forward<Args>(args)...);
+	return out;
+}
+
+template<typename ...Args>
+inline mutex_input_stream& read(mutex_input_stream& in,auto& e,Args&& ...args)
+{
+	std::lock_guard lg(in.mutex());
+	read(read(in.native_handle(),e),std::forward<Args>(args)...);
+	return in;
+}
+
 }

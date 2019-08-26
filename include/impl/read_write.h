@@ -96,5 +96,16 @@ inline standard_output_stream& write(standard_output_stream& out,Contiguous_fixe
 	return out;
 }
 
+template<typename ...Args>
+inline output_stream& write(output_stream& out,auto const& e,Args&& ...args)
+{
+	return write(write(out,e),std::forward<Args>(args)...);
+}
+
+template<typename ...Args>
+inline input_stream& read(input_stream& in,auto& e,Args&& ...args)
+{
+	return read(read(in,e),std::forward<Args>(args)...);
+}
 
 }
