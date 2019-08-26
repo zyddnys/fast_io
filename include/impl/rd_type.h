@@ -173,20 +173,22 @@ inline constexpr input_stream& scan(input_stream &in)
 {
 	return in;
 }
-template<typename T,typename ...Args>
-inline constexpr input_stream& scan(input_stream &in,T& cr,Args&& ...args)
+
+template<typename ...Args>
+inline constexpr input_stream& scan(input_stream &in,auto&& cr,Args&& ...args)
 {
 	return scan(in>>cr,std::forward<Args>(args)...);
 }
+
 inline constexpr output_stream& print(output_stream &out)
 {
 	return out;
 }
 
 template<typename T,typename ...Args>
-inline constexpr output_stream& print(output_stream &out,T const& cr,Args&& ...args)
+inline constexpr output_stream& print(output_stream &out,T&& cr,Args&& ...args)
 {
-	return print(out<<cr,std::forward<Args>(args)...);
+	return print(out<<std::forward<T>(cr),std::forward<Args>(args)...);
 }
 
 mutex_output_stream& operator<<(mutex_output_stream &omtx,auto const& args) = delete;

@@ -64,8 +64,8 @@ public:
 };
 
 
-template<typename T,typename ...Args>
-inline constexpr mutex_output_stream& print(mutex_output_stream &out,T const& cr,Args&& ...args)
+template<typename ...Args>
+inline constexpr mutex_output_stream& print(mutex_output_stream &out,auto&& cr,Args&& ...args)
 {
 	std::lock_guard lg{out.mutex()};
 	print(out.native_handle()<<cr,std::forward<Args>(args)...);
@@ -80,8 +80,8 @@ inline constexpr mutex_output_stream& fprint(mutex_output_stream &out,std::strin
 	return out;
 }
 
-template<typename T,typename ...Args>
-inline constexpr mutex_input_stream& scan(mutex_input_stream &in,T& cr,Args&& ...args)
+template<typename ...Args>
+inline constexpr mutex_input_stream& scan(mutex_input_stream &in,auto&& cr,Args&& ...args)
 {
 	std::lock_guard lg(in.mutex());
 	scan(in.native_handle()>>cr,std::forward<Args>(args)...);

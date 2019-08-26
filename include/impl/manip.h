@@ -166,7 +166,6 @@ inline constexpr standard_output_stream& operator<<(standard_output_stream& out,
 template<typename T>
 inline constexpr standard_input_stream& operator>>(standard_input_stream& in,details::signed_view_t<T> a)
 {
-//	return in;
 	return in>>reinterpret_cast<std::make_signed_t<T>&>(a.reference);
 }
 
