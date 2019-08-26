@@ -185,35 +185,6 @@ inline input& operator>>(input& in,Integral& a)
 {
 	return details::input_base_number<10>(in,a);
 }
-/*
-template<standard_input_stream input>
-inline input& operator>>(input& in,Unsigned_integer& a)
-{
-	decltype(in.get()) ch;
-	while(!details::isdigit(ch=in.get()));
-	a=ch-48;
-	for(decltype(in.try_get()) tch;details::isdigit((tch=in.try_get()).first);a=a*10+tch.first-48);
-	return in;
-}
-
-template<standard_input_stream input>
-inline input& operator>>(input& in,Signed_integer& a)
-{
-	decltype(in.get()) ch;
-	while(!details::isdigit_or_minus(ch=in.get()));
-	if(ch==45)
-	{
-		a=0;
-		for(decltype(in.try_get()) ch;details::isdigit((ch=in.try_get()).first);a=a*10+ch.first-48);
-		a=-a;
-	}
-	else
-	{
-		a=ch-48;
-		for(decltype(in.try_get()) ch;details::isdigit((ch=in.try_get()).first);a=a*10+ch.first-48);
-	}
-	return in;
-}*/
 
 template<standard_output_stream output>
 inline constexpr output& operator<<(output& out,Integral a)
