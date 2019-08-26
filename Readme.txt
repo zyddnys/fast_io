@@ -56,7 +56,7 @@ obuf:   0.13328110s
 obuf_mutex:     0.13685030s
 
 input 10000000 size_t from file
-root@DESKTOP-7H7UHQ9:/mnt/d/hg/fast_io/tests# ./j
+root@XXXXXX:/mnt/d/hg/fast_io/tests# ./j
 std::FILE*:     1.04546250s
 std::ifstream:  0.47838780s
 ibuf:   0.08077780s
