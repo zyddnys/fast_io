@@ -65,7 +65,7 @@ public:
 
 
 template<typename T,typename ...Args>
-inline mutex_output_stream& print(mutex_output_stream &out,T const& cr,Args&& ...args)
+inline constexpr mutex_output_stream& print(mutex_output_stream &out,T const& cr,Args&& ...args)
 {
 	std::lock_guard lg{out.mutex()};
 	print(out.native_handle()<<cr,std::forward<Args>(args)...);
@@ -73,7 +73,7 @@ inline mutex_output_stream& print(mutex_output_stream &out,T const& cr,Args&& ..
 }
 
 template<typename ...Args>
-inline mutex_output_stream& fprint(mutex_output_stream &out,std::string_view format,Args&& ...args)
+inline constexpr mutex_output_stream& fprint(mutex_output_stream &out,std::string_view format,Args&& ...args)
 {
 	std::lock_guard lg{out.mutex()};
 	fprint(out.native_handle(),format,std::forward<Args>(args)...);
@@ -81,7 +81,7 @@ inline mutex_output_stream& fprint(mutex_output_stream &out,std::string_view for
 }
 
 template<typename T,typename ...Args>
-inline mutex_input_stream& scan(mutex_input_stream &in,T& cr,Args&& ...args)
+inline constexpr mutex_input_stream& scan(mutex_input_stream &in,T& cr,Args&& ...args)
 {
 	std::lock_guard lg(in.mutex());
 	scan(in.native_handle()>>cr,std::forward<Args>(args)...);
@@ -89,7 +89,7 @@ inline mutex_input_stream& scan(mutex_input_stream &in,T& cr,Args&& ...args)
 }
 
 template<typename ...Args>
-inline mutex_output_stream& write(mutex_output_stream& out,auto const& e,Args&& ...args)
+inline constexpr mutex_output_stream& write(mutex_output_stream& out,auto const& e,Args&& ...args)
 {
 	std::lock_guard lg(out.mutex());
 	write(write(out.native_handle(),e),std::forward<Args>(args)...);
@@ -97,7 +97,7 @@ inline mutex_output_stream& write(mutex_output_stream& out,auto const& e,Args&& 
 }
 
 template<typename ...Args>
-inline mutex_input_stream& read(mutex_input_stream& in,auto& e,Args&& ...args)
+inline constexpr mutex_input_stream& read(mutex_input_stream& in,auto& e,Args&& ...args)
 {
 	std::lock_guard lg(in.mutex());
 	read(read(in.native_handle(),e),std::forward<Args>(args)...);

@@ -159,27 +159,27 @@ inline output_stream& fprint(output_stream &out,std::string_view format,T const&
 }
 
 template<typename ...Args>
-inline output_stream& fprint(output_stream &out,std::string_view format,Args&& ...args)
+inline constexpr output_stream& fprint(output_stream &out,std::string_view format,Args&& ...args)
 {
 	return details::fprint(out,format,std::forward<Args>(args)...);
 }
 
-inline input_stream& scan(input_stream &in)
+inline constexpr input_stream& scan(input_stream &in)
 {
 	return in;
 }
 template<typename T,typename ...Args>
-inline input_stream& scan(input_stream &in,T& cr,Args&& ...args)
+inline constexpr input_stream& scan(input_stream &in,T& cr,Args&& ...args)
 {
 	return scan(in>>cr,std::forward<Args>(args)...);
 }
-inline output_stream& print(output_stream &out)
+inline constexpr output_stream& print(output_stream &out)
 {
 	return out;
 }
 
 template<typename T,typename ...Args>
-inline output_stream& print(output_stream &out,T const& cr,Args&& ...args)
+inline constexpr output_stream& print(output_stream &out,T const& cr,Args&& ...args)
 {
 	return print(out<<cr,std::forward<Args>(args)...);
 }
