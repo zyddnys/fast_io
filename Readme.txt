@@ -13,13 +13,15 @@ Design goal.
 7. Native Unicode/UTF-8 support
 8. Compatible with C stdio/ C++ iostream
 9. Native Handle Interface
-10. support C style io format (fprint). C++ style io format (<<,>>). Basic Language format (print, scan)
+10. support C style io format (fprint). C++ style io format (<<,>>). Basic/Lua/Python/etc format (print, scan)
 11. Compilation time open mode parse. Supports C style open mode and C++ style open mode.
 12. No internal iomanip states (since it creates security issues)
 13. Extremely easy to support custom devices
 14. No stupid stuff like std::endl
 15. No integrated locale
 16. No traits_type and EOF shit
+17. All fast_io devices can be natively put in C++ containers. std::vector<fast_io::obuf> is valid
+18. Providing RAII for FILE*
 
 Future Plan After C++ 20
 1. Module support
@@ -28,7 +30,7 @@ Future Plan After C++ 20
 Zero-overhead deterministic exceptions: Throwing values
 http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0709r0.pdf
 4. Network handle support with coroutine. (NOT ASIO library)
-NETWORK SUPPORT IS MORE IMPORTANT IN MODERN WORLD
+NETWORK SUPPORT IS BECOMING MORE AND MORE IMPORTANT IN MODERN WORLD
 
 Possible Stuff in the future
 1. Cryptography
