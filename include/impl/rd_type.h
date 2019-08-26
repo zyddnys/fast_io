@@ -177,9 +177,17 @@ inline output_stream& print(output_stream &out)
 {
 	return out;
 }
+
 template<typename T,typename ...Args>
-inline output_stream& print(output_stream &out,const T& cr,Args&& ...args)
+inline output_stream& print(output_stream &out,T const& cr,Args&& ...args)
 {
 	return print(out<<cr,std::forward<Args>(args)...);
 }
+
+mutex_output_stream& operator<<(mutex_output_stream &omtx,auto const& args) = delete;
+//Not allow to use operator << directly to mutex stream since it will cause performance issue. Use print/fprint instead
+
+mutex_input_stream& operator>>(mutex_input_stream &omtx,auto& args) = delete;
+//Not allow to use operator >> directly to mutex stream since it will cause performance issue. Use scan instead
+
 }

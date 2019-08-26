@@ -16,7 +16,7 @@ public:
 	using char_type = typename native_handle_type::char_type;
 	template<typename ...Args>
 	basic_iomutex(Args&& ...args):mtx(std::make_unique<std::mutex>()),handler(std::forward<Args>(args)...){}
-	T& native_handle()
+	native_handle_type& native_handle()
 	{
 		return handler;
 	}
@@ -63,27 +63,29 @@ public:
 	}
 };
 
-template<typename ...Args>
-inline mutex_output_stream& print(mutex_output_stream &omtx,Args&& ...args)
+
+template<typename T,typename ...Args>
+inline mutex_output_stream& print(mutex_output_stream &out,T const& cr,Args&& ...args)
 {
-	std::lock_guard lg(omtx.mutex());
-	print(omtx.native_handle(),std::forward<Args>(args)...);
-	return omtx;
+	std::lock_guard lg{out.mutex()};
+	print(out.native_handle()<<cr,std::forward<Args>(args)...);
+	return out;
 }
 
 template<typename ...Args>
-inline mutex_output_stream& fprint(mutex_output_stream &omtx,std::string_view format,Args&& ...args)
+inline mutex_output_stream& fprint(mutex_output_stream &out,std::string_view format,Args&& ...args)
 {
-	std::lock_guard lg(omtx.mutex());
-	fprint(omtx.native_handle(),format,std::forward<Args>(args)...);
-	return omtx;
+	std::lock_guard lg{out.mutex()};
+	fprint(out.native_handle(),format,std::forward<Args>(args)...);
+	return out;
 }
 
-template<typename ...Args>
-inline mutex_output_stream& fprint(mutex_output_stream &omtx,Args&& ...args)
+template<typename T,typename ...Args>
+inline mutex_input_stream& scan(mutex_input_stream &in,T& cr,Args&& ...args)
 {
-	std::lock_guard lg(omtx.mutex());
-	fprint(omtx.native_handle(),std::forward<Args>(args)...);
-	return omtx;
+	std::lock_guard lg(in.mutex());
+	scan(in.native_handle()>>cr,std::forward<Args>(args)...);
+	return in;
 }
+
 }
