@@ -30,7 +30,7 @@ inline input& operator>>(input& in,Unsigned_integer& a)
 	decltype(in.get()) ch;
 	while(!details::isdigit(ch=in.get()));
 	a=ch-48;
-	for(decltype(in.try_get()) tch;details::isdigit((tch=in.try_get()).first);a=a*10+ch-48);
+	for(decltype(in.try_get()) tch;details::isdigit((tch=in.try_get()).first);a=a*10+tch.first-48);
 	return in;
 }
 
