@@ -47,9 +47,16 @@ https://gcc-mcf.lhmouse.com/
 
 
 Benchmark
+output 10000000 size_t to file
 root@XXXXXX:/mnt/d/hg/fast_io/tests# ./i
 std::FILE*:     1.03459230s
 std::ofstream:  0.59182820s
 std::ofstream with tricks:      0.39233580s
 obuf:   0.13328110s
 obuf_mutex:     0.13685030s
+
+input 10000000 size_t to file
+root@DESKTOP-7H7UHQ9:/mnt/d/hg/fast_io/tests# ./j
+std::FILE*:     1.04546250s
+std::ifstream:  0.47838780s
+ibuf:   0.08077780s
