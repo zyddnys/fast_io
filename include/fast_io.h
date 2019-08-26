@@ -54,8 +54,8 @@ inline tie<immediately_flush<decltype(out)>,decltype(out)> err(out,stderr);
 
 }
 
+#include"impl/base.h"
 #include"impl/rd_type.h"
 #include"impl/manip.h"
-#include"impl/base.h"
 #include"impl/read_write.h"
 #include"impl/unicode.h"
