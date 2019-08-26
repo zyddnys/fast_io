@@ -41,11 +41,15 @@ inline input& operator>>(input& in,Signed_integer& a)
 	while(!details::isdigit_or_minus(ch=in.get()));
 	if(ch==45)
 	{
-		for(;details::isdigit(ch=in.get());a=a*10+ch-48);
+		a=0;
+		for(decltype(in.try_get()) ch;details::isdigit((ch=in.try_get()).first);a=a*10+ch-48);
 		a=-a;
 	}
 	else
-		for(a=ch-48;details::isdigit(ch=in.get());a=a*10+ch-48);
+	{
+		a=ch-48;
+		for(;details::isdigit((ch=in.try_get()).first);a=a*10+ch-48);
+	}
 	return in;
 }
 
@@ -80,7 +84,8 @@ inline input& operator>>(input& in,std::basic_string<typename input::char_type> 
 	decltype(in.get()) ch;
 	for(;details::isspace(ch=in.get()););
 	str.clear();
-	for(str.push_back(ch);!details::isspace(ch=in.get());str.push_back(ch));
+	str.push_back(ch);
+	for(decltype(in.try_get()) ch;!details::isspace((ch=in.try_get()).first);str.push_back(ch.first));
 	return in;
 }
 
