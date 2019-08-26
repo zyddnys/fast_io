@@ -116,7 +116,7 @@ inline constexpr standard_input_stream& input_base_number(standard_input_stream&
 	}
 	return in;
 }
-template<std::size_t base>
+template<char base>
 inline constexpr standard_input_stream& input_base_number(standard_input_stream& in,Signed_integer& a)
 {
 	auto constexpr baseed(48+base);
