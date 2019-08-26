@@ -11,121 +11,122 @@ namespace fast_io
 namespace details
 {
 template<typename T>
-class const_character_t
+struct char_view_t
 {
-public:
-	const T& reference;
-	const_character_t(const T &_t):reference(_t){}			
-};
-template<typename T>
-class character_t
-{
-public:
 	T& reference;
-	character_t(T& _t):reference(_t){}	
+};
+
+template<Integral T>
+struct unsigned_view_t
+{
+	T& reference;
+};
+
+template<Integral T>
+struct signed_view_t
+{
+	T& reference;
 };
 
 template<typename T>
-class setw_t
+struct setw_t
 {
-public:
-	const std::size_t width;
-	const T& reference;
-	setw_t(std::size_t _w,const T& _t):width(_w),reference(_t){}
+	std::size_t width;
+	T& reference;
 };
+
 template<typename T,Integral char_type>
-class setw_fill_t
+struct setw_fill_t
 {
-public:
-	const std::size_t width;
-	const T& reference;
-	const char_type ch;
-	setw_fill_t(std::size_t _w,const T& _t,char_type _ch):width(_w),reference(_t),ch(_ch){}
+	std::size_t width;
+	T& reference;
+	char_type ch;
 };
-
-
+template<typename T>
 struct fixed
 {
 public:
-	double const& reference;
-	std::size_t const precision;
+	T& reference;
+	std::size_t precision;
 };
+template<typename T>
 struct scientific
 {
 public:
-	double const& reference;
-	std::size_t const precision;
+	T& reference;
+	std::size_t precision;
 };
+template<typename T>
 struct floating_point_default
 {
 public:
-	double const& reference;
-	std::size_t const precision;
+	T& reference;
+	std::size_t precision;
 };
-struct flush_t
-{};
+
 }
 template<Integral T>
-inline details::character_t<T> character(T &ch)
+inline constexpr details::char_view_t<T> char_view(T& ch)
 {
-	return details::character_t<T>(ch);
+	return {ch};
 }
+
 template<Integral T>
-inline details::const_character_t<T> character(const T &ch)
+inline constexpr details::unsigned_view_t<T> unsigned_view(T& integral)
 {
-	return details::const_character_t<T>(ch);
+	return {integral};
+}
+
+template<Integral T>
+inline constexpr details::signed_view_t<T> signed_view(T& integral)
+{
+	return {integral};
 }
 
 //	template<template T>
 //	requires requires std::is_floating_point_v<T>
-inline details::fixed fixed(double const &f,std::size_t precision)
+template<typename T>
+inline constexpr details::fixed<T const> fixed(T const &f,std::size_t precision)
 {
 	return {f,precision};
 }
-inline details::scientific scientific(double const &f,std::size_t precision)
+template<typename T>
+inline constexpr details::scientific<T const> scientific(T const &f,std::size_t precision)
 {
 	return {f,precision};
 }
-inline details::floating_point_default floating_point_default(double const &f,std::size_t precision)
+template<typename T>
+inline constexpr details::floating_point_default<T const> floating_point_default(T const &f,std::size_t precision)
 {
 	return {f,precision};
 }
-inline standard_input_stream& operator>>(standard_input_stream& in,details::character_t<Integral> &a)
+
+inline standard_input_stream& operator>>(standard_input_stream& in,details::char_view_t<Integral> a)
 {
-	while(details::isspace(a.reference = in.get()));
+	a.reference = in.get();
 	return in;
 }
-inline standard_output_stream& operator<<(standard_output_stream& out,const details::const_character_t<Integral> &a)
-{
-	out.put(a.reference);
-	return out;
-}
-inline standard_output_stream& operator<<(standard_output_stream& out,const details::character_t<Integral> &a)
+
+inline standard_output_stream& operator<<(standard_output_stream& out,details::char_view_t<Integral> a)
 {
 	out.put(a.reference);
 	return out;
 }
 
-inline details::flush_t constexpr flush;
-inline standard_output_stream& operator<<(standard_output_stream& out,details::flush_t)
+template<typename T>
+inline details::setw_t<T const> setw(std::size_t width,T const&t)
 {
-	out.flush();
-	return out;
+	return {width,t};
 }
 
-template<typename T>
-inline details::setw_t<T> setw(std::size_t width,const T &t)
+template<typename T,Integral char_type>
+inline constexpr details::setw_fill_t<T const,char_type> setw(std::size_t width,T const&t,char_type ch)
 {
-	return details::setw_t<T>(width,t);
-}
-template<typename T>
-inline details::setw_fill_t<T,Integral> setw(std::size_t width,const T &t,Integral ch)
-{
-	return details::setw_fill_t<T,decltype(ch)>(width,t,ch);
+	return {width,t,ch};
 }
 
 template<standard_output_stream output>
-inline output& operator<<(output& out,const details::setw_fill_t<auto,Integral> &a)
+inline output& operator<<(output& out,details::setw_fill_t<auto,Integral> a)
 {
 	basic_ostring<std::basic_string<typename output::char_type>> bas;
 	bas<<a.reference;
@@ -133,8 +134,9 @@ inline output& operator<<(output& out,const details::setw_fill_t<auto,Integral> 
 		out.put(a.ch);
 	return out<<bas.str();
 }
+
 template<standard_output_stream output>
-output& operator<<(output& out,const details::setw_t<auto> &a)
+inline output& operator<<(output& out,details::setw_t<auto> a)
 {
 	basic_ostring<std::basic_string<typename output::char_type>> bas;
 	bas<<a.reference;
@@ -142,7 +144,32 @@ output& operator<<(output& out,const details::setw_t<auto> &a)
 		out.put(' ');
 	return out<<bas.str();
 }
-	
+
+template<typename T>
+inline constexpr standard_output_stream& operator<<(standard_output_stream& out,details::unsigned_view_t<T> a)
+{
+	return out<<static_cast<std::make_unsigned_t<T>>(a.reference);
+}
+
+template<typename T>
+inline constexpr standard_input_stream& operator>>(standard_input_stream& in,details::unsigned_view_t<T> a)
+{
+	return in>>reinterpret_cast<std::make_unsigned_t<T>&>(a.reference);
+}
+
+template<typename T>
+inline constexpr standard_output_stream& operator<<(standard_output_stream& out,details::signed_view_t<T> a)
+{
+	return out<<static_cast<std::make_signed_t<T>>(a.reference);
+}
+
+template<typename T>
+inline constexpr standard_input_stream& operator>>(standard_input_stream& in,details::signed_view_t<T> a)
+{
+//	return in;
+	return in>>reinterpret_cast<std::make_signed_t<T>&>(a.reference);
+}
+
 namespace details
 {
 template<std::size_t v>
@@ -159,7 +186,8 @@ inline auto constexpr log2_minus_10(-std::log2(10));
 
 }
 
-inline standard_output_stream& operator<<(standard_output_stream& out,details::fixed const &a)
+template<typename T>
+inline standard_output_stream& operator<<(standard_output_stream& out,details::fixed<T> a)
 {
 	auto e(a.reference);
 	if(e<0)
@@ -183,7 +211,8 @@ inline standard_output_stream& operator<<(standard_output_stream& out,details::f
 	return out;
 }
 
-standard_output_stream& operator<<(standard_output_stream& out,details::scientific const &a)
+template<typename T>
+standard_output_stream& operator<<(standard_output_stream& out,details::scientific<T> a)
 {
 	auto e(a.reference);
 	if(e<0)
@@ -206,8 +235,8 @@ standard_output_stream& operator<<(standard_output_stream& out,details::scientif
 	return out<<static_cast<std::uint64_t>(x);
 }
 
-template<standard_output_stream output>
-inline output& operator<<(output& out,details::floating_point_default const &a)
+template<standard_output_stream output,typename T>
+inline output& operator<<(output& out,details::floating_point_default<T> a)
 {
 	auto e(a.reference);
 	if(e<0)

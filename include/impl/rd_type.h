@@ -49,13 +49,13 @@ inline input& operator>>(input& in,Signed_integer& a)
 	if(ch==45)
 	{
 		a=0;
-		for(decltype(in.try_get()) ch;details::isdigit((ch=in.try_get()).first);a=a*10+ch-48);
+		for(decltype(in.try_get()) ch;details::isdigit((ch=in.try_get()).first);a=a*10+ch.first-48);
 		a=-a;
 	}
 	else
 	{
 		a=ch-48;
-		for(;details::isdigit((ch=in.try_get()).first);a=a*10+ch-48);
+		for(decltype(in.try_get()) ch;details::isdigit((ch=in.try_get()).first);a=a*10+ch.first-48);
 	}
 	return in;
 }
