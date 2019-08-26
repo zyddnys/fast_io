@@ -16,6 +16,39 @@ public:
 	using native_interface_t = T;
 	using char_type = CharT;
 	using native_char_type = typename native_interface_t::char_type;
+private:
+	using unsigned_char_type = std::make_unsigned_t<char_type>;
+	using unsigned_native_char_type = std::make_unsigned_t<native_char_type>;
+	constexpr char_type get_impl(unsigned_native_char_type ch) requires standard_input_stream<T>()
+	{
+		auto constexpr ch_bits(sizeof(native_char_type)*8);
+		union
+		{
+			unsigned_native_char_type ch;
+			std::bitset<ch_bits> bts;
+		}u{ch};
+		if(!u.bts.test(ch_bits-1))
+			return u.ch;
+		auto constexpr ch_bits_m2(ch_bits-2);
+		auto constexpr limitm1((static_cast<std::size_t>(1)<<ch_bits_m2)-1);
+		if(!u.bts.test(ch_bits_m2))
+			throw std::runtime_error("not a utf8 character");
+		u.bts.reset(ch_bits-1);
+		std::size_t pos(ch_bits_m2-1);
+		for(;pos<ch_bits&&u.bts.test(pos);--pos)
+			u.bts.reset(pos);
+		std::size_t bytes(ch_bits_m2-pos);
+		char_type converted_ch(u.ch);
+		for(std::size_t i(0);i!=bytes;++i)
+		{
+			std::make_unsigned_t<decltype(ib.get())> t(ib.get());
+			if((t>>ch_bits_m2)==2)
+				converted_ch=(converted_ch<<ch_bits_m2)|(t&limitm1);
+			else
+				throw std::runtime_error("not a utf8 character");
+		}
+		return converted_ch;
+	}
 public:
 	constexpr unicode_view(T& ibv):ib(ibv){}
 	constexpr auto& native_handle()
@@ -28,34 +61,14 @@ public:
 	}
 	constexpr char_type get() requires standard_input_stream<T>()
 	{
-		std::make_unsigned_t<decltype(ib.get())> ch(ib.get());
-		auto constexpr ch_bits(sizeof(native_char_type)*8);
-		union
-		{
-			std::make_unsigned_t<decltype(ib.get())> ch;
-			std::bitset<ch_bits> bts;
-		}u{ib.get()};
-		if(!u.bts.test(ch_bits-1))
-			return u.ch;
-		auto constexpr ch_bits_m2(ch_bits-2);
-		auto constexpr limitm1((static_cast<std::size_t>(1)<<ch_bits_m2)-1);
-		if(!u.bts.test(ch_bits_m2))
-			throw std::runtime_error("not a utf8 character");
-		u.bts.reset(ch_bits-1);
-		std::size_t pos(ch_bits_m2-1);
-		for(;pos<ch_bits&&u.bts.test(pos);--pos)
-			u.bts.reset(pos);
-		std::size_t bytes(ch_bits_m2-pos);
-		char_type converted_ch(u.fake_char);
-		for(std::size_t i(0);i!=bytes;++i)
-		{
-			std::make_unsigned_t<decltype(ib.get())> t(ib.get());
-			if((t>>ch_bits_m2)==2)
-				converted_ch=(converted_ch<<ch_bits_m2)|(t&limitm1);
-			else
-				throw std::runtime_error("not a utf8 character");
-		}
-		return converted_ch;
+		return get_impl(ib.get());
+	}
+	constexpr std::pair<char_type,bool> try_get() requires standard_input_stream<T>()
+	{
+		auto ch(ib.try_get());
+		if(ch.second)
+			return {0,true};
+		return {get_impl(ch.first),false};
 	}
 	template<typename Contiguous_iterator>
 	constexpr Contiguous_iterator read(Contiguous_iterator b,Contiguous_iterator e) requires standard_input_stream<T>()
@@ -80,7 +93,6 @@ public:
 		auto constexpr lshift2(bytes-2);
 		auto constexpr limit2(static_cast<std::size_t>(1)<<lshift2);
 		auto constexpr limitm2(limit2-1);
-
 		std::array<native_char_type,sizeof(native_char_type)*8> a{};
 		auto i(a.size()-1);
 		for(;i<a.size()&&ch;--i)
@@ -119,6 +131,7 @@ inline constexpr void in_place_utf8_to_unicode(T& t,std::string_view view)
 {
 	basic_istring_view<std::string_view> ibsv(view);
 	unicode_view<decltype(ibsv),typename T::value_type> uv(ibsv);
+	static_assert(standard_input_stream<decltype(uv)>(),"not a standard input stream");
 	getwhole(uv,t);
 }
 

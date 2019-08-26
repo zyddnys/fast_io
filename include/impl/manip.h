@@ -70,6 +70,11 @@ inline constexpr details::char_view_t<T> char_view(T& ch)
 {
 	return {ch};
 }
+template<Integral T>
+inline constexpr details::char_view_t<T const> char_view(T const& ch)
+{
+	return {ch};
+}
 
 template<Integral T>
 inline constexpr details::unsigned_view_t<T> unsigned_view(T& integral)
@@ -79,6 +84,18 @@ inline constexpr details::unsigned_view_t<T> unsigned_view(T& integral)
 
 template<Integral T>
 inline constexpr details::signed_view_t<T> signed_view(T& integral)
+{
+	return {integral};
+}
+
+template<Integral T>
+inline constexpr details::unsigned_view_t<T const> unsigned_view(T const& integral)
+{
+	return {integral};
+}
+
+template<Integral T>
+inline constexpr details::signed_view_t<T const> signed_view(T const& integral)
 {
 	return {integral};
 }
