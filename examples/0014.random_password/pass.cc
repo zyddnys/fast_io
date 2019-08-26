@@ -26,6 +26,6 @@ int main()
 			else
 				ob.put(ch-36+'A');
 		}
-		ob.put('\n');
+		println(ob);
 	}
 }
