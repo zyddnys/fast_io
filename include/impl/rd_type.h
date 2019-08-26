@@ -144,7 +144,7 @@ inline output_stream& fprint(output_stream &out,std::string_view format)
 	return out;
 }
 template<typename T,typename ...Args>
-inline output_stream& fprint(output_stream &out,std::string_view format,T const& cr,Args&& ...args)
+inline output_stream& fprint(output_stream &out,std::string_view format,T&& cr,Args&& ...args)
 {
 	std::size_t percent_pos;
 	for(;(percent_pos=format.find('%'))!=std::string_view::npos&&percent_pos+1!=format.size()&&format[percent_pos+1]=='%';format.remove_prefix(percent_pos+2))
@@ -159,7 +159,7 @@ inline output_stream& fprint(output_stream &out,std::string_view format,T const&
 		out.write(format.cbegin(),format.cbegin()+percent_pos);
 		format.remove_prefix(percent_pos+1);
 	}
-	return fprint(out << cr,format,std::forward<Args>(args)...);
+	return fprint(out << std::forward<T>(cr),format,std::forward<Args>(args)...);
 }
 }
 
@@ -174,10 +174,10 @@ inline constexpr input_stream& scan(input_stream &in)
 	return in;
 }
 
-template<typename ...Args>
-inline constexpr input_stream& scan(input_stream &in,auto&& cr,Args&& ...args)
+template<typename T,typename ...Args>
+inline constexpr input_stream& scan(input_stream &in,T&& cr,Args&& ...args)
 {
-	return scan(in>>cr,std::forward<Args>(args)...);
+	return scan(in>>std::forward<T>(cr),std::forward<Args>(args)...);
 }
 
 inline constexpr output_stream& print(output_stream &out)
@@ -200,8 +200,7 @@ mutex_input_stream& operator>>(mutex_input_stream &omtx,auto& args) = delete;
 template<typename ...Args>
 inline constexpr output_stream& println(output_stream &out,Args&& ...args)
 {
-	print(out,std::forward<Args>(args)...);
-	out.put('\n');
+	print(out,std::forward<Args>(args)...).put('\n');
 	return out;
 }
 
