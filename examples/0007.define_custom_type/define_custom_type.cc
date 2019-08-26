@@ -7,7 +7,7 @@ struct foo
 
 //fast_io::output_stream is a concept. NOT A TYPE. This is GP not OOP!
 //Define this stream just like define operator<< for iostreams
-fast_io::output_stream& operator<<(fast_io::output_stream& out,foo const& d)
+inline constexpr fast_io::output_stream& operator<<(fast_io::output_stream& out,foo const& d)
 {
 	return out<<d.str;
 }
