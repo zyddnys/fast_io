@@ -23,7 +23,7 @@ inline bool isdigit_or_minus(Integral ch)
 	return (47<ch&&ch<58)||(ch==45);
 }
 
-template<std::size_t base,bool uppercase,standard_output_stream output>
+template<char base,bool uppercase,standard_output_stream output>
 inline output& output_base_number(output& out,Unsigned_integer a)
 {
 //number: 0:48 9:57
