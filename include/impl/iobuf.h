@@ -20,8 +20,8 @@ class basic_buf_handler
 public:
 	CharT *beg,*curr,*end;
 	explicit basic_buf_handler():beg(alloc.allocate(buffer_size)),end(beg+buffer_size){}
-	basic_buf_handler& operator=(const basic_buf_handler&)=delete;
-	basic_buf_handler(const basic_buf_handler&)=delete;
+	basic_buf_handler& operator=(basic_buf_handler const&)=delete;
+	basic_buf_handler basic_buf_handler const&)=delete;
 	static constexpr std::size_t size() {return buffer_size;}
 	basic_buf_handler(basic_buf_handler&& m) noexcept:beg(m.beg),curr(m.curr),end(m.end)
 	{
@@ -164,8 +164,8 @@ public:
 	{
 		close_impl();
 	}
-	basic_obuf& operator=(const basic_obuf&)=delete;
-	basic_obuf(const basic_obuf&)=delete;
+	basic_obuf& operator=(basic_obuf const&)=delete;
+	basic_obuf(basic_obuf const&)=delete;
 	basic_obuf(basic_obuf&& bmv) noexcept = default;
 	basic_obuf& operator=(basic_obuf&& b) noexcept
 	{
