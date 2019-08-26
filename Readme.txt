@@ -19,11 +19,12 @@ Design goal.
 13. Extremely easy to support custom devices
 14. No stupid stuff like std::endl
 15. No integrated locale
+16. No traits_type and EOF shit
 
 Future Plan After C++ 20
 1. Module support
 2. Coroutine support for async IO
-3. No traits_type and EOF shit if this proposal would be released
+3. if this proposal would be released. Probably remove more stuffs here
 Zero-overhead deterministic exceptions: Throwing values
 http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0709r0.pdf
 4. Network handle support with coroutine. (NOT ASIO library)
