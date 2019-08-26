@@ -2,6 +2,6 @@
 
 int main()
 {
-	fast_io::fprint(fast_io::out,"%\n%\n",fast_io::to<std::size_t>("325d"),
-		fast_io::to<std::size_t>("ddd"));//try to convert from an invalid string
+	println(fast_io::out,fast_io::to<std::size_t>("w325d"));//ignore all none-number character
+	println(fast_io::out,fast_io::to<std::size_t>("ddd"));//try to convert from an invalid string will throw exception
 }
