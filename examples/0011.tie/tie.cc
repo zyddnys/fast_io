@@ -13,6 +13,6 @@ try
 }
 catch(std::exception const& e)
 {
-	fprint(fast_io::err,"%\n",e);
+	println(fast_io::err,e);
 	return 1;
 }
