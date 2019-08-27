@@ -22,13 +22,13 @@ public:
 		oh.write(cbegin,cend);
 		oh.flush();
 	}
-	constexpr void put(char_type ch) requires !standard_output_stream<native_handle_type>()
+	constexpr void put(char_type ch) requires !standard_output_stream<native_handle_type>
 	{
 		auto const address(std::addressof(ch));
 		oh.write(address,address+1);
 		oh.flush();
 	}
-	constexpr void put(char_type ch) requires standard_output_stream<native_handle_type>()
+	constexpr void put(char_type ch) requires standard_output_stream<native_handle_type>
 	{
 		oh.put(ch);
 		oh.flush();

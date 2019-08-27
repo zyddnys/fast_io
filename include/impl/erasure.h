@@ -12,9 +12,9 @@ public:
 	ierasure(Args&& ...args):io(std::forward<Args>(args)...){}
 	template<typename Contiguous_iterator>
 	Contiguous_iterator read(Contiguous_iterator begin,Contiguous_iterator end) = delete;
-	auto get() requires standard_input_stream<io>() = delete;
-	auto try_get() requires standard_input_stream<io>() = delete;
-	auto eof() requires standard_input_stream<io>() = delete;
+	auto get() requires standard_input_stream<io> = delete;
+	auto try_get() requires standard_input_stream<io> = delete;
+	auto eof() requires standard_input_stream<io> = delete;
 };
 
 template<output_stream io>
@@ -26,8 +26,8 @@ public:
 	oerasure(Args&& ...args):io(std::forward<Args>(args)...){}
 	template<typename Contiguous_iterator>
 	void write(Contiguous_iterator begin,Contiguous_iterator end) = delete;
-	auto put() requires standard_output_stream<io>() = delete;
-	auto flush() requires standard_output_stream<io>() = delete;
+	auto put() requires standard_output_stream<io> = delete;
+	auto flush() requires standard_output_stream<io> = delete;
 };
 
 template<random_access_stream io>

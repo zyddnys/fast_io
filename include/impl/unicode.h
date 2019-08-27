@@ -19,7 +19,8 @@ public:
 private:
 	using unsigned_char_type = std::make_unsigned_t<char_type>;
 	using unsigned_native_char_type = std::make_unsigned_t<native_char_type>;
-	constexpr char_type get_impl(unsigned_native_char_type ch) requires standard_input_stream<T>()
+	constexpr char_type get_impl(unsigned_native_char_type ch)
+		requires standard_input_stream<T>
 	{
 		auto constexpr ch_bits(sizeof(native_char_type)*8);
 		union
@@ -58,15 +59,15 @@ public:
 	{
 		return ib;
 	}
-	constexpr auto eof() const requires standard_input_stream<T>()
+	constexpr auto eof() const requires standard_input_stream<T>
 	{
 		return ib.eof();
 	}
-	constexpr char_type get() requires standard_input_stream<T>()
+	constexpr char_type get() requires standard_input_stream<T>
 	{
 		return get_impl(ib.get());
 	}
-	constexpr std::pair<char_type,bool> try_get() requires standard_input_stream<T>()
+	constexpr std::pair<char_type,bool> try_get() requires standard_input_stream<T>
 	{
 		auto ch(ib.try_get());
 		if(ch.second)
@@ -74,7 +75,8 @@ public:
 		return {get_impl(ch.first),false};
 	}
 	template<typename Contiguous_iterator>
-	constexpr Contiguous_iterator read(Contiguous_iterator b,Contiguous_iterator e) requires standard_input_stream<T>()
+	constexpr Contiguous_iterator read(Contiguous_iterator b,Contiguous_iterator e)
+		requires standard_input_stream<T>
 	{
 		auto pb(static_cast<char_type*>(static_cast<void*>(std::addressof(*b))));
 		auto pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));
@@ -83,7 +85,8 @@ public:
 			*pi=get();
 		return b+(pi-pb)*sizeof(char_type)/sizeof(*b);
 	}
-	constexpr void put(char_type ch) requires standard_output_stream<T>()
+	constexpr void put(char_type ch)
+		requires standard_output_stream<T>
 	{
 		auto constexpr bytes(sizeof(native_char_type)*8);
 		auto constexpr lshift1(bytes-1);
@@ -116,14 +119,16 @@ public:
 		ib.write(a.cbegin()+i,a.cend());
 	}
 	template<typename Contiguous_iterator>
-	constexpr void write(Contiguous_iterator b,Contiguous_iterator e) requires standard_output_stream<T>()
+	constexpr void write(Contiguous_iterator b,Contiguous_iterator e)
+		requires standard_output_stream<T>
 	{
 		write_precondition<char_type>(b,e);
 		auto pb(std::addressof(*b));
 		for(auto pi(pb),pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));pi!=pe;++pi)
 			put(*pi);
 	}
-	constexpr void flush() requires standard_output_stream<T>()
+	constexpr void flush()
+		requires standard_output_stream<T>
 	{
 		ib.flush();
 	}

@@ -58,7 +58,7 @@ private:
 	char_type* mread(char_type* begin,char_type* end)
 	{
 		std::size_t n(end-begin);
-		if(bh.end-bh.curr<n)			//cache miss
+		if(bh.end<n+bh.curr)			//cache miss
 		{
 			begin=std::uninitialized_copy(bh.curr,bh.end,begin);
 			if(begin+Buf::size()<end)
@@ -116,7 +116,7 @@ public:
 		return ih;
 	}
 	template<typename... Args>
-	void seek(Args&& ...args) requires(random_access_stream<Ihandler>())
+	void seek(Args&& ...args) requires(random_access_stream<Ihandler>)
 	{
 		bh.curr=bh.end;
 		ih.seek(std::forward<Args>(args)...);
@@ -203,7 +203,7 @@ public:
 		return oh;
 	}
 	template<typename... Args>
-	void seek(Args&& ...args) requires(random_access_stream<Ohandler>())
+	void seek(Args&& ...args) requires(random_access_stream<Ohandler>)
 	{
 		oh.write(bh.beg,bh.curr);
 		bh.curr=bh.beg;
@@ -272,7 +272,7 @@ public:
 		return ibf.eof();
 	}
 	template<typename... Args>
-	void seek(Args&& ...args) requires(random_access_stream<io_handler>())
+	void seek(Args&& ...args) requires(random_access_stream<io_handler>)
 	{
 		ibf.native_handle().flush();
 		ibf.seek(std::forward<Args>(args)...);

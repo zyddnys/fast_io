@@ -60,4 +60,4 @@ inline tie<immediately_flush<decltype(out)>,decltype(out)> err(out,stderr);
 #include"impl/rd_type.h"
 #include"impl/manip.h"
 #include"impl/read_write.h"
-#include"impl/unicode.h"
+//#include"impl/unicode.h"

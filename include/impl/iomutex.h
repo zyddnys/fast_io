@@ -25,44 +25,45 @@ public:
 		return *mtx;
 	}
 	template<typename ...Args>
-	void write(Args&& ...args) requires output_stream<native_handle_type>()
+	void write(Args&& ...args) requires output_stream<native_handle_type>
 	{
 		std::lock_guard lg(mutex());
 		handler.write(std::forward<Args>(args)...);
 	}
 	template<typename ...Args>
-	void put(Args&& ...args) requires standard_output_stream<native_handle_type>()
+	void put(Args&& ...args) requires standard_output_stream<native_handle_type>
 	{
 		std::lock_guard lg(mutex());
 		handler.put(std::forward<Args>(args)...);
 	}
-	void flush() requires output_stream<native_handle_type>()
+	void flush() requires output_stream<native_handle_type>
 	{
 		std::lock_guard lg(mutex());
 		handler.flush();
 	}
 	template<typename Contiguous_iterator>
-	Contiguous_iterator read(Contiguous_iterator begin,Contiguous_iterator end) requires input_stream<native_handle_type>()
+	Contiguous_iterator read(Contiguous_iterator begin,Contiguous_iterator end)
+		requires input_stream<native_handle_type>
 	{
 		std::lock_guard<std::mutex> lg(mutex());
 		return handler.read(begin,end);
 	}
-	auto get() requires standard_input_stream<native_handle_type>()
+	auto get() requires standard_input_stream<native_handle_type>
 	{
 		std::lock_guard<std::mutex> lg(mutex());
 		return handler.get();
 	}
-	auto try_get() requires standard_input_stream<native_handle_type>()
+	auto try_get() requires standard_input_stream<native_handle_type>
 	{
 		std::lock_guard<std::mutex> lg(mutex());
 		return handler.try_get();
 	}
-	auto eof() requires standard_input_stream<native_handle_type>()
+	auto eof() requires standard_input_stream<native_handle_type>
 	{
 		return handler.eof();
 	}
 	template<typename... Args>
-	void seek(Args&& ...args) requires(random_access_stream<native_handle_type>())
+	void seek(Args&& ...args) requires random_access_stream<native_handle_type>
 	{
 		std::lock_guard<std::mutex> lg(mutex());
 		handler.seek(std::forward<Args>(args)...);
@@ -103,19 +104,17 @@ inline constexpr mutex_input_stream& scan(mutex_input_stream &in,auto&& cr,Args&
 }
 
 template<typename ...Args>
-inline constexpr mutex_output_stream& write(mutex_output_stream& out,auto const& e,Args&& ...args)
+inline constexpr mutex_output_stream& write(mutex_output_stream& out,Args&& ...args)
 {
 	std::lock_guard lg(out.mutex());
-	write(write(out.native_handle(),e),std::forward<Args>(args)...);
-	return out;
+	return write(out.native_handle(),std::forward<Args>(args)...);
 }
 
 template<typename ...Args>
-inline constexpr mutex_input_stream& read(mutex_input_stream& in,auto& e,Args&& ...args)
+inline constexpr mutex_input_stream& read(mutex_input_stream& in,Args&& ...args)
 {
 	std::lock_guard lg(in.mutex());
-	read(read(in.native_handle(),e),std::forward<Args>(args)...);
-	return in;
+	return read(in.native_handle(),std::forward<Args>(args)...);
 }
 
 }
