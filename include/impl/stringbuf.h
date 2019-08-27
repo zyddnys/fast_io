@@ -108,8 +108,9 @@ template<typename T,typename... Args>
 inline constexpr void in_place_to(T& t,Args&& ...args)
 {
 	basic_ostring<std::string> os;
-	basic_istring_view<std::string_view> is(print(os,std::forward<Args>(args)...).str());
-	is>>t;
+	print(os,std::forward<Args>(args)...);
+	basic_istring_view<std::string_view> is(os.str());
+	scan(is,t);
 }
 
 template<typename... Args>

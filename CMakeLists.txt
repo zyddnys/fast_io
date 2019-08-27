@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD 17)
 add_executable(compile "./examples/0000.Hello World/compile.cc")
 add_executable(hello_world "./examples/0000.Hello World/hello_world.cc")
 add_executable(hello_world_format "./examples/0000.Hello World/hello_world_format.cc")
-add_executable(hello_world1 "./examples/0000.Hello World/hello_world1.cc")
+#add_executable(hello_world1 "./examples/0000.Hello World/hello_world1.cc")
 add_executable(hello_world2 "./examples/0000.Hello World/hello_world2.cc")
 add_executable(hello_world3 "./examples/0000.Hello World/hello_world3.cc")
 

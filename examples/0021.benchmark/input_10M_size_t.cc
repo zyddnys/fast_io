@@ -37,23 +37,23 @@ try
 	cqw::timer t("ibuf");
 	fast_io::ibuf ibuf("cfilestar.txt",fast_io::open::interface<fast_io::open::binary>);
 	for(std::size_t i(0);i!=N;++i)
-		ibuf>>v[i];
+		scan(ibuf,v[i]);
 	}
 	{
 	cqw::timer t("dynamic standard input stream ibuf");
 	fast_io::dynamic_standard_input_stream ibuf(std::in_place_type<fast_io::ibuf>,"cfilestar.txt",fast_io::open::interface<fast_io::open::binary>);
 	for(std::size_t i(0);i!=N;++i)
-		ibuf>>v[i];
+		scan(ibuf,v[i]);
 	}
 	{
 	cqw::timer t("ibuf_dynamic isystem_file");
 	fast_io::ibuf_dynamic ibuf(std::in_place_type<fast_io::isystem_file>,"cfilestar.txt",fast_io::open::interface<fast_io::open::binary>);
 	for(std::size_t i(0);i!=N;++i)
-		ibuf>>v[i];
+		scan(ibuf,v[i]);
 	}
 }
 catch(std::exception const& e)
 {
-	fast_io::err<<e<<"\n";
+	println(fast_io::err,e);
 	return 1;
 }

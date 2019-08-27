@@ -22,8 +22,8 @@ int main()
 	for(auto const& e : arr)
 		for(auto const& e1:e)
 			for(auto const & e2 : e1)
-				fast_io::out<<e2<<"\n";
+				println(fast_io::out,e2);
 
-	fast_io::out<<str<<"\n";
+	println(fast_io::out,str);
 	}
 }

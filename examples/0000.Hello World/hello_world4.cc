@@ -3,5 +3,5 @@
 int main()
 {
 	fast_io::system_io_collections collections;
-	collections.out<<"Hello World\n";
+	print(collections.out,"Hello World\n");
 }

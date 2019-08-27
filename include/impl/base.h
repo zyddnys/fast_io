@@ -7,7 +7,7 @@ namespace details
 {
 	
 template<char base,bool uppercase,standard_output_stream output>
-inline output& output_base_number(output& out,Unsigned_integer a)
+inline void output_base_number(output& out,Unsigned_integer a)
 {
 //number: 0:48 9:57
 //upper: 65 :A 70: F
@@ -40,22 +40,21 @@ inline output& output_base_number(output& out,Unsigned_integer a)
 	}
 	else
 		out.put(48);
-	return out;
 }
 
 template<char base,bool uppercase,Signed_integer T>
-inline standard_output_stream& output_base_number(standard_output_stream& out,T a)
+inline void output_base_number(standard_output_stream& out,T a)
 {
 	if(a<0)
 	{
 		out.put('-');
 		a=-a;
 	}
-	return output_base_number<base,uppercase>(out,static_cast<std::make_unsigned_t<T>>(a));
+	output_base_number<base,uppercase>(out,static_cast<std::make_unsigned_t<T>>(a));
 }
 
 template<char base>
-inline constexpr standard_input_stream& input_base_number(standard_input_stream& in,Unsigned_integer& a)
+inline constexpr void input_base_number(standard_input_stream& in,Unsigned_integer& a)
 {
 	auto constexpr baseed(48+base);
 	while(true)
@@ -92,15 +91,14 @@ inline constexpr standard_input_stream& input_base_number(standard_input_stream&
 			else if(97<=try_ch.first&&try_ch.first<97+base)
 				a=a*base+try_ch.first-87;
 			else
-				break;
+				return;
 		}
 		else
-			break;
+			return;
 	}
-	return in;
 }
 template<char base>
-inline constexpr standard_input_stream& input_base_number(standard_input_stream& in,Signed_integer& a)
+inline constexpr void input_base_number(standard_input_stream& in,Signed_integer& a)
 {
 	auto constexpr baseed(48+base);
 	bool rev(false);
@@ -151,7 +149,6 @@ inline constexpr standard_input_stream& input_base_number(standard_input_stream&
 	}
 	if(rev)
 		a=-a;
-	return in;
 }
 
 template<std::size_t bs,bool uppercase,typename T>
@@ -184,15 +181,15 @@ template<typename T> inline constexpr details::base_t<2,false,T> bin(T& t){retur
 template<typename T> inline constexpr details::base_t<2,false,T const> bin(T const& t) {return {t};}
 
 template<std::size_t base,bool uppercase>
-inline constexpr standard_output_stream& operator<<(standard_output_stream& out,details::base_t<base,uppercase,Integral> v)
+inline constexpr void print(standard_output_stream& out,details::base_t<base,uppercase,Integral> v)
 {
-	return details::output_base_number<base,uppercase>(out,v.reference);
+	details::output_base_number<base,uppercase>(out,v.reference);
 }
 
 template<std::size_t base,bool uppercase>
-inline constexpr standard_input_stream& operator>>(standard_input_stream& in,details::base_t<base,uppercase,Integral> v)
+inline constexpr void scan(standard_input_stream& in,details::base_t<base,uppercase,Integral> v)
 {
-	return details::input_base_number<base>(in,v.reference);
+	details::input_base_number<base>(in,v.reference);
 }
 
 }

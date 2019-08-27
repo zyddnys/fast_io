@@ -9,7 +9,7 @@ int main()
 	std::size_t v(-1);
 	println(fast_io::out,fast_io::signed_view(v));
 	std::size_t k(0);
-	fast_io::in>>fast_io::signed_view(k);
+	scan(fast_io::in,fast_io::signed_view(k));
 	println(fast_io::out,k);
 //	fast_io::in>>fast_io::unsigned_view(f);
 	scan(fast_io::in,fast_io::unsigned_view(f));

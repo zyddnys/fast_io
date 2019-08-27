@@ -5,5 +5,5 @@ int main()
 	fast_io::ibuf ib("getline.txt");
 	std::string str;
 	getwhole(ib,str);
-	fast_io::out<<str;
+	print(fast_io::out,str);
 }

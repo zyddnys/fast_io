@@ -118,16 +118,14 @@ inline constexpr details::floating_point_default<T const> floating_point_default
 	return {f,precision};
 }
 
-inline standard_input_stream& operator>>(standard_input_stream& in,details::char_view_t<Integral> a)
+inline void scan(standard_input_stream& in,details::char_view_t<Integral> a)
 {
 	a.reference = in.get();
-	return in;
 }
 
-inline standard_output_stream& operator<<(standard_output_stream& out,details::char_view_t<Integral> a)
+inline void print(standard_output_stream& out,details::char_view_t<Integral> a)
 {
 	out.put(a.reference);
-	return out;
 }
 
 template<typename T>
@@ -143,47 +141,47 @@ inline constexpr details::setw_fill_t<T const,char_type> setw(std::size_t width,
 }
 
 template<standard_output_stream output>
-inline output& operator<<(output& out,details::setw_fill_t<auto,Integral> a)
+inline void print(output& out,details::setw_fill_t<auto,Integral> a)
 {
 	basic_ostring<std::basic_string<typename output::char_type>> bas;
-	bas<<a.reference;
+	print(bas,a.reference);
 	for(std::size_t i(bas.str().size());i<a.width;++i)
 		out.put(a.ch);
-	return out<<bas.str();
+	print(out,bas.str());
 }
 
 template<standard_output_stream output>
-inline output& operator<<(output& out,details::setw_t<auto> a)
+inline void print(output& out,details::setw_t<auto> a)
 {
 	basic_ostring<std::basic_string<typename output::char_type>> bas;
-	bas<<a.reference;
+	print(bas,a.reference);
 	for(std::size_t i(bas.str().size());i<a.width;++i)
 		out.put(' ');
-	return out<<bas.str();
+	print(out,bas.str());
 }
 
 template<typename T>
-inline constexpr standard_output_stream& operator<<(standard_output_stream& out,details::unsigned_view_t<T> a)
+inline constexpr void print(standard_output_stream& out,details::unsigned_view_t<T> a)
 {
-	return out<<static_cast<std::make_unsigned_t<T>>(a.reference);
+	print(out,static_cast<std::make_unsigned_t<T>>(a.reference));
 }
 
 template<typename T>
-inline constexpr standard_input_stream& operator>>(standard_input_stream& in,details::unsigned_view_t<T> a)
+inline constexpr void scan(standard_input_stream& in,details::unsigned_view_t<T> a)
 {
-	return in>>reinterpret_cast<std::make_unsigned_t<T>&>(a.reference);
+	scan(in,reinterpret_cast<std::make_unsigned_t<T>&>(a.reference));
 }
 
 template<typename T>
-inline constexpr standard_output_stream& operator<<(standard_output_stream& out,details::signed_view_t<T> a)
+inline constexpr void print(standard_output_stream& out,details::signed_view_t<T> a)
 {
-	return out<<static_cast<std::make_signed_t<T>>(a.reference);
+	print(out,static_cast<std::make_signed_t<T>>(a.reference));
 }
 
 template<typename T>
-inline constexpr standard_input_stream& operator>>(standard_input_stream& in,details::signed_view_t<T> a)
+inline constexpr void scan(standard_input_stream& in,details::signed_view_t<T> a)
 {
-	return in>>reinterpret_cast<std::make_signed_t<T>&>(a.reference);
+	scan(in,reinterpret_cast<std::make_signed_t<T>&>(a.reference));
 }
 
 namespace details
@@ -203,7 +201,7 @@ inline auto constexpr log2_minus_10(-std::log2(10));
 }
 
 template<typename T>
-inline standard_output_stream& operator<<(standard_output_stream& out,details::fixed<T> a)
+inline void print(standard_output_stream& out,details::fixed<T> a)
 {
 	auto e(a.reference);
 	if(e<0)
@@ -212,7 +210,7 @@ inline standard_output_stream& operator<<(standard_output_stream& out,details::f
 		out.put('-');
 	}
 	std::uint_fast64_t u(e);
-	out<<u;
+	print(out,u);
 	e-=u;
 	if(a.precision)
 	{
@@ -220,15 +218,14 @@ inline standard_output_stream& operator<<(standard_output_stream& out,details::f
 		auto p(static_cast<decltype(u)>(e*details::exp10_array.at(a.precision+1)));
 		auto md(p%10),pt(p/10);
 		if(md<5||(md==5&&!(pt&1)))
-			out<<setw(a.precision,pt,'0');
+			print(out,setw(a.precision,pt,'0'));
 		else
-			out<<setw(a.precision,pt+1,'0');
+			print(out,setw(a.precision,pt+1,'0'));
 	}
-	return out;
 }
 
 template<typename T>
-standard_output_stream& operator<<(standard_output_stream& out,details::scientific<T> a)
+void print(standard_output_stream& out,details::scientific<T> a)
 {
 	auto e(a.reference);
 	if(e<0)
@@ -239,20 +236,20 @@ standard_output_stream& operator<<(standard_output_stream& out,details::scientif
 	auto x(std::floor(std::log10(e)));
 	if(0<x)
 		++x;
-	out<<fixed(e*std::exp2(x*details::log2_minus_10),a.precision);
+	print(out,fixed(e*std::exp2(x*details::log2_minus_10),a.precision));
 	if(x==0)
-		return out;
+		return;
 	out.put('e');
 	if(x<0)
 	{
 		out.put('-');
-		return out<<static_cast<std::uint64_t>(-x);
+		print(out,static_cast<std::uint64_t>(-x));
 	}
-	return out<<static_cast<std::uint64_t>(x);
+	print(out,static_cast<std::uint64_t>(x));
 }
 
 template<standard_output_stream output,typename T>
-inline output& operator<<(output& out,details::floating_point_default<T> a)
+inline void print(output& out,details::floating_point_default<T> a)
 {
 	auto e(a.reference);
 	if(e<0)
@@ -267,36 +264,35 @@ inline output& operator<<(output& out,details::floating_point_default<T> a)
 	auto fix(std::fabs(x)<=a.precision);
 	basic_ostring<std::basic_string<typename output::char_type>> bas;
 	if(fix)
-		bas<<fixed(e,a.precision);
+		print(bas,fixed(e,a.precision));
 	else
-		bas<<fixed(e*std::exp2(x*details::log2_minus_10),a.precision);
+		print(bas,fixed(e*std::exp2(x*details::log2_minus_10),a.precision));
 	auto& str(bas.str());
 	if(str.find('.')!=std::string::npos)
 	{
 		for(;!str.empty()&&str.back()=='0';str.pop_back());
 		if(!str.empty()&&str.back()=='.')
 			str.pop_back();
-		out<<str;
+		print(out,str);
 	}
 	if(fix)
-		return out;
+		return;
 	}
 	if(x==0)
-		return out;
+		return;
 	out.put('e');
 	if(x<0)
 	{
 		out.put('-');
-		return out<<static_cast<std::uint64_t>(-x);
+		x=-x;
 	}
-	return out<<static_cast<std::uint64_t>(x);
+	print(out,static_cast<std::uint64_t>(x));
 }
 
-template<typename T>
-requires std::numeric_limits<T>::is_iec559
-inline standard_output_stream& operator<<(standard_output_stream& out,T v)
+/*
+inline void print(standard_output_stream& out,double v)
 {
-	return out<<floating_point_default(v,14);
-}
+	print(out,floating_point_default(v,14));
+}*/
 
 }

@@ -4,6 +4,6 @@ int main()
 {
 	fast_io::ibuf ib("getline.txt");
 	std::string str;
-	ib>>str;
+	scan(b,str);
 	println(fast_io::out,str);
 }

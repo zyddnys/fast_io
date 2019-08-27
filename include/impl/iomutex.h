@@ -80,7 +80,7 @@ template<typename ...Args>
 inline constexpr void scan(mutex_input_stream &in,auto&& cr,Args&& ...args)
 {
 	std::lock_guard lg(in.mutex());
-	scan(in.native_handle()>>cr,std::forward<Args>(args)...);
+	scan(scan(in.native_handle(),cr),std::forward<Args>(args)...);
 }
 
 template<typename ...Args>
