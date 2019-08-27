@@ -110,17 +110,19 @@ inline constexpr void scan(input_stream&){}
 
 inline constexpr void print(output_stream&){}
 
-template<typename T,typename ...Args>
-inline constexpr void scan(input_stream &in,T&& cr,Args&& ...args)
+template<typename T,typename R,typename ...Args>
+inline constexpr void scan(input_stream &in,T&& ref,R&& ref1,Args&& ...args)
 {
-	scan(in,std::forward<T>(cr));
+	scan(in,std::forward<T>(ref));
+	scan(in,std::forward<R>(ref1));
 	scan(in,std::forward<Args>(args)...);
 }
 
-template<typename T,typename ...Args>
-inline constexpr void print(output_stream &out,T&& cr,Args&& ...args)
+template<typename T,typename R,typename ...Args>
+inline constexpr void print(output_stream &out,T&&cr,R&&cr1,Args&& ...args)
 {
 	print(out,std::forward<T>(cr));
+	print(out,std::forward<R>(cr1));
 	print(out,std::forward<Args>(args)...);
 }
 
