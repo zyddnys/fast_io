@@ -15,15 +15,15 @@ int main()
 	write(out,ar);
 	}
 	{
+	fast_io::ibuf_mutex in("binary_serialization.txt");
 	std::deque<std::vector<std::array<std::size_t,3>>> arr;
-	fast_io::ibuf in("binary_serialization.txt");
-	read(in,arr);
+	std::string str;
+	read(in,arr,str);
 	for(auto const& e : arr)
 		for(auto const& e1:e)
 			for(auto const & e2 : e1)
 				fast_io::out<<e2<<"\n";
-	std::string str;
-	read(in,str);
+
 	fast_io::out<<str<<"\n";
 	}
 }
