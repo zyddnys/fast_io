@@ -30,7 +30,7 @@ add_executable(custom_binary_serialization_type "./examples/0008.binary_serializ
 add_executable(random_password "./examples/0014.random_password/random_password.cc")
 add_executable(unsigned_view "./examples/0017.unsigned_view/unsigned_view.cc")
 
-add_executable(string_to_size_t "./examples/0004.convert/string_to_size_t.cc"
+add_executable(string_to_size_t "./examples/0004.convert/string_to_size_t.cc")
 add_executable(compile_time_open_mode "./examples/0006.compile_time_open_mode/compile_time_open_mode.cc")
 add_executable(compile_time_c_style_open_mode "./examples/0006.compile_time_open_mode/compile_time_c_style_open_mode.cc")
 add_executable(dynamic "./fast_io/examples/0020.dynamic.cc")
