@@ -9,8 +9,8 @@ Design goal.
 3. Zero Overhead.
 4. As safe as possible.
 5. Binary serialization for trivially copyable types and C++ standard library containers. Serialization methods like JSON are slow and tedious for machines. read/write
-6. Native mutex support
-7. Native Unicode/UTF-8 support
+6. std::mutex mutex stream
+7. Unicode/UTF-8 support
 8. Compatible with C stdio/ C++ iostream
 9. Native Handle Interface
 10. support C style io format (fprint). C++ style io format (<<,>>). Basic/Lua/Python/etc format (print, scan)
