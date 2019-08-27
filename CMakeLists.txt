@@ -3,7 +3,9 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 project(fastio)
 
-set(CMAKE_CXX_FLAGS "-fconcepts -Wall -Wextra")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -fconcepts")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -fconcepts")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -fconcepts")
 set(CMAKE_CXX_STANDARD 17)
 
 add_executable(compile "./examples/0000.Hello World/compile.cc")
