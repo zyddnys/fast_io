@@ -33,6 +33,8 @@ add_executable(unsigned_view "./examples/0017.unsigned_view/unsigned_view.cc")
 add_executable(string_to_size_t "./examples/0004.convert/string_to_size_t.cc")
 add_executable(compile_time_open_mode "./examples/0006.compile_time_open_mode/compile_time_open_mode.cc")
 add_executable(compile_time_c_style_open_mode "./examples/0006.compile_time_open_mode/compile_time_c_style_open_mode.cc")
-add_executable(dynamic "./examples/0020.dynamic/0020.dynamic.cc")
 
+add_executable(dynamic "./examples/0020.dynamic/dynamic.cc")
 add_executable(setw "./examples/0010.manip/setw.cc")
+
+cmake_minimum_required(VERSION 3.10)
