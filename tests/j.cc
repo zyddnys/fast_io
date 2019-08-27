@@ -31,6 +31,12 @@ try
 	for(std::size_t i(0);i!=N;++i)
 		ibuf>>v[i];
 	}
+	{
+	cqw::timer t("dynamic standard input stream ibuf");
+	fast_io::dynamic_standard_input_stream ibuf(std::in_place_type<fast_io::ibuf>,"cfilestar.txt",fast_io::open::interface<fast_io::open::binary>);
+	for(std::size_t i(0);i!=N;++i)
+		ibuf>>v[i];
+	}
 }
 catch(std::exception const& e)
 {
