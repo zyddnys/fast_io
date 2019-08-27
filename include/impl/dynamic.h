@@ -183,7 +183,7 @@ public:
 							static_cast<char_type const*>(static_cast<void const*>(std::addressof(*e))));
 	}
 	void flush() { return up->flush();}
-		template<typename Contiguous_iterator>
+	template<typename Contiguous_iterator>
 	Contiguous_iterator read(Contiguous_iterator b,Contiguous_iterator e)
 	{
 		char_type *pb(static_cast<char_type*>(static_cast<void*>(std::addressof(*b))));
