@@ -12,7 +12,6 @@ try
 {
 	std::size_t constexpr N(10000000);
 	std::vector<std::size_t> v(N);
-
 	{
 	cqw::timer t("std::FILE*");
 	std::unique_ptr<std::FILE,decltype(fclose)*> fp(std::fopen("cfilestar.txt","rb"),fclose);
@@ -37,7 +36,6 @@ try
 	for(std::size_t i(0);i!=N;++i)
 		ibuf>>v[i];
 	}
-
 }
 catch(std::exception const& e)
 {
