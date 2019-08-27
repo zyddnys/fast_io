@@ -39,10 +39,10 @@ try
 		println(obuf,i);
 	}
 	{
-	cqw::timer t("obuf_mutex with dec(i)");
-	fast_io::obuf_mutex obuf("obuf_mutex.txt",fast_io::open::interface<fast_io::open::binary>);
+	cqw::timer t("dynamic obuf");
+	fast_io::dynamic_standard_output_stream dobuf(std::in_place_type<fast_io::obuf>,"obuf.txt",fast_io::open::interface<fast_io::open::binary>);
 	for(std::size_t i(0);i!=N;++i)
-		println(obuf,fast_io::dec(i));
+		println(dobuf,i);
 	}
 	{
 	cqw::timer t("obuf_mutex");
