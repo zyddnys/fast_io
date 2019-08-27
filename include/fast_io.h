@@ -16,6 +16,7 @@
 #include"impl/tie.h"
 #include"impl/immediately_flush.h"
 #include"impl/erasure.h"
+#include"impl/dynamic.h"
 
 namespace fast_io
 {
