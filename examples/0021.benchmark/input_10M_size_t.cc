@@ -20,6 +20,14 @@ try
 		fscanf(fp.get(),"%zu\n",v.data()+i);
 	}
 	{
+	cqw::timer t("std::FILE* with 1048576 buffer size + _IOFBF (Full buffering) tag");
+	std::unique_ptr<std::FILE,decltype(fclose)*> fp(std::fopen("cfilestar.txt","rb"),fclose);
+	auto buffer(std::make_unique<char[]>(1048576));
+	setvbuf(fp.get(),buffer.get(),_IOFBF,1048576);
+	for(std::size_t i(0);i!=N;++i)
+		fscanf(fp.get(),"%zu\n",v.data()+i);
+	}
+	{
 	cqw::timer t("std::ifstream");
 	std::ifstream fin("cfilestar.txt",std::ofstream::binary);
 	for(std::size_t i(0);i!=N;++i)
