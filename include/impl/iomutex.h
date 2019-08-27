@@ -30,6 +30,11 @@ public:
 		std::lock_guard lg(mutex());
 		handler.write(std::forward<Args>(args)...);
 	}
+	void put(char_type ch) requires standard_output_stream<native_handle_type>
+	{
+		std::lock_guard lg(mutex());
+		handler.put(ch);
+	}
 	void flush() requires output_stream<native_handle_type>
 	{
 		std::lock_guard lg(mutex());
@@ -41,6 +46,16 @@ public:
 	{
 		std::lock_guard<std::mutex> lg(mutex());
 		return handler.read(begin,end);
+	}
+	auto get()
+	{
+		std::lock_guard<std::mutex> lg(mutex());
+		return handler.get();
+	}
+	auto try_get()
+	{
+		std::lock_guard<std::mutex> lg(mutex());
+		return handler.try_get();
 	}
 	auto eof() requires standard_input_stream<native_handle_type>
 	{
@@ -77,10 +92,10 @@ inline constexpr void fprint(mutex_output_stream &out,Args&& ...args)
 }
 
 template<typename ...Args>
-inline constexpr void scan(mutex_input_stream &in,auto&& cr,Args&& ...args)
+inline constexpr void scan(mutex_input_stream &in,Args&& ...args)
 {
 	std::lock_guard lg(in.mutex());
-	scan(scan(in.native_handle(),cr),std::forward<Args>(args)...);
+	scan(in.native_handle(),std::forward<Args>(args)...);
 }
 
 template<typename ...Args>

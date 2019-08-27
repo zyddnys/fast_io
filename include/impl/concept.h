@@ -78,16 +78,16 @@ template<typename T>
 concept bool mutex_stream = stream<T>&&details::mutex_stream_impl<T>();
 
 template<typename T>
-concept bool mutex_input_stream = stream<T>&&details::input_stream_impl<T>()&&mutex_stream<T>;
+concept bool input_stream = stream<T>&&details::input_stream_impl<T>();
 
 template<typename T>
-concept bool input_stream = stream<T>&&details::input_stream_impl<T>()&&!mutex_input_stream<T>;
+concept bool mutex_input_stream = input_stream<T>&&mutex_stream<T>;
 
 template<typename T>
-concept bool mutex_output_stream = stream<T>&&details::output_stream_impl<T>()&&mutex_stream<T>;
+concept bool output_stream = stream<T>&&details::output_stream_impl<T>();
 
 template<typename T>
-concept bool output_stream = stream<T>&&details::output_stream_impl<T>()&&!mutex_output_stream<T>;
+concept bool mutex_output_stream = output_stream<T>&&mutex_stream<T>;
 
 template<typename T>
 concept bool random_access_stream = stream<T>&&details::random_access_stream_impl<T>();
