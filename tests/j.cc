@@ -37,6 +37,7 @@ try
 	for(std::size_t i(0);i!=N;++i)
 		ibuf>>v[i];
 	}
+
 }
 catch(std::exception const& e)
 {

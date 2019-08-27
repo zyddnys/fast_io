@@ -76,3 +76,30 @@ std::FILE*:     1.04546250s
 std::ifstream:  0.47838780s
 
 ibuf:   0.08077780s
+
+
+Windows:
+
+g++ -o output_10M_size_t output_10M_size_t.cc -O2 -std=c++17 -fconcepts
+
+Process started (PID=1580) >>>
+
+<<< Process finished (PID=1580). (Exit code 0)
+
+output_10M_size_t
+
+Process started (PID=1208) >>>
+
+std::FILE*:	2.26901100s
+
+std::ofstream:	1.03628600s
+
+std::ofstream with tricks:	0.84219500s
+
+obuf:	0.13401100s
+
+dynamic obuf:	0.13586300s
+
+iobuf_dynamic system_file:	0.13000100s
+
+obuf_mutex:	0.15303500s

@@ -19,7 +19,11 @@ namespace details
 inline constexpr int calculate_posix_open_mode(open::mode const &om)
 {
 	using namespace open;
+#ifdef O_BINARY
+	switch(remove_ate(om))
+#else
 	switch(remove_binary(remove_ate(om)))
+#endif
 	{
 //Action if file already exists;	Action if file does not exist;	c-style mode;	Explanation
 //Read from start;	Failure to open;	"r";	Open a file for reading
@@ -58,6 +62,45 @@ inline constexpr int calculate_posix_open_mode(open::mode const &om)
 	case out|in|app|no_overwrite:
 	case in|app|no_overwrite:
 		return {O_RDWR | O_CREAT | O_APPEND | O_EXCL};
+#ifdef O_BINARY
+//Action if file already exists;	Action if file does not exist;	c-style mode;	Explanation
+//Read from start;	Failure to open;	"r";	Open a file for reading
+	case in|binary:
+		return {O_RDONLY | O_BINARY};
+//Destroy contents;	Create new;	"w";	Create a file for writing
+	case out|binary:
+	case out|trunc|binary:
+		return {O_WRONLY | O_CREAT | O_TRUNC | O_BINARY};
+//Append to file;	Create new;	"a";	Append to a file
+	case app|binary:
+	case out|app|binary:
+		return {O_WRONLY | O_CREAT | O_APPEND | O_BINARY};
+//Read from start;	Error;	"r+";		Open a file for read/write
+	case out|in|binary:
+		return {O_RDWR | O_BINARY};
+//Destroy contents;	Create new;	"w+";	Create a file for read/write
+	case out|in|trunc|binary:
+		return {O_RDWR | O_CREAT | O_TRUNC | O_BINARY};
+//Write to end;	Create new;	"a+";	Open a file for read/write
+	case out|in|app|binary:
+	case in|app|binary:
+		return {O_RDWR | O_CREAT | O_APPEND | O_BINARY};
+//Destroy contents;	Error;	"wx";	Create a file for writing
+	case out|no_overwrite|binary:
+	case out|trunc|no_overwrite|binary:
+		return {O_RDWR | O_CREAT | O_APPEND | O_EXCL | O_BINARY};
+//Append to file;	Error;	"ax";	Append to a file
+	case app|no_overwrite|binary:
+	case out|app|no_overwrite|binary:
+		return {O_WRONLY | O_CREAT | O_APPEND | O_EXCL | O_BINARY};
+//Destroy contents;	Error;	"w+x";	Create a file for read/write
+	case out|in|trunc|no_overwrite|binary:
+		return {O_RDWR | O_CREAT | O_TRUNC | O_EXCL | O_BINARY};
+//Write to end;	Error;	"a+x";	Open a file for read/write
+	case out|in|app|no_overwrite|binary:
+	case in|app|no_overwrite|binary:
+		return {O_RDWR | O_CREAT | O_APPEND | O_EXCL | O_BINARY};
+#endif
 	default:
 		throw std::runtime_error("unknown posix file openmode");
 	}

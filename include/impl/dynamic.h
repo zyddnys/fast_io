@@ -149,5 +149,47 @@ public:
 	void put(char_type ch){up->put(ch);}
 };
 
+class dynamic_io_stream
+{
+public:
+	using char_type = char;
+private:
+	struct base
+	{
+		virtual void write(char_type const*,char_type const*) = 0;
+		virtual void flush() = 0;
+		virtual char_type* read(char_type*,char_type*) = 0;
+		virtual ~base() = default;
+	};
+	template<io_stream iod>
+	struct derv:base
+	{
+		iod out;
+		template<typename ...Args>
+		derv(std::in_place_type_t<iod>,Args&& ...args):out(std::forward<Args>(args)...){}
+		void write(char_type const* b,char_type const* e) {out.write(b,e);}
+		void flush() {out.flush();}
+		char_type* read(char_type* b,char_type* e) {return out.read(b,e);}
+	};
+	std::unique_ptr<base> up;
+public:
+	template<input_stream P,typename ...Args>
+	dynamic_io_stream(std::in_place_type_t<P>,Args&& ...args):
+		up(new derv<P>(std::in_place_type<P>,std::forward<Args>(args)...)){}
+	template<typename Contiguous_iterator>
+	void write(Contiguous_iterator b,Contiguous_iterator e)
+	{
+		up->write(static_cast<char_type const*>(static_cast<void const*>(std::addressof(*b))),
+							static_cast<char_type const*>(static_cast<void const*>(std::addressof(*e))));
+	}
+	void flush() { return up->flush();}
+		template<typename Contiguous_iterator>
+	Contiguous_iterator read(Contiguous_iterator b,Contiguous_iterator e)
+	{
+		char_type *pb(static_cast<char_type*>(static_cast<void*>(std::addressof(*b))));
+		char_type *pe(static_cast<char_type*>(static_cast<void*>(std::addressof(*e))));
+		return b+(up->read(pb,pe)-pb)*sizeof(*b)/sizeof(char_type);
+	}
+};
 
 }

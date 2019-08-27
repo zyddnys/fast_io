@@ -55,6 +55,10 @@ inline c_style_ohandle out(stdout);
 inline tie<c_style_ihandle,decltype(out)> in(out,stdin);
 inline tie<immediately_flush<decltype(out)>,decltype(out)> err(out,stderr);
 
+
+using ibuf_dynamic = basic_ibuf<dynamic_input_stream>;
+using obuf_dynamic = basic_obuf<dynamic_output_stream>;
+using iobuf_dynamic = basic_iobuf<dynamic_io_stream>;
 }
 
 #include"impl/base.h"
