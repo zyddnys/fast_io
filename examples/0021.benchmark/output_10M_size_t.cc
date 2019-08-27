@@ -46,7 +46,6 @@ try
 		rdbuf.sputc('\n');
 	}
 	}
-	}
 	{
 	cqw::timer t("obuf");
 	fast_io::obuf obuf("obuf.txt",fast_io::open::interface<fast_io::open::binary>);
