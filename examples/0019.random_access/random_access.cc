@@ -3,12 +3,15 @@
 int main()
 {
 	using namespace fast_io;
-	ibuf_mutex ib("asfaf.txt");
+	ibuf ib("asfaf.txt");
 	ib.seek(4);
-	out.put(ib.get());
+	char ch;
+	scan(ib,char_view(ch));
+	out.put(ch);
 	out.put('\n');
 	ib.seek(seek_type<std::uint32_t>,-1,seekdir::end);
-	out.put(ib.get());
+	scan(ib,char_view(ch));
+	out.put(ch);
 	out.put('\n');
 	ib.seek(std::size_t(-1));
 }
