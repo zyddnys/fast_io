@@ -2,10 +2,11 @@
 
 int main()
 {
-	fast_io::ibuf_mutex ib("asfaf.txt");
+	using namespace fast_io;
+	ibuf_mutex ib("asfaf.txt");
 	ib.seek(4);
-	fast_io::println(fast_io::out,fast_io::char_view(ib.get()));
-	ib.seek(fast_io::seek_type<std::uint32_t>,-1,fast_io::seekdir::end);
-	fast_io::println(fast_io::out,fast_io::char_view(ib.get()));
+	println(out,char_view(ib.get()));
+	ib.seek(seek_type<std::uint32_t>,-1,seekdir::end);
+	println(out,char_view(ib.get()));
 	ib.seek(std::size_t(-1));
 }
