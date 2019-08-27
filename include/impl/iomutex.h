@@ -56,49 +56,45 @@ public:
 
 
 template<typename ...Args>
-inline constexpr mutex_output_stream& print(mutex_output_stream &out,auto&& cr,Args&& ...args)
+inline constexpr void print(mutex_output_stream &out,Args&& ...args)
 {
 	std::lock_guard lg{out.mutex()};
-	print(out.native_handle()<<cr,std::forward<Args>(args)...);
-	return out;
+	print(out.native_handle(),std::forward<Args>(args)...);
 }
 
 template<typename ...Args>
-inline constexpr mutex_output_stream& println(mutex_output_stream &out,Args&& ...args)
+inline constexpr void println(mutex_output_stream &out,Args&& ...args)
 {
 	std::lock_guard lg{out.mutex()};
 	println(out.native_handle(),std::forward<Args>(args)...);
-	return out;
 }
 
 template<typename ...Args>
-inline constexpr mutex_output_stream& fprint(mutex_output_stream &out,std::string_view format,Args&& ...args)
+inline constexpr void fprint(mutex_output_stream &out,Args&& ...args)
 {
 	std::lock_guard lg{out.mutex()};
-	fprint(out.native_handle(),format,std::forward<Args>(args)...);
-	return out;
+	fprint(out.native_handle(),std::forward<Args>(args)...);
 }
 
 template<typename ...Args>
-inline constexpr mutex_input_stream& scan(mutex_input_stream &in,auto&& cr,Args&& ...args)
+inline constexpr void scan(mutex_input_stream &in,auto&& cr,Args&& ...args)
 {
 	std::lock_guard lg(in.mutex());
 	scan(in.native_handle()>>cr,std::forward<Args>(args)...);
-	return in;
 }
 
 template<typename ...Args>
-inline constexpr mutex_output_stream& write(mutex_output_stream& out,Args&& ...args)
+inline constexpr void write(mutex_output_stream& out,Args&& ...args)
 {
 	std::lock_guard lg(out.mutex());
-	return write(out.native_handle(),std::forward<Args>(args)...);
+	write(out.native_handle(),std::forward<Args>(args)...);
 }
 
 template<typename ...Args>
-inline constexpr mutex_input_stream& read(mutex_input_stream& in,Args&& ...args)
+inline constexpr void read(mutex_input_stream& in,Args&& ...args)
 {
 	std::lock_guard lg(in.mutex());
-	return read(in.native_handle(),std::forward<Args>(args)...);
+	read(in.native_handle(),std::forward<Args>(args)...);
 }
 
 }
