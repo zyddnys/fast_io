@@ -103,3 +103,24 @@ dynamic obuf:	0.13586300s
 iobuf_dynamic system_file:	0.13000100s
 
 obuf_mutex:	0.15303500s
+
+
+g++ -o input_10M_size_t input_10M_size_t.cc -O2 -std=c++17 -fconcepts
+
+Process started (PID=11856) >>>
+
+<<< Process finished (PID=11856). (Exit code 0)
+
+input_10M_size_t
+
+Process started (PID=21088) >>>
+
+std::FILE*:	5.53888200s
+
+std::ifstream:	1.27124600s
+
+ibuf:	0.07400200s
+
+dynamic standard input stream ibuf:	0.08899900s
+
+ibuf_dynamic isystem_file:	0.07600900s
