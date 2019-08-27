@@ -46,11 +46,10 @@ try
 		ibuf>>v[i];
 	}
 	{
-	std::vector<std::size_t> v1(N);
 	cqw::timer t("ibuf_dynamic isystem_file");
 	fast_io::ibuf_dynamic ibuf(std::in_place_type<fast_io::isystem_file>,"cfilestar.txt",fast_io::open::interface<fast_io::open::binary>);
 	for(std::size_t i(0);i!=N;++i)
-		ibuf>>v1[i];
+		ibuf>>v[i];
 	}
 }
 catch(std::exception const& e)

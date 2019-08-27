@@ -36,4 +36,5 @@ add_executable(compile_time_c_style_open_mode "./examples/0006.compile_time_open
 add_executable(dynamic "./examples/0020.dynamic/dynamic.cc")
 add_executable(setw "./examples/0010.manip/setw.cc")
 
+add_executable(manually_lockguard "./examples/0022.mutex/manually_lockguard.cc")
 cmake_minimum_required(VERSION 3.10)
