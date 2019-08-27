@@ -22,6 +22,7 @@ Design goal.
 16. No traits_type and EOF shit
 17. All fast_io devices can be natively put in C++ containers. std::vector<fast_io::obuf> is valid
 18. Providing RAII for FILE*&POSIX file id
+19. Dynamic Type Support
 
 Future Plan After C++ 20
 1. Module support
