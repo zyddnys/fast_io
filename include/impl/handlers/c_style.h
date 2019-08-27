@@ -73,6 +73,16 @@ public:
 		if(std::fflush(fp))
 			throw std::system_error(errno,std::system_category());
 	}
+	template<typename T>
+	void seek(seek_type_t<T>,Integral i,seekdir s=seekdir::beg)
+	{
+		if(fseek(fp,seek_precondition<long,T,char_type>(i),static_cast<int>(s)))
+			throw std::system_error(errno,std::system_category()); 
+	}
+	void seek(Integral i,seekdir s=seekdir::beg)
+	{
+		seek(seek_type<char_type>,i,s);
+	}
 };
 
 class c_style_file:public c_style_io_handle
@@ -92,9 +102,17 @@ public:
 			throw std::system_error(errno,std::generic_category());
 	}
 	c_style_file(std::string_view name,std::string_view mode):c_style_file(native_interface,name.data(),mode.data()){}
-	c_style_file(std::string_view file,open::mode const& m):c_style_file(file,c_style(m)){}
+	c_style_file(std::string_view file,open::mode const& m):c_style_file(file,c_style(m))
+	{
+		if(with_ate(m))
+			seek(0,seekdir::end);
+	}
 	template<std::size_t om>
-	c_style_file(std::string_view name,open::interface_t<om>):c_style_file(name,open::interface_t<om>::c_style){}
+	c_style_file(std::string_view name,open::interface_t<om>):c_style_file(name,open::interface_t<om>::c_style)
+	{
+		if constexpr (with_ate(open::mode(om)))
+			seek(0,seekdir::end);
+	}
 	c_style_file(c_style_file const&)=delete;
 	c_style_file& operator=(c_style_file const&)=delete;
 	c_style_file(c_style_file&& b) noexcept : c_style_io_handle(b.native_handle())

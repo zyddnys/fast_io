@@ -30,6 +30,16 @@ public:
 	auto flush() requires standard_output_stream<io>() = delete;
 };
 
+template<random_access_stream io>
+class seekerasure:public io
+{
+public:
+	using char_type = typename io::char_type;
+	template<typename ...Args>
+	seekerasure(Args&& ...args):io(std::forward<Args>(args)...){}
+	void seek(Integral,seekdir)=delete;
+	template<typename T> void seek(seek_type_t<T>,Integral,seekdir) = delete;
+};
 
 
 }

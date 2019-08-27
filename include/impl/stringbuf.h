@@ -3,7 +3,7 @@
 #include<string>
 #include"concept.h"
 #include<string_view>
-#include"write_precondition.h"
+#include"precondition.h"
 
 namespace fast_io
 {

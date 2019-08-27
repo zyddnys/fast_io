@@ -4,7 +4,7 @@
 #include<string>
 #include<cstddef>
 #include"concept.h"
-#include"write_precondition.h"
+#include"precondition.h"
 
 namespace fast_io
 {
@@ -115,6 +115,12 @@ public:
 	{
 		return ih;
 	}
+	template<typename... Args>
+	void seek(Args&& ...args) requires(random_access_stream<Ihandler>())
+	{
+		bh.curr=bh.end;
+		ih.seek(std::forward<Args>(args)...);
+	}
 };
 template<output_stream Ohandler,typename Buf=basic_buf_handler<typename Ohandler::char_type>>
 class basic_obuf
@@ -196,6 +202,13 @@ public:
 	{
 		return oh;
 	}
+	template<typename... Args>
+	void seek(Args&& ...args) requires(random_access_stream<Ohandler>())
+	{
+		oh.write(bh.beg,bh.curr);
+		bh.curr=bh.beg;
+		oh.seek(std::forward<Args>(args)...);
+	}
 };
 
 namespace details
@@ -257,6 +270,12 @@ public:
 	bool eof() const
 	{
 		return ibf.eof();
+	}
+	template<typename... Args>
+	void seek(Args&& ...args) requires(random_access_stream<io_handler>())
+	{
+		ibf.native_handle().flush();
+		ibf.seek(std::forward<Args>(args)...);
 	}
 };
 

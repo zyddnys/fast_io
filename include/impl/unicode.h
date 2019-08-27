@@ -30,7 +30,7 @@ private:
 		if(!u.bts.test(ch_bits-1))
 			return u.ch;
 		auto constexpr ch_bits_m2(ch_bits-2);
-		auto constexpr limitm1((static_cast<std::size_t>(1)<<ch_bits_m2)-1);
+		auto constexpr limitm1((static_cast<unsigned_native_char_type>(1)<<ch_bits_m2)-1);
 		if(!u.bts.test(ch_bits_m2))
 			throw std::runtime_error("not a utf8 character");
 		u.bts.reset(ch_bits-1);
@@ -38,18 +38,18 @@ private:
 		for(;pos<ch_bits&&u.bts.test(pos);--pos)
 			u.bts.reset(pos);
 		std::size_t bytes(ch_bits_m2-pos);
-		char_type converted_ch(u.ch);
-		print(fast_io::out,fast_io::bin(converted_ch)).put('\t');
+		unsigned_char_type converted_ch(u.ch);
+//		fprint(fast_io::out,"%,%\t",bytes,fast_io::bin(converted_ch));
 		for(std::size_t i(0);i!=bytes;++i)
 		{
 			unsigned_native_char_type t(ib.get());
-			print(fast_io::out,fast_io::bin(converted_ch)).put('\t');
 			if((t>>ch_bits_m2)==2)
-				converted_ch=(converted_ch<<ch_bits_m2)|(t&limitm1);
+				converted_ch=((converted_ch<<ch_bits_m2)|(t&limitm1))&((1<<((i+2)*6)) -1);
 			else
 				throw std::runtime_error("not a utf8 character");
+//			fprint(fast_io::out,"%,%\t",fast_io::bin(t),fast_io::bin(converted_ch));
 		}
-		println(fast_io::out);
+//		println(fast_io::out);
 		return converted_ch;
 	}
 public:

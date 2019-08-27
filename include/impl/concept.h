@@ -3,6 +3,7 @@
 #include<limits>
 #include<type_traits>
 #include"before_cpp20_concept.h"
+#include"seek.h"
 
 namespace fast_io
 {
@@ -20,8 +21,8 @@ concept bool standard_input_stream()
 {
 	return input_stream<T>()&&requires(T in)
 	{
-		{in.get()};
-		{in.try_get()}->std::pair<decltype(in.get()),bool>;
+		{in.get()}->typename T::char_type;
+		{in.try_get()}->std::pair<typename T::char_type,bool>;
 		{in.eof()}->bool;
 	};
 };
@@ -72,6 +73,15 @@ concept bool mutex_output_stream = standard_output_stream<T>()&&mutex_stream<T>(
 
 template<typename T>
 concept bool mutex_io_stream = input_stream<T>()&&output_stream<T>()&&io_stream<T>;
+
+template<typename T>
+concept bool random_access_stream()
+{
+	return stream<T>&&requires(T t)
+	{
+		{t.seek};
+	};
+};
 
 /*	template<typename T>
 	concept bool random_access_input_stream()

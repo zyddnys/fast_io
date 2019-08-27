@@ -7,6 +7,7 @@
 #include<type_traits>
 #include"../mode.h"
 #include"../concept.h"
+#include"../seek.h"
 #include<system_error>
 #include<tuple>
 
@@ -100,6 +101,16 @@ public:
 			throw std::system_error(errno,std::system_category());
 		return begin+(write_bytes/sizeof(*begin));
 	}
+	template<typename T>
+	void seek(seek_type_t<T>,Integral i,seekdir s=seekdir::beg)
+	{
+		if(::lseek64(fd,seek_precondition<off64_t,T,char_type>(i),static_cast<int>(s))==-1)
+			throw std::system_error(errno,std::system_category()); 
+	}
+	void seek(Integral i,seekdir s=seekdir::beg)
+	{
+		seek(seek_type<char_type>,i,s);
+	}
 	void flush()
 	{
 		// no need fsync. OS can deal with it
@@ -125,8 +136,17 @@ public:
 			throw std::system_error(errno,std::generic_category());
 	}
 	template<std::size_t om>
-	posix_file(std::string_view file,open::interface_t<om>):posix_file(native_interface,file.data(),details::posix_file_openmode<om>::mode,420){}		//potential support modification prv in the future
-	posix_file(std::string_view file,open::mode const& m):posix_file(native_interface,file.data(),details::calculate_posix_open_mode(m),420){}		//potential support modification prv in the future
+	posix_file(std::string_view file,open::interface_t<om>):posix_file(native_interface,file.data(),details::posix_file_openmode<om>::mode,420)
+	{
+		if constexpr (with_ate(open::mode(om)))
+			seek(0,seekdir::end);
+	}
+	//potential support modification prv in the future
+	posix_file(std::string_view file,open::mode const& m):posix_file(native_interface,file.data(),details::calculate_posix_open_mode(m),420)
+	{
+		if(with_ate(m))
+			seek(0,seekdir::end);
+	}
 	posix_file(std::string_view file,std::string_view mode):posix_file(file,fast_io::open::c_style(mode)){}
 	posix_file(posix_file const&)=delete;
 	posix_file& operator=(posix_file const&)=delete;

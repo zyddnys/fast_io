@@ -61,6 +61,12 @@ public:
 	{
 		return handler.eof();
 	}
+	template<typename... Args>
+	void seek(Args&& ...args) requires(random_access_stream<native_handle_type>())
+	{
+		std::lock_guard<std::mutex> lg(mutex());
+		handler.seek(std::forward<Args>(args)...);
+	}
 };
 
 
