@@ -21,13 +21,13 @@ inline constexpr int calculate_posix_open_mode(open::mode const &om)
 	using namespace open;
 	std::size_t value(remove_ate(om).value);
 	int mode(0);
-#ifdef O_BINARY
 	if(value&binary.value)
 	{
+#ifdef O_BINARY
 		mode |= O_BINARY;
+#endif
 		value &= ~binary.value;
 	}
-#endif
 	if(value&excl.value)
 	{
 		mode |= O_CREAT  | O_EXCL;
