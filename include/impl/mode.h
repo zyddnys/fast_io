@@ -28,9 +28,10 @@ inline static mode constexpr app{1};
 inline static mode constexpr ate{1<<1};
 inline static mode constexpr binary{1<<2};
 inline static mode constexpr in{1<<3};
-inline static mode constexpr no_overwrite{1<<4};//C++ iostream currently still does not support "x"
+inline static mode constexpr excl{1<<4};//C++ iostream currently still does not support "x"
 inline static mode constexpr out{1<<5};
 inline static mode constexpr trunc{1<<6};
+//inline static mode constexpr sync{1<<7}; future support for sync tag after implementing ntopen
 
 inline constexpr mode operator|(mode const& a,mode const& b)
 {
@@ -85,19 +86,19 @@ inline auto constexpr c_style(mode const& m)
 	case in|app:
 		return "a+"sv;
 //Destroy contents;	Error;	"wx";	Create a file for writing
-	case out|no_overwrite:
-	case out|trunc|no_overwrite:
+	case out|excl:
+	case out|trunc|excl:
 		return "wx"sv;
 //Append to file;	Error;	"ax";	Append to a file
-	case app|no_overwrite:
-	case out|app|no_overwrite:
+	case app|excl:
+	case out|app|excl:
 		return "ax"sv;
 //Destroy contents;	Error;	"w+x";	Create a file for read/write
-	case out|in|trunc|no_overwrite:
+	case out|in|trunc|excl:
 		return "w+x"sv;
 //Write to end;	Error;	"a+x";	Open a file for read/write
-	case out|in|app|no_overwrite:
-	case in|app|no_overwrite:
+	case out|in|app|excl:
+	case in|app|excl:
 		return "a+x"sv;
 	break;
 	
@@ -126,19 +127,19 @@ inline auto constexpr c_style(mode const& m)
 	case in|app|binary:
 		return "a+b"sv;
 //Destroy contents;	Error;	"wxb";	Create a file for writing
-	case out|no_overwrite|binary:
-	case out|trunc|no_overwrite|binary:
+	case out|excl|binary:
+	case out|trunc|excl|binary:
 		return "wxb"sv;
 //Append to file;	Error;	"axb";	Append to a file
-	case app|no_overwrite|binary:
-	case out|app|no_overwrite|binary:
+	case app|excl|binary:
+	case out|app|excl|binary:
 		return "axb"sv;
 //Destroy contents;	Error;	"w+xb";	Create a file for read/write
-	case out|in|trunc|no_overwrite|binary:
+	case out|in|trunc|excl|binary:
 		return "w+xb"sv;
 //Write to end;	Error;	"a+xb";	Open a file for read/write
-	case out|in|app|no_overwrite|binary:
-	case in|app|no_overwrite|binary:
+	case out|in|app|excl|binary:
+	case in|app|excl|binary:
 		return "a+xb"sv;
 	break;
 	default:
@@ -175,7 +176,7 @@ inline auto constexpr c_style(std::string_view csm)
 					v|=in|trunc;
 			break;
 			case 'x':
-				v|=no_overwrite;
+				v|=excl;
 			break;
 			case '+':
 			break;
