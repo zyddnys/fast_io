@@ -70,7 +70,12 @@ try
 	for(std::size_t i(0);i!=N;++i)
 		println(obuf,i);
 	}
-	
+	{
+	cqw::timer t("ofsync");
+	fast_io::ofsync obuf("ofsync.txt",fast_io::open::interface<fast_io::open::binary|fast_io::open::out|fast_io::open::trunc>);
+	for(std::size_t i(0);i!=N;++i)
+		println(obuf,i);
+	}
 }
 catch(std::exception const& e)
 {

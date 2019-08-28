@@ -33,6 +33,11 @@ inline constexpr int calculate_posix_open_mode(open::mode const &om)
 		mode |= O_CREAT  | O_EXCL;
 		value &= ~excl.value;
 	}
+	if(value&trunc.value)
+	{
+		mode |= O_TRUNC;
+		value &= ~trunc.value;
+	}
 	switch(value)
 	{
 //Action if file already exists;	Action if file does not exist;	c-style mode;	Explanation
@@ -41,7 +46,6 @@ inline constexpr int calculate_posix_open_mode(open::mode const &om)
 		return mode | O_RDONLY;
 //Destroy contents;	Create new;	"w";	Create a file for writing
 	case out:
-	case out|trunc:
 		return mode | O_WRONLY | O_CREAT | O_TRUNC;
 //Append to file;	Create new;	"a";	Append to a file
 	case app:
@@ -50,9 +54,6 @@ inline constexpr int calculate_posix_open_mode(open::mode const &om)
 //Read from start;	Error;	"r+";		Open a file for read/write
 	case out|in:
 		return mode | O_RDWR;
-//Destroy contents;	Create new;	"w+";	Create a file for read/write
-	case out|in|trunc:
-		return mode | O_RDWR | O_CREAT | O_TRUNC;
 //Write to end;	Create new;	"a+";	Open a file for read/write
 	case out|in|app:
 	case in|app:
