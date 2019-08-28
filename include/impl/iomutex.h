@@ -48,12 +48,12 @@ public:
 		std::lock_guard<std::mutex> lg(mutex());
 		return handler.read(begin,end);
 	}
-	auto get()
+	auto get() requires standard_input_stream<native_handle_type>
 	{
 		std::lock_guard<std::mutex> lg(mutex());
 		return handler.get();
 	}
-	auto try_get()
+	auto try_get() requires standard_input_stream<native_handle_type>
 	{
 		std::lock_guard<std::mutex> lg(mutex());
 		return handler.try_get();

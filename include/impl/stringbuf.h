@@ -74,8 +74,9 @@ public:
 	{
 		s.push_back(ch);
 	}
-	constexpr void flush(){}
+	constexpr void flush() const {}
 	constexpr void clear(){s.clear();}
+	constexpr auto empty() const {return s.empty();}
 };
 
 //potential constexpr in the future if std::string can be constexpr

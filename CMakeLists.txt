@@ -1,4 +1,5 @@
 project(fastio)
+find_package(Threads)
 
 set(CMAKE_CXX_FLAGS "-Wall -Wextra -fconcepts")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -fconcepts")
@@ -45,6 +46,8 @@ add_executable(line_flush "./examples/0023.flush/line_flush.cc")
 add_executable(no_tie_immediately_line_flush "./examples/0023.flush/no_tie_immediately_line_flush.cc")
 
 add_executable(multithreads_log "./examples/0024.multithreads/multithreads_log.cc")
+target_link_libraries( multithreads_log ${CMAKE_THREAD_LIBS_INIT} )
 add_executable(multithreads_log_line_flush "./examples/0024.multithreads/multithreads_log_line_flush.cc")
+target_link_libraries( multithreads_log_line_flush ${CMAKE_THREAD_LIBS_INIT} )
 
 cmake_minimum_required(VERSION 3.10)
