@@ -4,5 +4,5 @@
 int main()
 {
 	for(std::size_t i(0);i!=100;++i)
-		std::system(fast_io::concat<>("multithread_sync &").c_str());
+		std::system(fast_io::concat<>("./multithread_sync ",i," &").c_str());
 }

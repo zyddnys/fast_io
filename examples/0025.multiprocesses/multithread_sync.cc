@@ -24,6 +24,7 @@ int main(int argc,char **argv)
 		println(fast_io::err,"Usage: ",*argv," <process tag>");
 		return 1;
 	}
+	process_tag=argv[1];
 	std::vector<std::thread> th;
 	for(std::size_t i(1);i!=30;++i)
 		th.emplace_back(log_func,i);
