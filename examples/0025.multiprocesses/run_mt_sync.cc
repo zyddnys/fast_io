@@ -5,7 +5,7 @@
 
 void launch_process(std::size_t process_number)
 {
-	std::system(fast_io::concat<>(".\\multithread_sync ",process_number).c_str());
+	std::system(fast_io::concat<>("./multithread_sync ",process_number).c_str());
 }
 
 int main()

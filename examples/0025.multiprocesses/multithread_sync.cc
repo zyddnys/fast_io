@@ -12,7 +12,7 @@ void log_func(std::size_t thread_number)
 {
 	for(std::size_t i(0);i!=10000;++i)
 	{
-		println(file_log,"Process ",process_tag," Thread ",thread_number);
+		println(file_log,"Process",fast_io::setw(5,process_tag)," Thread",fast_io::setw(5,thread_number)," Loop",fast_io::setw(5,i));
 		file_log.flush();
 	}
 }
