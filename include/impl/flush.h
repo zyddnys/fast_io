@@ -8,8 +8,7 @@ template<output_stream Ohandler>
 class immediately_flush:public Ohandler
 {
 public:
-	using native_handle_type = Ohandler;
-	using char_type = typename native_handle_type::char_type;
+	using char_type = typename Ohandler::char_type;
 	template<typename... Args>
 	constexpr immediately_flush(Args&&... args):Ohandler(std::forward<Args>(args)...){}
 	template<typename Contiguous_Iterator>
@@ -18,14 +17,14 @@ public:
 		Ohandler::write(cbegin,cend);
 		Ohandler::flush();
 	}
-	constexpr void put(char_type ch) requires standard_output_stream<native_handle_type>
+	constexpr void put(char_type ch) requires standard_output_stream<Ohandler>
 	{
 		Ohandler::put(ch);
 		Ohandler::flush();
 	}
-	constexpr Ohandler& native_handle()
+	constexpr auto& native_handle()
 	{
-		return static_cast<Ohandler&>(*this);
+		return Ohandler::native_handle();
 	}
 };
 
@@ -33,8 +32,7 @@ template<output_stream Ohandler,typename Ohandler::char_type flush_character>
 class char_flush:public Ohandler
 {
 public:
-	using native_handle_type = Ohandler;
-	using char_type = typename native_handle_type::char_type;
+	using char_type = typename Ohandler::char_type;
 	template<typename... Args>
 	constexpr char_flush(Args&&... args):Ohandler(std::forward<Args>(args)...){}
 	template<typename Contiguous_Iterator>
@@ -51,15 +49,15 @@ public:
 			}
 		Ohandler::write(pb,pe);
 	}
-	constexpr void put(char_type ch) requires standard_output_stream<native_handle_type>
+	constexpr void put(char_type ch) requires standard_output_stream<Ohandler>
 	{
 		Ohandler::put(ch);
 		if(ch==flush_character)
 			Ohandler::flush();
 	}
-	constexpr Ohandler& native_handle()
+	constexpr auto& native_handle()
 	{
-		return static_cast<Ohandler&>(*this);
+		return Ohandler::native_handle();
 	}
 };
 
