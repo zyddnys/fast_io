@@ -17,14 +17,6 @@ try
 		fprintf(fp.get(),"%zu\n",i);
 	}
 	{
-	cqw::timer t("std::FILE* with 1048576 buffer size + _IOFBF (Full buffering) tag");
-	std::unique_ptr<std::FILE,decltype(fclose)*> fp(std::fopen("cfilestar_with_large_buffer.txt","wb"),fclose);
-	auto buffer(std::make_unique<char[]>(1048576));
-	setvbuf(fp.get(),buffer.get(),_IOFBF,1048576);
-	for(std::size_t i(0);i!=N;++i)
-		fprintf(fp.get(),"%zu\n",i);
-	}
-	{
 	cqw::timer t("std::ofstream");
 	std::ofstream fout("ofstream.txt",std::ofstream::binary);
 	for(std::size_t i(0);i!=N;++i)

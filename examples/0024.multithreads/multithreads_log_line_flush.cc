@@ -1,18 +1,18 @@
 #include"../../include/fast_io.h"
 #include<thread>
 
-fast_io::line_flush<fast_io::obuf_mutex> file_log("log.txt");
+fast_io::obuf_mutex file_log("log.txt");
 
 void thread_function1()
 {
 	for(std::size_t i(0);i!=10000;++i)
-		println(file_log,"thread1:",i);
+		println_flush(file_log,"thread1:",i);
 }
 
 void thread_function2()
 {
 	for(std::size_t i(0);i!=10000;++i)
-		println(file_log,"thread2:",i);
+		println_flush(file_log,"thread2:",i);
 }
 
 int main()
@@ -20,7 +20,7 @@ int main()
 	std::thread th1(thread_function1);
 	std::thread th2(thread_function2);
 	for(std::size_t i(0);i!=10000;++i)
-		println(file_log,"main thread:",i);
+		println_flush(file_log,"main thread:",i);
 	th1.join();
 	th2.join();
 }

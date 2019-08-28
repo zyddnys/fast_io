@@ -11,10 +11,7 @@ fast_io::osync_mutex file_log("log.txt",fast_io::open::interface<fast_io::open::
 void log_func(std::size_t thread_number)
 {
 	for(std::size_t i(0);i!=10000;++i)
-	{
-		println(file_log,"Process",fast_io::setw(5,process_tag)," Thread",fast_io::setw(5,thread_number)," Loop",fast_io::setw(5,i));
-		file_log.flush();
-	}
+		println_flush(file_log,"Process",fast_io::setw(5,process_tag)," Thread",fast_io::setw(5,thread_number)," Loop",fast_io::setw(5,i));
 }
 
 int main(int argc,char **argv)
