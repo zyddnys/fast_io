@@ -55,5 +55,6 @@ target_link_libraries(multithread_sync ${CMAKE_THREAD_LIBS_INIT} )
 add_executable(ofsync "./examples/0025.multiprocesses/ofsync.cc")
 add_executable(osync "./examples/0025.multiprocesses/osync.cc")
 add_executable(run_mt_sync "./examples/0025.multiprocesses/run_mt_sync.cc")
+target_link_libraries(run_mt_sync ${CMAKE_THREAD_LIBS_INIT} )
 
 cmake_minimum_required(VERSION 3.10)
