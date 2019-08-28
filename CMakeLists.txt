@@ -38,4 +38,11 @@ add_executable(setw "./examples/0010.manip/setw.cc")
 
 add_executable(manually_lockguard "./examples/0022.mutex/manually_lockguard.cc")
 add_executable(multithreads_log "./examples/0022.mutex/multithreads_log.cc")
+
+add_executable(any_character_flush "./examples/0023.flush/any_character_flush.cc")
+add_executable(change_flush_state "./examples/0023.flush/change_flush_state.cc")
+add_executable(immediately_flush "./examples/0023.flush/immediately_flush.cc")
+add_executable(line_flush "./examples/0023.flush/line_flush.cc")
+add_executable(no_tie_immediately_line_flush "./examples/0023.flush/no_tie_immediately_line_flush.cc")
+
 cmake_minimum_required(VERSION 3.10)
