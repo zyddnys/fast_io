@@ -1,4 +1,3 @@
-#include<iostream>
 #include"../../include/fast_io.h"
 #include<thread>
 

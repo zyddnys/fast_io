@@ -19,10 +19,10 @@ public:
 	auto& buffer(){return mostr;}
 	auto& native_handle() {return handle;}
 	template<typename ...Args>
-	basic_sync(Args&& ...args):output(std::forward<Args>(args)...){}
+	basic_sync(Args&& ...args):handle(std::forward<Args>(args)...){}
 	void flush()
 	{
-		handle.write(mostr.cbegin(),mostr.cend());
+		handle.write(mostr.str().cbegin(),mostr.str().cend());
 		mostr.clear();
 	}
 	template<typename ...Args>
