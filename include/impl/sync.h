@@ -40,7 +40,30 @@ public:
 		flush();
 		handle.seek(std::forward<Args>(args)...);
 	}
+	template<typename Contiguous_iterator>
+	Contiguous_iterator read(Contiguous_iterator begin,Contiguous_iterator end)
+		requires input_stream<native_handle_type>
+	{
+		flush();
+		return handle.read(begin,end);
+	}
+	auto get() requires standard_input_stream<native_handle_type>
+	{
+		flush();
+		return handle.get();
+	}
+	auto try_get() requires standard_input_stream<native_handle_type>
+	{
+		flush();
+		return handle.try_get();
+	}
+	auto eof() requires standard_input_stream<native_handle_type>
+	{
+		flush();
+		return handle.eof();
+	}
 };
+
 
 template<output_stream output,typename ostr = basic_ostring<std::string>>
 class basic_fsync:public basic_sync<output,ostr>

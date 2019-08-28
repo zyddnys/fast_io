@@ -38,8 +38,15 @@ using isystem_file = input_wrapper<system_file>;
 using osystem_file = output_wrapper<system_file>;
 using iosystem_file = io_wrapper<system_file>;
 
-using osync = basic_sync<basic_wrapper<system_file,fast_io::open::out|fast_io::open::app>>;
-using ofsync = basic_fsync<basic_wrapper<system_file,fast_io::open::out|fast_io::open::app>>;
+using sync = basic_sync<basic_wrapper<system_file,fast_io::open::app>>;
+using osync = ierasure<sync>;
+using fsync = basic_fsync<basic_wrapper<system_file,fast_io::open::app>>;
+using ofsync = ierasure<fsync>;
+
+using sync_mutex = basic_iomutex<sync>;
+using osync_mutex = basic_iomutex<osync>;
+using fsync_mutex = basic_iomutex<fsync>;
+using ofsync_mutex = basic_iomutex<ofsync>;
 
 using ibuf = basic_ibuf<isystem_file>;
 using obuf = basic_obuf<osystem_file>;
@@ -47,10 +54,6 @@ using iobuf = basic_iobuf<iosystem_file>;
 
 using istring_view = basic_istring_view<std::string_view>;
 using ostring = basic_ostring<std::string>;
-
-
-using osync_mutex = basic_iomutex<osync>;
-using ofsync_mutex = basic_iomutex<ofsync>;
 
 using ibuf_mutex = basic_iomutex<ibuf>;
 using obuf_mutex = basic_iomutex<obuf>;
