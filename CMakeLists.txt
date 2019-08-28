@@ -50,4 +50,10 @@ target_link_libraries( multithreads_log ${CMAKE_THREAD_LIBS_INIT} )
 add_executable(multithreads_log_line_flush "./examples/0024.multithreads/multithreads_log_line_flush.cc")
 target_link_libraries( multithreads_log_line_flush ${CMAKE_THREAD_LIBS_INIT} )
 
+add_executable(multithread_sync "./examples/0025.multiprocesses/multithread_sync.cc")
+target_link_libraries(multithread_sync ${CMAKE_THREAD_LIBS_INIT} )
+add_executable(ofsync "./examples/0025.multiprocesses/ofsync.cc")
+add_executable(osync "./examples/0025.multiprocesses/osync.cc")
+
+
 cmake_minimum_required(VERSION 3.10)
