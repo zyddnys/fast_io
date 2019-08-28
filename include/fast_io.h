@@ -14,7 +14,7 @@
 #include"impl/iomutex.h"
 #include"impl/wrapper.h"
 #include"impl/tie.h"
-#include"impl/immediately_flush.h"
+#include"impl/flush.h"
 #include"impl/erasure.h"
 #include"impl/dynamic.h"
 
