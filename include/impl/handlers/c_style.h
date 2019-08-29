@@ -97,11 +97,13 @@ public:
 	using char_type = c_style_io_handle::char_type;
 	using native_handle_type = c_style_io_handle::native_handle_type;
 	template<typename ...Args>
-	c_style_file(native_interface_t,Args&& ...args):c_style_io_handle(std::fopen(std::forward<Args>(args)...))
+	c_style_file(native_handle_t,Args&& ...args):c_style_io_handle(std::forward<Args>(args)...)
 	{
 		if(native_handle()==nullptr)
 			throw std::system_error(errno,std::generic_category());
 	}
+	template<typename ...Args>
+	c_style_file(native_interface_t,Args&& ...args):c_style_file(fast_io::native_handle,std::fopen(std::forward<Args>(args)...)){}
 	c_style_file(std::string_view name,std::string_view mode):c_style_file(native_interface,name.data(),mode.data()){}
 	c_style_file(std::string_view file,open::mode const& m):c_style_file(file,c_style(m))
 	{

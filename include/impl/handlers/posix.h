@@ -132,10 +132,14 @@ public:
 	using char_type = posix_io_handle::char_type;
 	using native_handle_type = posix_io_handle::native_handle_type;
 	template<typename ...Args>
-	posix_file(native_interface_t,Args&& ...args):posix_io_handle(::open(std::forward<Args>(args)...))
+	posix_file(native_handle_t,Args&& ...args):posix_io_handle(std::forward<Args>(args)...)
 	{
 		if(native_handle()==-1)
 			throw std::system_error(errno,std::generic_category());
+	}
+	template<typename ...Args>
+	posix_file(native_interface_t,Args&& ...args):posix_file(fast_io::native_handle,::open(std::forward<Args>(args)...))
+	{
 	}
 	template<std::size_t om>
 	posix_file(std::string_view file,open::interface_t<om>):posix_file(native_interface,file.data(),details::posix_file_openmode<om>::mode,420)
