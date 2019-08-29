@@ -9,6 +9,7 @@ namespace fast_io
 {
 
 template<stream T,typename CharT>
+requires sizeof(typename T::char_type)<sizeof(CharT)
 class unicode_view
 {
 	T& ib;
@@ -40,7 +41,6 @@ private:
 			u.bts.reset(pos);
 		std::size_t bytes(ch_bits_m2-pos);
 		unsigned_char_type converted_ch(u.ch);
-//		fprint(fast_io::out,"%,%\t",bytes,fast_io::bin(converted_ch));
 		for(std::size_t i(0);i!=bytes;++i)
 		{
 			unsigned_native_char_type t(ib.get());
@@ -48,9 +48,7 @@ private:
 				converted_ch=((converted_ch<<ch_bits_m2)|(t&limitm1))&((1<<((i+2)*6)) -1);
 			else
 				throw std::runtime_error("not a utf8 character");
-//			fprint(fast_io::out,"%,%\t",fast_io::bin(t),fast_io::bin(converted_ch));
 		}
-//		println(fast_io::out);
 		return converted_ch;
 	}
 public:
@@ -88,35 +86,30 @@ public:
 	constexpr void put(char_type ch)
 		requires standard_output_stream<T>
 	{
-		auto constexpr bytes(sizeof(native_char_type)*8);
-		auto constexpr lshift1(bytes-1);
-		auto constexpr limit1(static_cast<std::size_t>(1)<<lshift1);
-		if(ch<limit1)
+		unsigned_native_char_type constexpr native_char_bits(8*sizeof(unsigned_native_char_type));
+		unsigned_native_char_type constexpr fair(1<<(native_char_bits-1));
+		unsigned_native_char_type constexpr utf8_limit(1<<(native_char_bits-2));
+		if(ch<fair)
 		{
 			ib.put(ch);
 			return;
 		}
-		auto constexpr lshift2(bytes-2);
-		auto constexpr limit2(static_cast<std::size_t>(1)<<lshift2);
-		auto constexpr limitm2(limit2-1);
-		std::array<native_char_type,sizeof(native_char_type)*8> a{};
-		auto i(a.size()-1);
-		for(;i<a.size()&&ch;--i)
+		std::array<unsigned_native_char_type,sizeof(char_type)/sizeof(unsigned_native_char_type)+1> v{};
+		auto ed(v.data()+v.size());
+		do
 		{
-			a[i]=((ch&limitm2)|limit1);
-			ch>>=lshift2;
+			*--ed = (ch%utf8_limit)|fair;
 		}
-		if(a.size()<=++i)
-			throw std::runtime_error("incorrect character");
-		std::size_t pos(i-1);
-		native_char_type v(0);
-		v=~v;
-		v>>=pos;
-		v<<=pos;
-		v&=~(1<<pos);
-		a[i]|=v;
-		a[i]&=~(1<<pos);
-		ib.write(a.cbegin()+i,a.cend());
+		while(ch/=utf8_limit);
+		std::size_t v_elements(v.data()+v.size()-ed);
+		if((1<<(native_char_bits-1-v_elements))<=(*ed&~fair))
+		{
+			--ed;
+			++v_elements;
+		}
+		unsigned_native_char_type constexpr max_native_char_type(-1);
+		*ed |= max_native_char_type>>(native_char_bits-v_elements-1)<<(native_char_bits-v_elements);
+		ib.write(ed,v.data()+v.size());
 	}
 	template<typename Contiguous_iterator>
 	constexpr void write(Contiguous_iterator b,Contiguous_iterator e)
@@ -157,7 +150,7 @@ inline void in_place_unicode_to_utf8(std::string& v,std::basic_string_view<T> vi
 {
 	basic_ostring<std::string> obsv(std::move(v));
 	unicode_view<decltype(obsv),T> uv(obsv);
-	print(uv,view);
+	uv.write(view.cbegin(),view.cend());
 	v=std::move(obsv.str());
 }
 
@@ -166,7 +159,7 @@ inline std::string unicode_to_utf8(std::basic_string_view<T> view)
 {
 	basic_ostring<std::string> obsv;
 	unicode_view<decltype(obsv),T> uv(obsv);
-	print(uv,view);
+	uv.write(view.cbegin(),view.cend());
 	return std::move(obsv.str());
 }
 }
