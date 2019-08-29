@@ -11,7 +11,9 @@ int main()
 		print(ob,unsigned_view(e)," ");
 	print(ob,"\n\n");
 	auto u32emoji(utf8_to_unicode<std::u32string>(emoji));
-	println(ob,"unicode characters: ",u32emoji.size());
+	println(ob,"u32string size is ",u32emoji.size(),"\nunicode string:");
+	print(view,u32emoji);
+	print(ob,"\n\n");
 	for(auto const & e : u32emoji)
 	{
 		view.put(e);
