@@ -69,7 +69,8 @@ inline void getwhole(input& in,std::basic_string<typename input::char_type> &str
 
 namespace details
 {
-inline constexpr void fprint(output_stream &out,std::string_view format)
+template<output_stream os,typename ...Args>
+inline void fprint(os &out,std::basic_string_view<typename os::char_type> format)
 {
 	std::size_t percent_pos;
 	for(;(percent_pos=format.find('%'))!=std::string_view::npos&&percent_pos+1!=format.size()&&format[percent_pos+1]=='%';format.remove_prefix(percent_pos+2))
@@ -78,8 +79,9 @@ inline constexpr void fprint(output_stream &out,std::string_view format)
 		throw std::runtime_error("fprint() format error");
 	out.write(format.cbegin(),format.cend());
 }
-template<typename T,typename ...Args>
-inline void fprint(output_stream &out,std::string_view format,T&& cr,Args&& ...args)
+
+template<output_stream os,typename T,typename ...Args>
+inline void fprint(os &out,std::basic_string_view<typename os::char_type> format,T&& cr,Args&& ...args)
 {
 	std::size_t percent_pos;
 	for(;(percent_pos=format.find('%'))!=std::string_view::npos&&percent_pos+1!=format.size()&&format[percent_pos+1]=='%';format.remove_prefix(percent_pos+2))
@@ -99,8 +101,8 @@ inline void fprint(output_stream &out,std::string_view format,T&& cr,Args&& ...a
 }
 }
 
-template<typename ...Args>
-inline constexpr void fprint(output_stream &out,std::string_view format,Args&& ...args)
+template<output_stream os,typename ...Args>
+inline constexpr void fprint(os &out,std::basic_string_view<typename os::char_type> format,Args&& ...args)
 {
 	details::fprint(out,format,std::forward<Args>(args)...);
 }
