@@ -62,4 +62,7 @@ add_executable(emoji "./examples/0012.unicode/emoji.cc")
 add_executable(unicode_view "./examples/0012.unicode/unicode_view.cc")
 add_executable(test_unicode "./examples/0012.unicode/test_unicode.cc")
 add_executable(hello_unicode_world "./examples/0012.unicode/hello_unicode_world.cc")
+
+add_executable(define_custom_type "./examples/0007.define_custom_type/define_custom_type.cc")
+add_executable(define_custom_type2 "./examples/0007.define_custom_type/define_custom_type2.cc")
 cmake_minimum_required(VERSION 3.10)
