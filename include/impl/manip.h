@@ -77,15 +77,15 @@ inline constexpr details::char_view_t<T const> char_view(T const& ch)
 }
 
 template<Integral T>
-inline constexpr details::unsigned_view_t<T> unsigned_view(T& integral)
+inline constexpr T& unsigned_view(T& integral)
 {
-	return {integral};
+	return reinterpret_cast<std::make_unsigned_t<T>&>(integral);
 }
 
 template<Integral T>
 inline constexpr details::signed_view_t<T> signed_view(T& integral)
 {
-	return {integral};
+	return reinterpret_cast<std::make_signed_t<T>&>(integral);
 }
 
 template<Integral T>
@@ -159,7 +159,7 @@ inline void print(output& out,details::setw_t<auto> a)
 		out.put(' ');
 	print(out,bas.str());
 }
-
+/*
 template<typename T>
 inline constexpr void print(standard_output_stream& out,details::unsigned_view_t<T> a)
 {
@@ -182,7 +182,7 @@ template<typename T>
 inline constexpr void scan(standard_input_stream& in,details::signed_view_t<T> a)
 {
 	scan(in,reinterpret_cast<std::make_signed_t<T>&>(a.reference));
-}
+}*/
 
 namespace details
 {

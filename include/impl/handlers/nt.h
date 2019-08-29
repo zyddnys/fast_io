@@ -51,7 +51,7 @@ public:
 	}
 	nt_file& operator=(nt_file&& b) noexcept
 	{
-		if(&b!=this)
+		if(std::addressof(b))
 		{
 			closeimpl();
 			handle = b.handle;

@@ -29,7 +29,7 @@ public:
 	}
 	basic_buf_handler& operator=(basic_buf_handler&& m) noexcept
 	{
-		if(&m!=this)
+		if(std::addressof(m)!=this)
 		{
 			alloc.deallocate(beg,buffer_size);
 			beg=m.beg;
@@ -175,7 +175,7 @@ public:
 	basic_obuf(basic_obuf&& bmv) noexcept = default;
 	basic_obuf& operator=(basic_obuf&& b) noexcept
 	{
-		if(&b!=this)
+		if(std::addressof(b)!=this)
 		{
 			close_impl();
 			oh=std::move(b.oh);

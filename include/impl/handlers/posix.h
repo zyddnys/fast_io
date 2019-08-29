@@ -157,7 +157,7 @@ public:
 	}
 	posix_file& operator=(posix_file&& b) noexcept
 	{
-		if(&b!=this)
+		if(std::addressof(b)!=this)
 		{
 			close_impl();
 			protected_native_handle()=b.protected_native_handle();

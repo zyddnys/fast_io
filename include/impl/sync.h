@@ -90,7 +90,7 @@ public:
 	}
 	basic_fsync& operator=(basic_fsync&& other) noexcept
 	{
-		if(&other!=this)
+		if(std::addressof(other)!=this)
 		{
 			sync();
 			basic_sync<output,ostr>::operator=(std::move(other));

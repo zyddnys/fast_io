@@ -121,7 +121,7 @@ public:
 	}
 	c_style_file& operator=(c_style_file&& b) noexcept
 	{
-		if(&b!=this)
+		if(std::addressof(b)!=this)
 		{
 			close_impl();
 			protected_native_handle()=b.native_handle();

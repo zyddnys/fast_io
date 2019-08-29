@@ -157,7 +157,7 @@ inline void in_place_unicode_to_utf8(std::string& v,std::basic_string_view<T> vi
 {
 	basic_ostring<std::string> obsv(std::move(v));
 	unicode_view<decltype(obsv),T> uv(obsv);
-	uv<<view;
+	print(uv,view);
 	v=std::move(obsv.str());
 }
 
@@ -166,7 +166,7 @@ inline std::string unicode_to_utf8(std::basic_string_view<T> view)
 {
 	basic_ostring<std::string> obsv;
 	unicode_view<decltype(obsv),T> uv(obsv);
-	uv<<view;
+	print(uv,view);
 	return std::move(obsv.str());
 }
 }

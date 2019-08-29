@@ -1,7 +1,13 @@
 #include"../../include/fast_io.h"
+#include<string_view>
 int main()
 {
-	fast_io::obuf ob("unicode.txt");
-	fast_io::unicode_view<decltype(ob),wchar_t> uv(ob);
-	uv<<L"工要在地一，上是中国同和的有人我主产不为这经以发了民㍿dsgds\n";
+//	fast_io::obuf ob("unicode.txt");
+//	fast_io::unicode_view<decltype(ob),wchar_t> uv(ob);
+//	println(uv,L"😀");
+	std::string_view const emoji(u8"😀");
+	for(auto const & e : emoji)
+	{
+		print(fast_io::out,fast_io::unsigned_view(e),"\t");
+	}
 }
