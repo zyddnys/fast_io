@@ -4,6 +4,7 @@
 #include<windows.h>
 #include<ntifs.h>
 #include"../mode.h"
+#include<memory>
 
 namespace fast_io
 {

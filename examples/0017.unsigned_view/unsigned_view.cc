@@ -11,7 +11,6 @@ int main()
 	std::size_t k(0);
 	scan(fast_io::in,fast_io::signed_view(k));
 	println(fast_io::out,k);
-//	fast_io::in>>fast_io::unsigned_view(f);
 	scan(fast_io::in,fast_io::unsigned_view(f));
 	println(fast_io::out,f);
 }

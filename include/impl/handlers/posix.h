@@ -10,6 +10,7 @@
 #include"../seek.h"
 #include<system_error>
 #include<tuple>
+#include<memory>
 
 namespace fast_io
 {

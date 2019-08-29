@@ -77,17 +77,35 @@ inline constexpr details::char_view_t<T const> char_view(T const& ch)
 }
 
 template<Integral T>
-inline constexpr T& unsigned_view(T& integral)
+inline constexpr decltype(auto) unsigned_view(T& integral)
 {
 	return reinterpret_cast<std::make_unsigned_t<T>&>(integral);
 }
 
 template<Integral T>
-inline constexpr details::signed_view_t<T> signed_view(T& integral)
+inline constexpr decltype(auto) signed_view(T& integral)
 {
 	return reinterpret_cast<std::make_signed_t<T>&>(integral);
 }
 
+template<Integral T>
+inline constexpr decltype(auto) unsigned_view(T const& integral)
+{
+	return reinterpret_cast<std::make_unsigned_t<T const>&>(integral);
+}
+
+template<Integral T>
+inline constexpr decltype(auto) signed_view(T const& integral)
+{
+	return reinterpret_cast<std::make_signed_t<T const>&>(integral);
+}
+
+inline constexpr std::size_t unsigned_view(auto * const pointer)
+{
+	return reinterpret_cast<std::size_t>(pointer);
+}
+
+/*
 template<Integral T>
 inline constexpr details::unsigned_view_t<T const> unsigned_view(T const& integral)
 {
@@ -98,7 +116,7 @@ template<Integral T>
 inline constexpr details::signed_view_t<T const> signed_view(T const& integral)
 {
 	return {integral};
-}
+}*/
 
 //	template<template T>
 //	requires requires std::is_floating_point_v<T>
