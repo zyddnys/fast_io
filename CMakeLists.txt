@@ -59,4 +59,7 @@ target_link_libraries(run_mt_sync ${CMAKE_THREAD_LIBS_INIT} )
 add_executable(addressof "./examples/0027.pointer/addressof.cc")
 
 add_executable(emoji "./examples/0012.unicode/emoji.cc")
+add_executable(unicode_view "./examples/0012.unicode/unicode_view.cc")
+add_executable(test_unicode "./examples/0012.unicode/test_unicode.cc")
+add_executable(hello_unicode_world "./examples/0012.unicode/hello_unicode_world.cc")
 cmake_minimum_required(VERSION 3.10)
