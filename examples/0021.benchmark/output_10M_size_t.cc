@@ -46,7 +46,7 @@ try
 	}
 	{
 	cqw::timer t("obuf unicode_view");
-	fast_io::obuf obuf("obuf.txt",fast_io::open::interface<fast_io::open::binary>);
+	fast_io::obuf obuf("obuf_uv.txt",fast_io::open::interface<fast_io::open::binary>);
 	fast_io::unicode_view<decltype(obuf),char32_t> uv(obuf);
 	for(std::size_t i(0);i!=N;++i)
 		println(uv,i);
