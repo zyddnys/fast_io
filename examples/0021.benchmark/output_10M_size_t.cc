@@ -45,6 +45,13 @@ try
 		println(obuf,i);
 	}
 	{
+	cqw::timer t("obuf unicode_view");
+	fast_io::obuf obuf("obuf.txt",fast_io::open::interface<fast_io::open::binary>);
+	fast_io::unicode_view<decltype(obuf),char32_t> uv(obuf);
+	for(std::size_t i(0);i!=N;++i)
+		println(uv,i);
+	}
+	{
 	cqw::timer t("dynamic obuf");
 	fast_io::dynamic_standard_output_stream dobuf(std::in_place_type<fast_io::obuf>,"dynamic_obuf.txt",fast_io::open::interface<fast_io::open::binary>);
 	for(std::size_t i(0);i!=N;++i)
