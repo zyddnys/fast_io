@@ -133,4 +133,32 @@ inline constexpr void println(output_stream &out,Args&& ...args)
 	out.put('\n');
 }
 
+template<typename ...Args>
+inline constexpr void print_flush(output_stream &out,Args&& ...args)
+{
+	print(out,std::forward<Args>(args)...);
+	out.flush();
+}
+
+template<typename ...Args>
+inline constexpr void println_flush(output_stream &out,Args&& ...args)
+{
+	println(out,std::forward<Args>(args)...);
+	out.flush();
+}
+
+template<typename ...Args>
+inline constexpr void fprint_flush(output_stream &out,Args&& ...args)
+{
+	fprint(out,std::forward<Args>(args)...);
+	out.flush();
+}
+
+template<typename ...Args>
+inline constexpr void write_flush(output_stream& out,Args&& ...args)
+{
+	write(out,std::forward<Args>(args)...);
+	out.flush();
+}
+
 }

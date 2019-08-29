@@ -92,37 +92,32 @@ inline constexpr void fprint(mutex_output_stream &out,Args&& ...args)
 	fprint(out.native_handle(),std::forward<Args>(args)...);
 }
 
-
 template<typename ...Args>
 inline constexpr void print_flush(mutex_output_stream &out,Args&& ...args)
 {
 	std::lock_guard lg{out.mutex()};
-	print(out.native_handle(),std::forward<Args>(args)...);
-	out.flush();
+	print_flush(out.native_handle(),std::forward<Args>(args)...);
 }
 
 template<typename ...Args>
 inline constexpr void println_flush(mutex_output_stream &out,Args&& ...args)
 {
 	std::lock_guard lg{out.mutex()};
-	println(out.native_handle(),std::forward<Args>(args)...);
-	out.flush();
+	println_flush(out.native_handle(),std::forward<Args>(args)...);
 }
 
 template<typename ...Args>
 inline constexpr void fprint_flush(mutex_output_stream &out,Args&& ...args)
 {
 	std::lock_guard lg{out.mutex()};
-	fprint(out.native_handle(),std::forward<Args>(args)...);
-	out.flush();
+	fprint_flush(out.native_handle(),std::forward<Args>(args)...);
 }
 
 template<typename ...Args>
 inline constexpr void write_flush(mutex_output_stream& out,Args&& ...args)
 {
 	std::lock_guard lg(out.mutex());
-	write(out.native_handle(),std::forward<Args>(args)...);
-	out.flush();
+	write_flush(out.native_handle(),std::forward<Args>(args)...);
 }
 
 }
