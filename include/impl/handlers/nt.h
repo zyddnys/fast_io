@@ -2,7 +2,7 @@
 
 #include"ntkernel_category.hpp"
 #include<windows.h>
-#include<ntifs.h>
+#include<ddk/ntifs.h>
 #include"../mode.h"
 #include<memory>
 
@@ -42,7 +42,8 @@ public:
 		RtlInitUnicodeString(std::addressof(Name_U),filename.data());
 		Oa.Length = sizeof(Oa);
 		Oa.ObjectName = std::addressof(Name_U);
-		Oa.RootDirectory = 
+		Oa.RootDirectory = nullptr;
+		
 	}
 	nt_file(nt_file const&) = delete;
 	nt_file& operator=(nt_file const&) = delete;
