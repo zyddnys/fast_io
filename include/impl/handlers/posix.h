@@ -75,9 +75,10 @@ class posix_io_handle
 {
 	int fd;
 protected:
-	auto& protected_native_handle()
+	void close_impl() noexcept
 	{
-		return fd;
+		if(native_handle()!=-1)
+			close(native_handle());
 	}
 public:
 	using char_type = char;
@@ -86,6 +87,7 @@ public:
 	{
 		return fd;
 	}
+	posix_io_handle() = default;
 	posix_io_handle(int fdd):fd(fdd){}
 	template<typename ContiguousIterator>
 	ContiguousIterator read(ContiguousIterator begin,ContiguousIterator end)
@@ -119,27 +121,46 @@ public:
 //		if(::fsync(fd)==-1)
 //			throw std::system_error(errno,std::system_category());
 	}
+
+	posix_io_handle(posix_io_handle const& dp):fd(dup(dp.fd))
+	{
+		if(fd<0)
+			throw std::system_error(errno,std::generic_category());
+	}
+	posix_io_handle& operator=(posix_io_handle const& dp)
+	{
+		auto newfd(dup2(dp.fd,fd));
+		if(newfd<0)
+			throw std::system_error(errno,std::generic_category());
+		fd=newfd;
+		return *this;
+	}
+	posix_io_handle(posix_io_handle&& b) noexcept : posix_io_handle(b.fd)
+	{
+		b.fd = -1;
+	}
+	posix_io_handle& operator=(posix_io_handle&& b) noexcept
+	{
+		if(std::addressof(b)!=this)
+		{
+			close_impl();
+			fd=b.fd;
+			b.fd = -1;
+		}
+		return *this;
+	}
 };
 
 class posix_file:public posix_io_handle
 {
-	void close_impl() noexcept
-	{
-		if(native_handle()!=-1)
-			close(native_handle());
-	}
 public:
 	using char_type = posix_io_handle::char_type;
 	using native_handle_type = posix_io_handle::native_handle_type;
 	template<typename ...Args>
-	posix_file(native_handle_t,Args&& ...args):posix_io_handle(std::forward<Args>(args)...)
+	posix_file(native_interface_t,Args&& ...args):posix_io_handle(::open(std::forward<Args>(args)...))
 	{
 		if(native_handle()==-1)
 			throw std::system_error(errno,std::generic_category());
-	}
-	template<typename ...Args>
-	posix_file(native_interface_t,Args&& ...args):posix_file(fast_io::native_handle,::open(std::forward<Args>(args)...))
-	{
 	}
 	template<std::size_t om>
 	posix_file(std::string_view file,open::interface_t<om>):posix_file(native_interface,file.data(),details::posix_file_openmode<om>::mode,420)
@@ -154,25 +175,145 @@ public:
 			seek(0,seekdir::end);
 	}
 	posix_file(std::string_view file,std::string_view mode):posix_file(file,fast_io::open::c_style(mode)){}
-	posix_file(posix_file const&)=delete;
-	posix_file& operator=(posix_file const&)=delete;
-	posix_file(fast_io::posix_file&& b) noexcept : posix_io_handle(b.protected_native_handle())
+	~posix_file()
 	{
-		b.protected_native_handle() = -1;
+		posix_io_handle::close_impl();
 	}
-	posix_file& operator=(posix_file&& b) noexcept
+};
+
+class posix_pipe
+{
+public:
+	using char_type = char;
+	using native_handle_type = std::array<int,2>;
+private:
+	native_handle_type pipes;
+	void close_impl()
 	{
-		if(std::addressof(b)!=this)
+		for(auto const & e : pipes)
+			if(e!=-1)
+				close(e);
+	}
+public:
+	posix_pipe()
+	{
+#ifdef _WIN32_WINNT
+		if(_pipe(pipes.data(),1048576,_O_BINARY)==-1)
+#else
+		if(::pipe(pipes.data())==-1)
+#endif
+			throw std::system_error(errno,std::system_category());
+	}
+	posix_pipe(posix_pipe&& other) noexcept:pipes(other.pipes)
+	{
+		other.pipes.fill(-1);
+	}
+	posix_pipe& operator=(posix_pipe && other) noexcept
+	{
+		if(pipes.data()!=other.pipes.data())
 		{
 			close_impl();
-			protected_native_handle()=b.protected_native_handle();
-			b.protected_native_handle() = -1;
+			pipes = other.pipes;
+			other.pipes.fill(-1);
 		}
 		return *this;
 	}
-	~posix_file()
+	template<std::size_t om>
+	posix_pipe(open::interface_t<om>):posix_pipe()
+	{
+		if constexpr ((!om)||(om&~(open::in.value|open::out.value)))
+			throw std::runtime_error("unknown posix pipe flags");
+		if constexpr (~(om&open::in.value))
+		{
+			close(pipes.front());
+			pipes.front()=-1;
+		}
+		if constexpr (~(om&open::out.value))
+		{
+			close(pipes.back());			
+			pipes.back()=-1;
+		}
+	}
+	posix_pipe(posix_pipe const& b)
+	{
+		std::size_t i(0);
+		try
+		{
+			for(;i!=b.pipes.size();++i)
+				if(b.pipes[i]==-1)
+					pipes[i]=-1;
+				else
+				{
+					auto newfd(dup(b.pipes[i]));
+					if(newfd<0)
+						throw std::system_error(errno,std::generic_category());
+					pipes[i]=newfd;
+				}
+		}
+		catch(...)
+		{
+			for(;i;--i)
+				if(pipes[i-1]!=-1)
+					close(pipes[i-1]);
+			throw;
+		}
+	}
+	posix_pipe& operator=(posix_pipe const& m)
+	{
+		std::size_t i(0);
+		native_handle_type new_hds;
+		try
+		{
+			for(;i!=m.pipes.size();++i)
+				if(m.pipes[i]==-1)
+					new_hds[i]=-1;
+				else
+				{
+					auto newfd(dup(m.pipes[i]));
+					if(newfd==-1)
+						throw std::system_error(errno,std::generic_category());
+					new_hds[i]=newfd;
+				}
+		}
+		catch(...)
+		{
+			for(;i;--i)
+				if(new_hds[i-1]!=-1)
+					close(new_hds[i-1]);
+			throw;
+		}
+		for(auto const & e : pipes)
+			if(e!=-1)
+				close(e);
+		pipes=new_hds;
+		return *this;
+	}
+	~posix_pipe()
 	{
 		close_impl();
+	}
+	auto& native_handle()
+	{
+		return pipes;
+	}
+	void flush()
+	{
+	}
+	template<typename ContiguousIterator>
+	ContiguousIterator read(ContiguousIterator begin,ContiguousIterator end)
+	{
+		auto read_bytes(::read(pipes.front(),std::addressof(*begin),std::addressof(*end)-std::addressof(*begin)));
+		if(read_bytes==-1)
+			throw std::system_error(errno,std::system_category());
+		return begin+(read_bytes/sizeof(*begin));
+	}
+	template<typename ContiguousIterator>
+	ContiguousIterator write(ContiguousIterator begin,ContiguousIterator end)
+	{
+		auto write_bytes(::write(pipes.back(),std::addressof(*begin),std::addressof(*end)-std::addressof(*begin)));
+		if(write_bytes==-1)
+			throw std::system_error(errno,std::system_category());
+		return begin+(write_bytes/sizeof(*begin));
 	}
 };
 }

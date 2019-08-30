@@ -21,6 +21,13 @@
 
 namespace fast_io
 {
+	
+
+using iposix_pipe = input_wrapper<posix_pipe>;
+using oposix_pipe = output_wrapper<posix_pipe>;
+using ioposix_pipe = io_wrapper<posix_pipe>;
+
+
 using system_io_handle = posix_io_handle;
 using system_file = posix_file;
 using system_ohandle = ierasure<system_io_handle>;
@@ -34,13 +41,15 @@ tie<immediately_flush<decltype(out)>,decltype(out)> err;
 system_io_collections():out(1),in(out,0),err(out,2){}
 };
 
-using isystem_file = input_wrapper<system_file>;
-using osystem_file = output_wrapper<system_file>;
-using iosystem_file = io_wrapper<system_file>;
+using isystem_file = input_file_wrapper<system_file>;
+using osystem_file = output_file_wrapper<system_file>;
+using iosystem_file = io_file_wrapper<system_file>;
 
-using sync = basic_sync<basic_wrapper<system_file,fast_io::open::app>>;
+
+
+using sync = basic_sync<basic_file_wrapper<system_file,fast_io::open::app|fast_io::open::binary>>;
 using osync = ierasure<sync>;
-using fsync = basic_fsync<basic_wrapper<system_file,fast_io::open::app>>;
+using fsync = basic_fsync<basic_file_wrapper<system_file,fast_io::open::app|fast_io::open::binary>>;
 using ofsync = ierasure<fsync>;
 
 using sync_mutex = basic_iomutex<sync>;
@@ -78,3 +87,6 @@ using iobuf_dynamic = basic_iobuf<dynamic_io_stream>;
 #include"impl/manip.h"
 #include"impl/read_write.h"
 #include"impl/unicode.h"
+#ifdef _WIN32_WINNT
+//#include"impl/handlers/nt.h"
+#endif

@@ -1,6 +1,8 @@
 project(fastio)
 find_package(Threads)
 
+
+
 set(CMAKE_CXX_FLAGS "-Wall -Wextra -fconcepts")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -fconcepts")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -fconcepts")
@@ -65,4 +67,6 @@ add_executable(hello_unicode_world "./examples/0012.unicode/hello_unicode_world.
 
 add_executable(define_custom_type "./examples/0007.define_custom_type/define_custom_type.cc")
 add_executable(define_custom_type2 "./examples/0007.define_custom_type/define_custom_type2.cc")
+add_executable(pipe "./examples/0028.pipe/pipe.cc")
+
 cmake_minimum_required(VERSION 3.10)
