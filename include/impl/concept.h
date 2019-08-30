@@ -47,7 +47,6 @@ concept bool standard_input_stream_impl()
 	{
 		{in.get()}->typename T::char_type;
 		{in.try_get()}->std::pair<typename T::char_type,bool>;
-		{in.eof()}->bool;
 	};
 }
 

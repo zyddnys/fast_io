@@ -38,11 +38,6 @@ public:
 		o.flush();
 		t.flush();
 	}
-	constexpr bool eof() requires standard_input_stream<T>
-	{
-		o.flush();
-		return t.eof();
-	}
 	template<typename Contiguous_iterator>
 	constexpr Contiguous_iterator read(Contiguous_iterator begin,Contiguous_iterator end) 	requires input_stream<T>
 	{

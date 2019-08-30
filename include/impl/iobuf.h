@@ -88,10 +88,6 @@ public:
 		auto bgchadd(static_cast<char_type*>(static_cast<void*>(std::addressof(*begin))));
 		return begin+(mread(bgchadd,static_cast<char_type*>(static_cast<void*>(std::addressof(*end))))-bgchadd)/sizeof(*begin);
 	}
-	bool eof() const
-	{
-		return bh.beg==bh.end;
-	}
 	std::pair<char_type,bool> try_get()
 	{
 		if(bh.end==bh.curr)		//cache miss
@@ -267,10 +263,6 @@ public:
 	auto try_get()
 	{
 		return ibf.try_get();
-	}
-	bool eof() const
-	{
-		return ibf.eof();
 	}
 	template<typename... Args>
 	void seek(Args&& ...args) requires(random_access_stream<io_handler>)

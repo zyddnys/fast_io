@@ -1,10 +1,35 @@
 #pragma once
 #include"concept.h"
 #include"precondition.h"
+#include<utility>
 
 namespace fast_io
 {
-template<output_stream Ohandler>
+
+template<input_stream Ihandler>
+class nobuf_reader:public Ihandler
+{
+public:
+	using char_type = typename Ihandler::char_type;
+	char_type get() requires !standard_input_stream<Ihandler>
+	{
+		char_type ch;
+		auto address(std::addressof(ch));
+		if(Ihandler::read(address,address+1)==address)
+			throw std::runtime_error("Try to read EOF stream from nobuf_reader");
+		return ch;
+	}
+	std::pair<char_type,bool> try_get() requires !standard_input_stream<Ihandler>
+	{
+		char_type ch;
+		auto address(std::addressof(ch));
+		if(Ihandler::read(address,address+1)==address)
+			return {0,true};
+		return {ch,false};
+	}
+};
+
+template<stream Ohandler>
 class immediately_flush:public Ohandler
 {
 public:
@@ -12,7 +37,7 @@ public:
 	template<typename... Args>
 	constexpr immediately_flush(Args&&... args):Ohandler(std::forward<Args>(args)...){}
 	template<typename Contiguous_Iterator>
-	constexpr void write(Contiguous_Iterator cbegin,Contiguous_Iterator cend)
+	constexpr void write(Contiguous_Iterator cbegin,Contiguous_Iterator cend) requires output_stream<Ohandler>
 	{
 		Ohandler::write(cbegin,cend);
 		Ohandler::flush();
@@ -22,15 +47,11 @@ public:
 		Ohandler::put(ch);
 		Ohandler::flush();
 	}
-	constexpr void put(char_type ch)
+	constexpr void put(char_type ch) requires output_stream<Ohandler>
 	{
 		auto address(std::addressof(ch));
 		Ohandler::write(address,address+1);
 		Ohandler::flush();
-	}
-	constexpr auto& native_handle()
-	{
-		return Ohandler::native_handle();
 	}
 };
 

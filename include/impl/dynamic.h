@@ -47,7 +47,6 @@ private:
 		virtual char_type* read(char_type*,char_type*) = 0;
 		virtual char_type get() = 0;
 		virtual std::pair<char_type,bool> try_get() = 0;
-		virtual bool eof() const = 0;
 		virtual ~base() = default;
 	};
 	template<standard_input_stream input>
@@ -57,7 +56,6 @@ private:
 		template<typename ...Args>
 		derv(std::in_place_type_t<input>,Args&& ...args):in(std::forward<Args>(args)...){}
 		char_type* read(char_type* b,char_type* e) {return in.read(b,e);}
-		bool eof() const { return in.eof();}
 		char_type get() {return in.get();}
 		std::pair<char_type,bool> try_get() {return in.try_get();}
 	};
@@ -73,9 +71,7 @@ public:
 		char_type *pe(static_cast<char_type*>(static_cast<void*>(std::addressof(*e))));
 		return b+(up->read(pb,pe)-pb)*sizeof(*b)/sizeof(char_type);
 	}
-	bool eof() const {return up->eof();}
 	char_type get() {return up->get();}
-	std::pair<char_type,bool> try_get() {return up->try_get();}
 };
 
 class dynamic_output_stream

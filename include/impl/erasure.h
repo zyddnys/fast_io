@@ -14,7 +14,6 @@ public:
 	Contiguous_iterator read(Contiguous_iterator begin,Contiguous_iterator end) = delete;
 	auto get() requires standard_input_stream<io> = delete;
 	auto try_get() requires standard_input_stream<io> = delete;
-	auto eof() requires standard_input_stream<io> = delete;
 };
 
 template<output_stream io>

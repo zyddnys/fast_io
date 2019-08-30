@@ -20,10 +20,6 @@ public:
 	{
 		return s;
 	}
-	constexpr bool eof() const
-	{
-		return s.empty();
-	}
 	template<typename contiguous_iterator>
 	constexpr contiguous_iterator read(contiguous_iterator begin,contiguous_iterator end)
 	{

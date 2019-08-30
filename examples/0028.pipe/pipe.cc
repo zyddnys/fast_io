@@ -2,6 +2,8 @@
 
 int main()
 {
-	fast_io::oposix_pipe pipe;
+	fast_io::ioposix_pipe pipe;
 	println(pipe,"hello world ",4);
+	std::size_t v;
+	scan(pipe,v);
 }

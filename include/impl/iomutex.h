@@ -58,10 +58,6 @@ public:
 		std::lock_guard<std::mutex> lg(mutex());
 		return handler.try_get();
 	}
-	auto eof() requires standard_input_stream<native_handle_type>
-	{
-		return handler.eof();
-	}
 	template<typename... Args>
 	void seek(Args&& ...args) requires random_access_stream<native_handle_type>
 	{

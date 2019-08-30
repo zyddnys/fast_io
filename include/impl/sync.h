@@ -57,11 +57,6 @@ public:
 		flush();
 		return handle.try_get();
 	}
-	auto eof() requires standard_input_stream<native_handle_type>
-	{
-		flush();
-		return handle.eof();
-	}
 };
 
 
