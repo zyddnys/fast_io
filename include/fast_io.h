@@ -24,8 +24,8 @@ namespace fast_io
 	
 
 using iposix_pipe = input_wrapper<posix_pipe>;
-using oposix_pipe = output_wrapper<posix_pipe>;
-using ioposix_pipe = io_wrapper<posix_pipe>;
+using oposix_pipe = immediately_flush<output_wrapper<posix_pipe>>;
+using ioposix_pipe = immediately_flush<io_wrapper<posix_pipe>>;
 
 
 using system_io_handle = posix_io_handle;

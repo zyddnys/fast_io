@@ -22,6 +22,12 @@ public:
 		Ohandler::put(ch);
 		Ohandler::flush();
 	}
+	constexpr void put(char_type ch)
+	{
+		auto address(std::addressof(ch));
+		Ohandler::write(address,address+1);
+		Ohandler::flush();
+	}
 	constexpr auto& native_handle()
 	{
 		return Ohandler::native_handle();
@@ -52,6 +58,13 @@ public:
 	constexpr void put(char_type ch) requires standard_output_stream<Ohandler>
 	{
 		Ohandler::put(ch);
+		if(ch==flush_character)
+			Ohandler::flush();
+	}
+	constexpr void put(char_type ch)
+	{
+		auto address(std::addressof(ch));
+		Ohandler::write(address,address+1);
 		if(ch==flush_character)
 			Ohandler::flush();
 	}
