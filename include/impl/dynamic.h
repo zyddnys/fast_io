@@ -5,10 +5,11 @@
 namespace fast_io
 {
 
-class dynamic_input_stream
+template<typename T>
+class basic_dynamic_input_stream
 {
 public:
-	using char_type = char;
+	using char_type = T;
 private:
 	struct base
 	{
@@ -26,7 +27,7 @@ private:
 	std::unique_ptr<base> up;
 public:
 	template<input_stream P,typename ...Args>
-	dynamic_input_stream(std::in_place_type_t<P>,Args&& ...args):
+	basic_dynamic_input_stream(std::in_place_type_t<P>,Args&& ...args):
 		up(new derv<P>(std::in_place_type<P>,std::forward<Args>(args)...)){}
 	template<typename Contiguous_iterator>
 	Contiguous_iterator read(Contiguous_iterator b,Contiguous_iterator e)
@@ -37,10 +38,13 @@ public:
 	}
 };
 
-class dynamic_standard_input_stream
+using dynamic_input_stream = basic_dynamic_input_stream<char>;
+
+template<typename T>
+class basic_dynamic_standard_input_stream
 {
 public:
-	using char_type = char;
+	using char_type = T;
 private:
 	struct base
 	{
@@ -62,7 +66,7 @@ private:
 	std::unique_ptr<base> up;
 public:
 	template<standard_input_stream P,typename ...Args>
-	dynamic_standard_input_stream(std::in_place_type_t<P>,Args&& ...args):
+	basic_dynamic_standard_input_stream(std::in_place_type_t<P>,Args&& ...args):
 		up(new derv<P>(std::in_place_type<P>,std::forward<Args>(args)...)){}
 	template<typename Contiguous_iterator>
 	Contiguous_iterator read(Contiguous_iterator b,Contiguous_iterator e)
@@ -72,12 +76,16 @@ public:
 		return b+(up->read(pb,pe)-pb)*sizeof(*b)/sizeof(char_type);
 	}
 	char_type get() {return up->get();}
+	auto try_get() {return up->try_get();}
 };
 
-class dynamic_output_stream
+using dynamic_standard_input_stream = basic_dynamic_standard_input_stream<char>;
+
+template<typename T>
+class basic_dynamic_output_stream
 {
 public:
-	using char_type = char;
+	using char_type = T;
 private:
 	struct base
 	{
@@ -97,7 +105,7 @@ private:
 	std::unique_ptr<base> up;
 public:
 	template<output_stream P,typename ...Args>
-	dynamic_output_stream(std::in_place_type_t<P>,Args&& ...args):
+	basic_dynamic_output_stream(std::in_place_type_t<P>,Args&& ...args):
 		up(new derv<P>(std::in_place_type<P>,std::forward<Args>(args)...)){}
 	template<typename Contiguous_iterator>
 	void write(Contiguous_iterator b,Contiguous_iterator e)
@@ -108,10 +116,13 @@ public:
 	void flush() { return up->flush();}
 };
 
-class dynamic_standard_output_stream
+using dynamic_output_stream = basic_dynamic_output_stream<char>;
+
+template<typename T>
+class basic_dynamic_standard_output_stream
 {
 public:
-	using char_type = char;
+	using char_type = T;
 private:
 	struct base
 	{
@@ -133,7 +144,7 @@ private:
 	std::unique_ptr<base> up;
 public:
 	template<standard_output_stream P,typename ...Args>
-	dynamic_standard_output_stream(std::in_place_type_t<P>,Args&& ...args):
+	basic_dynamic_standard_output_stream(std::in_place_type_t<P>,Args&& ...args):
 		up(new derv<P>(std::in_place_type<P>,std::forward<Args>(args)...)){}
 	template<typename Contiguous_iterator>
 	void write(Contiguous_iterator b,Contiguous_iterator e)
@@ -145,10 +156,13 @@ public:
 	void put(char_type ch){up->put(ch);}
 };
 
-class dynamic_io_stream
+using dynamic_standard_output_stream = basic_dynamic_standard_output_stream<char>;
+
+template<typename T>
+class basic_dynamic_io_stream
 {
 public:
-	using char_type = char;
+	using char_type = T;
 private:
 	struct base
 	{
@@ -170,7 +184,7 @@ private:
 	std::unique_ptr<base> up;
 public:
 	template<input_stream P,typename ...Args>
-	dynamic_io_stream(std::in_place_type_t<P>,Args&& ...args):
+	basic_dynamic_io_stream(std::in_place_type_t<P>,Args&& ...args):
 		up(new derv<P>(std::in_place_type<P>,std::forward<Args>(args)...)){}
 	template<typename Contiguous_iterator>
 	void write(Contiguous_iterator b,Contiguous_iterator e)
@@ -187,5 +201,5 @@ public:
 		return b+(up->read(pb,pe)-pb)*sizeof(*b)/sizeof(char_type);
 	}
 };
-
+using dynamic_io_stream = basic_dynamic_io_stream<char>;
 }
