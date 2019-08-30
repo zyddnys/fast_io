@@ -299,6 +299,22 @@ public:
 	void flush()
 	{
 	}
+	void close_in()
+	{
+		if(pipes.front()!=-1)
+		{
+			close(pipes.front());
+			pipes.front() = -1;
+		}
+	}
+	void close_out()
+	{
+		if(pipes.back()!=-1)
+		{
+			close(pipes.back());
+			pipes.back() = -1;
+		}
+	}
 	template<typename ContiguousIterator>
 	ContiguousIterator read(ContiguousIterator begin,ContiguousIterator end)
 	{
