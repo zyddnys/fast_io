@@ -223,12 +223,12 @@ public:
 	{
 		if constexpr ((!om)||(om&~(open::in.value|open::out.value)))
 			throw std::runtime_error("unknown posix pipe flags");
-		if constexpr (~(om&open::in.value))
+		if constexpr (!(om&~open::in.value)&&(om&~open::out.value))
 		{
 			close(pipes.front());
 			pipes.front()=-1;
 		}
-		if constexpr (~(om&open::out.value))
+		if constexpr ((om&~open::in.value)&&!(om&~open::out.value))
 		{
 			close(pipes.back());			
 			pipes.back()=-1;
