@@ -1,6 +1,6 @@
 #pragma once
 
-#include"ntkernel_category.hpp"
+#include"nt_exception.h"
 #include<windows.h>
 #include<ddk/ntifs.h>
 #include"../mode.h"
@@ -8,11 +8,6 @@
 
 namespace fast_io
 {
-
-namespace detail
-{
-	
-}
 
 class nt_file
 {
@@ -30,7 +25,7 @@ public:
 	{
 		auto status(NtCreateFile(std::addressof(handle),std::forward<Args>(args)...));
 		if(status)
-			throw std::system_error(status,ntkernel_error_category::ntkernel_category());
+			throw nt_error(status);
 	}
 	template<openmode om>
 	nt_file(std::string_view filename,open_interface_t<om>)
