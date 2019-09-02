@@ -31,7 +31,7 @@ inline constexpr auto generate_nt_exceptions()
 	return array;
 }
 
-auto constexpr nt_exceptions{generate_nt_exceptions()};
+inline auto constexpr nt_exceptions{generate_nt_exceptions()};
 
 inline constexpr char const* nt_exception_information(std::int32_t status)
 {
