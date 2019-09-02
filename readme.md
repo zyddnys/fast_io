@@ -1,7 +1,7 @@
 This is a new Experimental library to replace iostream and cstdio based on C++ 2a feature concepts. Currently, the only compiler which supports Concepts TS is GCC.
 
 ## Documents
-https://bitbucket.org/ejsvifq_mabmip/fast_io/src/default/include/doxygen/html/index.html
+https://bitbucket.org/ejsvifq_mabmip/fast_io/src/default/doxygen/html/index.html
 
 Since C++ 20 has not been released. No standard supporting libraries for concepts, which means a lot of Concepts Definitions are ugly. It will be changed after C++ 20 is officially published.
 
