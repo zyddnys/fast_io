@@ -88,5 +88,5 @@ using iobuf_dynamic = basic_iobuf<dynamic_io_stream>;
 #include"impl/read_write.h"
 #include"impl/unicode.h"
 #ifdef _WIN32_WINNT
-//#include"impl/handlers/nt.h"
+#include"impl/handlers/nt.h"
 #endif

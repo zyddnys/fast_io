@@ -2,7 +2,7 @@
 
 #include"nt_exception.h"
 #include<windows.h>
-#include<ddk/ntifs.h>
+#include<winternl.h>
 #include"../mode.h"
 #include<memory>
 
@@ -27,14 +27,14 @@ public:
 		if(status)
 			throw nt_error(status);
 	}
-	template<openmode om>
-	nt_file(std::string_view filename,open_interface_t<om>)
+//	template<std::size_t om>
+	nt_file(std::string_view filename)//,open_interface_t<om>)
 	{
 //https://stackoverflow.com/questions/7430959/how-to-make-createfile-as-fast-as-possible
 		OBJECT_ATTRIBUTES Oa{};
 		IO_STATUS_BLOCK IoSb{};
 		UNICODE_STRING Name_U;
-		RtlInitUnicodeString(std::addressof(Name_U),filename.data());
+//		RtlInitUnicodeString(std::addressof(Name_U),filename.data());
 		Oa.Length = sizeof(Oa);
 		Oa.ObjectName = std::addressof(Name_U);
 		Oa.RootDirectory = nullptr;
