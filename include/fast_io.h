@@ -43,7 +43,7 @@ using system_ihandle = oerasure<system_io_handle>;
 struct system_io_collections
 {
 basic_obuf<system_ohandle> out;
-tie<basic_ibuf<posix_io_handle>,decltype(out)> in;
+tie<basic_ibuf<system_io_handle>,decltype(out)> in;
 tie<immediately_flush<decltype(out)>,decltype(out)> err;
 system_io_collections():out(1),in(out,0),err(out,2){}
 };
