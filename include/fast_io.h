@@ -4,11 +4,15 @@
 #include"impl/mode.h"
 #include"impl/handlers/c_style.h"
 #include"impl/mode.h"
+#include"impl/base.h"
+#include"impl/rd_type.h"
+#include"impl/manip.h"
+#include"impl/read_write.h"
+#include"impl/unicode.h"
 #ifdef _WIN32_WINNT
+#include"impl/handlers/win32.h"
 #endif
-//#ifdef _POSIX_C_SOURCE
 #include"impl/handlers/posix.h"	
-//#endif
 #include"impl/stringbuf.h"
 #include"impl/iobuf.h"
 #include"impl/iomutex.h"
@@ -21,15 +25,17 @@
 
 namespace fast_io
 {
-	
+#ifdef _WIN32_WINNT
+using system_file = win32_file;
+#else
+using system_file = posix_file;
+#endif
 
 using iposix_pipe = nobuf_reader<input_wrapper<posix_pipe>>;
 using oposix_pipe = immediately_flush<nobuf_reader<output_wrapper<posix_pipe>>>;
 using ioposix_pipe = immediately_flush<nobuf_reader<io_wrapper<posix_pipe>>>;
 
-
 using system_io_handle = posix_io_handle;
-using system_file = posix_file;
 using system_ohandle = ierasure<system_io_handle>;
 using system_ihandle = oerasure<system_io_handle>;
 
@@ -81,12 +87,3 @@ using ibuf_dynamic = basic_ibuf<dynamic_input_stream>;
 using obuf_dynamic = basic_obuf<dynamic_output_stream>;
 using iobuf_dynamic = basic_iobuf<dynamic_io_stream>;
 }
-
-#include"impl/base.h"
-#include"impl/rd_type.h"
-#include"impl/manip.h"
-#include"impl/read_write.h"
-#include"impl/unicode.h"
-#ifdef _WIN32_WINNT
-#include"impl/handlers/nt.h"
-#endif

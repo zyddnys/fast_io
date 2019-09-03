@@ -3,7 +3,8 @@
 int main()
 try
 {
-	fast_io::nt_file file("abc.txt");
+	fast_io::obuf file("abc.txt");
+	println(file,"hello world");
 }
 catch(std::exception const & e)
 {
