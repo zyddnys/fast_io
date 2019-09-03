@@ -9,6 +9,7 @@
 #include"impl/manip.h"
 #include"impl/read_write.h"
 #include"impl/unicode.h"
+#include"impl/text.h"
 #ifdef _WIN32_WINNT
 #include"impl/handlers/win32.h"
 #endif
