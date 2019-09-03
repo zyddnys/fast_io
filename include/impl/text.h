@@ -43,7 +43,9 @@ public:
 		auto ch(ib.get());
 		if(ch=='\r')
 		{
-			auto internal(ib.get());
+			auto internal(ib.try_get());
+			if(internal.second)
+				return ch;
 			if(internal=='\n')
 				return '\n';
 			state.state=true;

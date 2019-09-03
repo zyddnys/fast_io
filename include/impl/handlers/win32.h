@@ -21,8 +21,6 @@ inline constexpr win32_open_mode calculate_win32_open_mode(open::mode const &om)
 	using namespace open;
 	std::size_t value(remove_ate(om).value);
 	win32_open_mode mode;
-	if(value&open::binary.value)
-		value &= ~open::binary.value;
 	if(value&open::in.value)
 		mode.dwDesiredAccess|=FILE_SHARE_READ;
 	if(value&open::out.value)

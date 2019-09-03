@@ -4,13 +4,13 @@ int main()
 try
 {
 	{
-	fast_io::obuf file("binary.txt");
-	print(file,"hello world\n");
+	fast_io::obuf file("text.txt");
+	println(file,"hello world\nmmd\n");
 	}
 	{
-	fast_io::obuf file("text.txt");
+	fast_io::obuf file("binary.txt");
 	fast_io::text_view view(file);
-	print(view,"hello world\n");
+	println(view,"hello world\nmmd\n");
 	}
 }
 catch(std::exception const & e)
