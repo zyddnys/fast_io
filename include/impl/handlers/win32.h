@@ -42,6 +42,8 @@ inline constexpr win32_open_mode calculate_win32_open_mode(open::mode const &om)
 		else
 			mode.dwCreationDisposition=CREATE_ALWAYS;
 	}
+	else
+		mode.dwCreationDisposition=OPEN_ALWAYS;
 	return mode;
 }
 template<std::size_t om>
