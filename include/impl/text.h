@@ -108,4 +108,8 @@ public:
 		ib.flush();
 	}
 };
+
+template<typename stream>
+text_view(stream&) -> text_view<stream>;
+
 }

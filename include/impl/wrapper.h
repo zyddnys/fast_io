@@ -21,11 +21,11 @@ public:
 };
 
 template<input_stream T>
-using input_file_wrapper = basic_file_wrapper<T,fast_io::open::in>;
+using input_file_wrapper = basic_file_wrapper<T,fast_io::open::in|fast_io::open::binary>;
 template<output_stream T>
-using output_file_wrapper = basic_file_wrapper<T,fast_io::open::out>;
+using output_file_wrapper = basic_file_wrapper<T,fast_io::open::out|fast_io::open::binary>;
 template<io_stream T>
-using io_file_wrapper = basic_file_wrapper<T,fast_io::open::in|fast_io::open::out>;
+using io_file_wrapper = basic_file_wrapper<T,fast_io::open::in|fast_io::open::out|fast_io::open::binary>;
 
 template<stream T,std::size_t interface_mode>
 class basic_wrapper:public T
@@ -41,10 +41,10 @@ public:
 };
 
 template<input_stream T>
-using input_wrapper = basic_wrapper<T,fast_io::open::in>;
+using input_wrapper = basic_wrapper<T,fast_io::open::in|fast_io::open::binary>;
 template<output_stream T>
-using output_wrapper = basic_wrapper<T,fast_io::open::out>;
+using output_wrapper = basic_wrapper<T,fast_io::open::out|fast_io::open::binary>;
 template<io_stream T>
-using io_wrapper = basic_wrapper<T,fast_io::open::in|fast_io::open::out>;
+using io_wrapper = basic_wrapper<T,fast_io::open::in|fast_io::open::out|fast_io::open::binary>;
 
 }
