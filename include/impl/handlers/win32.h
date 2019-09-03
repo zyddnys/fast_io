@@ -88,7 +88,7 @@ public:
 	}
 
 	template<std::size_t om>
-	win32_file(std::string_view filename,open::interface_t<om>):win32_file(fast_io::native_interface,fast_io::utf8_to_unicode<std::wstring>(filename).c_str(),
+	win32_file(std::string_view filename,open::interface_t<om>):win32_file(fast_io::native_interface,fast_io::utf8_to_ucs<std::wstring>(filename).c_str(),
 				details::win32_file_openmode<om>::mode.dwDesiredAccess,
 				details::win32_file_openmode<om>::mode.dwShareMode,
 				details::win32_file_openmode<om>::mode.lpSecurityAttributes,
@@ -101,7 +101,7 @@ public:
 	win32_file(std::string_view filename,open::mode const& m)
 	{
 		auto const mode(details::calculate_win32_open_mode(m));
-		if((mhandle=CreateFileW(fast_io::utf8_to_unicode<std::wstring>(filename).c_str(),
+		if((mhandle=CreateFileW(fast_io::utf8_to_ucs<std::wstring>(filename).c_str(),
 					mode.dwDesiredAccess,
 					mode.dwShareMode,
 					mode.lpSecurityAttributes,

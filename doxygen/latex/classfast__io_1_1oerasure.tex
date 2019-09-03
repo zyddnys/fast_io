@@ -1,0 +1,34 @@
+\hypertarget{classfast__io_1_1oerasure}{}\doxysection{fast\+\_\+io\+::oerasure$<$ io $>$ Class Template Reference}
+\label{classfast__io_1_1oerasure}\index{fast\_io::oerasure$<$ io $>$@{fast\_io::oerasure$<$ io $>$}}
+Inheritance diagram for fast\+\_\+io\+::oerasure$<$ io $>$\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classfast__io_1_1oerasure}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classfast__io_1_1oerasure_a0642e0ba5a844dd4fb3c016e0d2b0ec5}\label{classfast__io_1_1oerasure_a0642e0ba5a844dd4fb3c016e0d2b0ec5}} 
+using {\bfseries char\+\_\+type} = typename io\+::char\+\_\+type
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classfast__io_1_1oerasure_aa25a366f0f08ebafe1f22a37398e178e}\label{classfast__io_1_1oerasure_aa25a366f0f08ebafe1f22a37398e178e}} 
+{\footnotesize template$<$typename ... Args$>$ }\\{\bfseries oerasure} (Args \&\&...args)
+\item 
+\mbox{\Hypertarget{classfast__io_1_1oerasure_ab898aa8f9a431a3cdb820ca00fe64342}\label{classfast__io_1_1oerasure_ab898aa8f9a431a3cdb820ca00fe64342}} 
+{\footnotesize template$<$typename Contiguous\+\_\+iterator $>$ }\\void {\bfseries write} (Contiguous\+\_\+iterator begin, Contiguous\+\_\+iterator end)=delete
+\item 
+\mbox{\Hypertarget{classfast__io_1_1oerasure_adab6c1d64e1bd79415f6419a9abe7a87}\label{classfast__io_1_1oerasure_adab6c1d64e1bd79415f6419a9abe7a87}} 
+auto {\bfseries put} () requires standard\+\_\+output\+\_\+stream$<$ io $>$=delete
+\item 
+\mbox{\Hypertarget{classfast__io_1_1oerasure_a103dfe9671e0ba37c8a59c5b35ca4fde}\label{classfast__io_1_1oerasure_a103dfe9671e0ba37c8a59c5b35ca4fde}} 
+auto {\bfseries flush} () requires standard\+\_\+output\+\_\+stream$<$ io $>$=delete
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+D\+:/hg/fast\+\_\+io/include/impl/erasure.\+h\end{DoxyCompactItemize}

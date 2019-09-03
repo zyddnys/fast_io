@@ -1,0 +1,34 @@
+\hypertarget{classfast__io_1_1basic__istring__view}{}\doxysection{fast\+\_\+io\+::basic\+\_\+istring\+\_\+view$<$ T $>$ Class Template Reference}
+\label{classfast__io_1_1basic__istring__view}\index{fast\_io::basic\_istring\_view$<$ T $>$@{fast\_io::basic\_istring\_view$<$ T $>$}}
+\doxysubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__istring__view_a071547fb135b0a4e92eb13f1a30deae3}\label{classfast__io_1_1basic__istring__view_a071547fb135b0a4e92eb13f1a30deae3}} 
+using {\bfseries value\+\_\+type} = T
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__istring__view_a999374aff25377dee4be1d36cada65ab}\label{classfast__io_1_1basic__istring__view_a999374aff25377dee4be1d36cada65ab}} 
+using {\bfseries char\+\_\+type} = std\+::make\+\_\+unsigned\+\_\+t$<$ typename T\+::value\+\_\+type $>$
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__istring__view_a51e994dd56093697d71dce231224f558}\label{classfast__io_1_1basic__istring__view_a51e994dd56093697d71dce231224f558}} 
+{\footnotesize template$<$typename ... Args$>$ }\\constexpr {\bfseries basic\+\_\+istring\+\_\+view} (Args \&\&...args)
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__istring__view_ae0e799f98ac84fbea165ddb2b4020523}\label{classfast__io_1_1basic__istring__view_ae0e799f98ac84fbea165ddb2b4020523}} 
+constexpr auto \& {\bfseries str} ()
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__istring__view_a7657cb73f2f5d80195002e7c49f395e9}\label{classfast__io_1_1basic__istring__view_a7657cb73f2f5d80195002e7c49f395e9}} 
+{\footnotesize template$<$typename contiguous\+\_\+iterator $>$ }\\constexpr contiguous\+\_\+iterator {\bfseries read} (contiguous\+\_\+iterator begin, contiguous\+\_\+iterator end)
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__istring__view_a608cbbfa576fba6ba486b9285f3be2cf}\label{classfast__io_1_1basic__istring__view_a608cbbfa576fba6ba486b9285f3be2cf}} 
+constexpr char\+\_\+type {\bfseries get} ()
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__istring__view_ac9ecd756813a83659ea44457eab7086f}\label{classfast__io_1_1basic__istring__view_ac9ecd756813a83659ea44457eab7086f}} 
+constexpr std\+::pair$<$ char\+\_\+type, bool $>$ {\bfseries try\+\_\+get} ()
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+D\+:/hg/fast\+\_\+io/include/impl/stringbuf.\+h\end{DoxyCompactItemize}

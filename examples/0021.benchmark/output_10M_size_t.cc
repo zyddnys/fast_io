@@ -34,7 +34,7 @@ try
 	}
 	{
 	cqw::timer t("obuf");
-	fast_io::obuf obuf("obuf.txt",fast_io::open::interface<fast_io::open::binary>);
+	fast_io::obuf obuf("obuf.txt");
 	for(std::size_t i(0);i!=N;++i)
 		println(obuf,i);
 	}
@@ -46,33 +46,33 @@ try
 		println(view,i);
 	}
 	{
-	cqw::timer t("obuf unicode_view");
-	fast_io::obuf obuf("obuf_uv.txt",fast_io::open::interface<fast_io::open::binary>);
-	fast_io::unicode_view<decltype(obuf),char32_t> uv(obuf);
+	cqw::timer t("obuf ucs_view");
+	fast_io::obuf obuf("obuf_ucsview.txt");
+	fast_io::ucs_view<decltype(obuf),char32_t> uv(obuf);
 	for(std::size_t i(0);i!=N;++i)
 		println(uv,i);
 	}
 	{
 	cqw::timer t("dynamic obuf");
-	fast_io::dynamic_standard_output_stream dobuf(std::in_place_type<fast_io::obuf>,"dynamic_obuf.txt",fast_io::open::interface<fast_io::open::binary>);
+	fast_io::dynamic_standard_output_stream dobuf(std::in_place_type<fast_io::obuf>,"dynamic_obuf.txt");
 	for(std::size_t i(0);i!=N;++i)
 		println(dobuf,i);
 	}
 	{
 	cqw::timer t("iobuf_dynamic system_file");
-	fast_io::iobuf_dynamic dobuf(std::in_place_type<fast_io::osystem_file>,"iobuf_dynamic_system_file.txt",fast_io::open::interface<fast_io::open::binary>);
+	fast_io::iobuf_dynamic dobuf(std::in_place_type<fast_io::osystem_file>,"iobuf_dynamic_system_file.txt");
 	for(std::size_t i(0);i!=N;++i)
 		println(dobuf,i);
 	}
 	{
 	cqw::timer t("obuf_mutex");
-	fast_io::obuf_mutex obuf("obuf_mutex.txt",fast_io::open::interface<fast_io::open::binary>);
+	fast_io::obuf_mutex obuf("obuf_mutex.txt");
 	for(std::size_t i(0);i!=N;++i)
 		println(obuf,i);
 	}
 	{
 	cqw::timer t("ofsync");
-	fast_io::ofsync obuf("ofsync.txt",fast_io::open::interface<fast_io::open::binary|fast_io::open::out|fast_io::open::trunc>);
+	fast_io::ofsync obuf("ofsync.txt",fast_io::open::interface<fast_io::open::out|fast_io::open::trunc>);
 	for(std::size_t i(0);i!=N;++i)
 		println(obuf,i);
 	}

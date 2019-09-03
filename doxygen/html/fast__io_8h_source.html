@@ -22,7 +22,6 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">fast_io
-   &#160;<span id="projectnumber">beta</span>
    </div>
   </td>
  </tr>
@@ -76,110 +75,108 @@ $(function() {
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include&quot;impl/mode.h&quot;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include&quot;impl/handlers/c_style.h&quot;</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include&quot;impl/mode.h&quot;</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#ifdef _WIN32_WINNT</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment">//#ifdef _POSIX_C_SOURCE</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include&quot;impl/handlers/posix.h&quot;</span> </div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment">//#endif</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include&quot;impl/stringbuf.h&quot;</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include&quot;impl/iobuf.h&quot;</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include&quot;impl/iomutex.h&quot;</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include&quot;impl/wrapper.h&quot;</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include&quot;impl/tie.h&quot;</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include&quot;impl/flush.h&quot;</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include&quot;impl/erasure.h&quot;</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include&quot;impl/dynamic.h&quot;</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include&quot;impl/sync.h&quot;</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="keyword">namespace </span>fast_io</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;{</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    </div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">using</span> iposix_pipe = nobuf_reader&lt;input_wrapper&lt;posix_pipe&gt;&gt;;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">using</span> oposix_pipe = immediately_flush&lt;nobuf_reader&lt;output_wrapper&lt;posix_pipe&gt;&gt;&gt;;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">using</span> ioposix_pipe = immediately_flush&lt;nobuf_reader&lt;io_wrapper&lt;posix_pipe&gt;&gt;&gt;;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">using</span> system_io_handle = posix_io_handle;</div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include&quot;impl/base.h&quot;</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include&quot;impl/rd_type.h&quot;</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include&quot;impl/manip.h&quot;</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include&quot;impl/read_write.h&quot;</span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include&quot;impl/ucs.h&quot;</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include&quot;impl/text.h&quot;</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#ifdef _WIN32_WINNT</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include&quot;impl/handlers/win32.h&quot;</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include&quot;impl/handlers/posix.h&quot;</span> </div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include&quot;impl/stringbuf.h&quot;</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include&quot;impl/iobuf.h&quot;</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include&quot;impl/iomutex.h&quot;</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include&quot;impl/wrapper.h&quot;</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include&quot;impl/tie.h&quot;</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include&quot;impl/flush.h&quot;</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include&quot;impl/erasure.h&quot;</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include&quot;impl/dynamic.h&quot;</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include&quot;impl/sync.h&quot;</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">namespace </span>fast_io</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;{</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#ifdef _WIN32_WINNT</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">using</span> system_file = win32_file;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#else</span></div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">using</span> system_file = posix_file;</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">using</span> system_ohandle = ierasure&lt;system_io_handle&gt;;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="keyword">using</span> system_ihandle = oerasure&lt;system_io_handle&gt;;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
-<div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="structfast__io_1_1system__io__collections.html">   36</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structfast__io_1_1system__io__collections.html">system_io_collections</a></div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;{</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<a class="code" href="classfast__io_1_1basic__obuf.html">basic_obuf&lt;system_ohandle&gt;</a> out;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<a class="code" href="classfast__io_1_1tie.html">tie&lt;basic_ibuf&lt;posix_io_handle&gt;</a>,decltype(out)&gt; in;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<a class="code" href="classfast__io_1_1tie.html">tie</a>&lt;<a class="code" href="classfast__io_1_1immediately__flush.html">immediately_flush</a>&lt;decltype(out)&gt;,decltype(out)&gt; err;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<a class="code" href="structfast__io_1_1system__io__collections.html">system_io_collections</a>():out(1),in(out,0),err(out,2){}</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;};</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__file__wrapper.html">isystem_file</a> = <a class="code" href="classfast__io_1_1basic__file__wrapper.html">input_file_wrapper&lt;system_file&gt;</a>;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__file__wrapper.html">osystem_file</a> = <a class="code" href="classfast__io_1_1basic__file__wrapper.html">output_file_wrapper&lt;system_file&gt;</a>;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__file__wrapper.html">iosystem_file</a> = <a class="code" href="classfast__io_1_1basic__file__wrapper.html">io_file_wrapper&lt;system_file&gt;</a>;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__sync.html">sync</a> = <a class="code" href="classfast__io_1_1basic__sync.html">basic_sync&lt;basic_file_wrapper&lt;system_file,fast_io::open::app|fast_io::open::binary&gt;</a>&gt;;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1ierasure.html">osync</a> = <a class="code" href="classfast__io_1_1ierasure.html">ierasure&lt;sync&gt;</a>;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__fsync.html">fsync</a> = <a class="code" href="classfast__io_1_1basic__fsync.html">basic_fsync&lt;basic_file_wrapper&lt;system_file,fast_io::open::app|fast_io::open::binary&gt;</a>&gt;;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1ierasure.html">ofsync</a> = <a class="code" href="classfast__io_1_1ierasure.html">ierasure&lt;fsync&gt;</a>;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keyword">using</span> iposix_pipe = nobuf_reader&lt;input_wrapper&lt;posix_pipe&gt;&gt;;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="keyword">using</span> oposix_pipe = immediately_flush&lt;nobuf_reader&lt;output_wrapper&lt;posix_pipe&gt;&gt;&gt;;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="keyword">using</span> ioposix_pipe = immediately_flush&lt;nobuf_reader&lt;io_wrapper&lt;posix_pipe&gt;&gt;&gt;;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">using</span> system_io_handle = posix_io_handle;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keyword">using</span> system_ohandle = ierasure&lt;system_io_handle&gt;;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="keyword">using</span> system_ihandle = oerasure&lt;system_io_handle&gt;;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
+<div class="line"><a name="l00043"></a><span class="lineno"><a class="line" href="structfast__io_1_1system__io__collections.html">   43</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structfast__io_1_1system__io__collections.html">system_io_collections</a></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;{</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<a class="code" href="classfast__io_1_1basic__obuf.html">basic_obuf&lt;system_ohandle&gt;</a> out;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<a class="code" href="classfast__io_1_1tie.html">tie&lt;basic_ibuf&lt;posix_io_handle&gt;</a>,decltype(out)&gt; in;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<a class="code" href="classfast__io_1_1tie.html">tie</a>&lt;<a class="code" href="classfast__io_1_1immediately__flush.html">immediately_flush</a>&lt;decltype(out)&gt;,decltype(out)&gt; err;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<a class="code" href="structfast__io_1_1system__io__collections.html">system_io_collections</a>():out(1),in(out,0),err(out,2){}</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;};</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__file__wrapper.html">isystem_file</a> = <a class="code" href="classfast__io_1_1basic__file__wrapper.html">input_file_wrapper&lt;system_file&gt;</a>;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__file__wrapper.html">osystem_file</a> = <a class="code" href="classfast__io_1_1basic__file__wrapper.html">output_file_wrapper&lt;system_file&gt;</a>;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__file__wrapper.html">iosystem_file</a> = <a class="code" href="classfast__io_1_1basic__file__wrapper.html">io_file_wrapper&lt;system_file&gt;</a>;</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__iomutex.html">sync_mutex</a> = <a class="code" href="classfast__io_1_1basic__iomutex.html">basic_iomutex&lt;sync&gt;</a>;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__iomutex.html">osync_mutex</a> = <a class="code" href="classfast__io_1_1basic__iomutex.html">basic_iomutex&lt;osync&gt;</a>;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__iomutex.html">fsync_mutex</a> = <a class="code" href="classfast__io_1_1basic__iomutex.html">basic_iomutex&lt;fsync&gt;</a>;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__iomutex.html">ofsync_mutex</a> = <a class="code" href="classfast__io_1_1basic__iomutex.html">basic_iomutex&lt;ofsync&gt;</a>;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__ibuf.html">ibuf</a> = <a class="code" href="classfast__io_1_1basic__ibuf.html">basic_ibuf&lt;isystem_file&gt;</a>;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__obuf.html">obuf</a> = <a class="code" href="classfast__io_1_1basic__obuf.html">basic_obuf&lt;osystem_file&gt;</a>;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__iobuf.html">iobuf</a> = <a class="code" href="classfast__io_1_1basic__iobuf.html">basic_iobuf&lt;iosystem_file&gt;</a>;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160; </div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__istring__view.html">istring_view</a> = <a class="code" href="classfast__io_1_1basic__istring__view.html">basic_istring_view&lt;std::string_view&gt;</a>;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__ostring.html">ostring</a> = <a class="code" href="classfast__io_1_1basic__ostring.html">basic_ostring&lt;std::string&gt;</a>;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__sync.html">sync</a> = <a class="code" href="classfast__io_1_1basic__sync.html">basic_sync&lt;basic_file_wrapper&lt;system_file,fast_io::open::app|fast_io::open::binary&gt;</a>&gt;;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1ierasure.html">osync</a> = <a class="code" href="classfast__io_1_1ierasure.html">ierasure&lt;sync&gt;</a>;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__fsync.html">fsync</a> = <a class="code" href="classfast__io_1_1basic__fsync.html">basic_fsync&lt;basic_file_wrapper&lt;system_file,fast_io::open::app|fast_io::open::binary&gt;</a>&gt;;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1ierasure.html">ofsync</a> = <a class="code" href="classfast__io_1_1ierasure.html">ierasure&lt;fsync&gt;</a>;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__iomutex.html">sync_mutex</a> = <a class="code" href="classfast__io_1_1basic__iomutex.html">basic_iomutex&lt;sync&gt;</a>;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__iomutex.html">osync_mutex</a> = <a class="code" href="classfast__io_1_1basic__iomutex.html">basic_iomutex&lt;osync&gt;</a>;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__iomutex.html">fsync_mutex</a> = <a class="code" href="classfast__io_1_1basic__iomutex.html">basic_iomutex&lt;fsync&gt;</a>;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__iomutex.html">ofsync_mutex</a> = <a class="code" href="classfast__io_1_1basic__iomutex.html">basic_iomutex&lt;ofsync&gt;</a>;</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__iomutex.html">ibuf_mutex</a> = <a class="code" href="classfast__io_1_1basic__iomutex.html">basic_iomutex&lt;ibuf&gt;</a>;</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__iomutex.html">obuf_mutex</a> = <a class="code" href="classfast__io_1_1basic__iomutex.html">basic_iomutex&lt;obuf&gt;</a>;</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__iomutex.html">iobuf_mutex</a> = <a class="code" href="classfast__io_1_1basic__iomutex.html">basic_iomutex&lt;iobuf&gt;</a>;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__iomutex.html">istring_view_mutex</a> = <a class="code" href="classfast__io_1_1basic__iomutex.html">basic_iomutex&lt;istring_view&gt;</a>;</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__iomutex.html">ostring_mutex</a> = <a class="code" href="classfast__io_1_1basic__iomutex.html">basic_iomutex&lt;ostring&gt;</a>;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1ierasure.html">c_style_ohandle</a> = <a class="code" href="classfast__io_1_1ierasure.html">ierasure&lt;c_style_io_handle&gt;</a>;</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1oerasure.html">c_style_ihandle</a> = <a class="code" href="classfast__io_1_1oerasure.html">oerasure&lt;c_style_io_handle&gt;</a>;</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="keyword">inline</span> <a class="code" href="classfast__io_1_1ierasure.html">c_style_ohandle</a> out(stdout);</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="keyword">inline</span> <a class="code" href="classfast__io_1_1tie.html">tie</a>&lt;<a class="code" href="classfast__io_1_1oerasure.html">c_style_ihandle</a>,decltype(out)&gt; in(out,stdin);</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="keyword">inline</span> <a class="code" href="classfast__io_1_1tie.html">tie</a>&lt;<a class="code" href="classfast__io_1_1immediately__flush.html">immediately_flush</a>&lt;decltype(out)&gt;,decltype(out)&gt; err(out,stderr);</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__ibuf.html">ibuf</a> = <a class="code" href="classfast__io_1_1basic__ibuf.html">basic_ibuf&lt;isystem_file&gt;</a>;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__obuf.html">obuf</a> = <a class="code" href="classfast__io_1_1basic__obuf.html">basic_obuf&lt;osystem_file&gt;</a>;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__iobuf.html">iobuf</a> = <a class="code" href="classfast__io_1_1basic__iobuf.html">basic_iobuf&lt;iosystem_file&gt;</a>;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__istring__view.html">istring_view</a> = <a class="code" href="classfast__io_1_1basic__istring__view.html">basic_istring_view&lt;std::string_view&gt;</a>;</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__ostring.html">ostring</a> = <a class="code" href="classfast__io_1_1basic__ostring.html">basic_ostring&lt;std::string&gt;</a>;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__iomutex.html">ibuf_mutex</a> = <a class="code" href="classfast__io_1_1basic__iomutex.html">basic_iomutex&lt;ibuf&gt;</a>;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__iomutex.html">obuf_mutex</a> = <a class="code" href="classfast__io_1_1basic__iomutex.html">basic_iomutex&lt;obuf&gt;</a>;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__iomutex.html">iobuf_mutex</a> = <a class="code" href="classfast__io_1_1basic__iomutex.html">basic_iomutex&lt;iobuf&gt;</a>;</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__iomutex.html">istring_view_mutex</a> = <a class="code" href="classfast__io_1_1basic__iomutex.html">basic_iomutex&lt;istring_view&gt;</a>;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__iomutex.html">ostring_mutex</a> = <a class="code" href="classfast__io_1_1basic__iomutex.html">basic_iomutex&lt;ostring&gt;</a>;</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__ibuf.html">ibuf_dynamic</a> = <a class="code" href="classfast__io_1_1basic__ibuf.html">basic_ibuf&lt;dynamic_input_stream&gt;</a>;</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__obuf.html">obuf_dynamic</a> = <a class="code" href="classfast__io_1_1basic__obuf.html">basic_obuf&lt;dynamic_output_stream&gt;</a>;</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__iobuf.html">iobuf_dynamic</a> = <a class="code" href="classfast__io_1_1basic__iobuf.html">basic_iobuf&lt;dynamic_io_stream&gt;</a>;</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;}</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160; </div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="preprocessor">#include&quot;impl/base.h&quot;</span></div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="preprocessor">#include&quot;impl/rd_type.h&quot;</span></div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="preprocessor">#include&quot;impl/manip.h&quot;</span></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="preprocessor">#include&quot;impl/read_write.h&quot;</span></div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="preprocessor">#include&quot;impl/unicode.h&quot;</span></div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="preprocessor">#ifdef _WIN32_WINNT</span></div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="comment">//#include&quot;impl/handlers/nt.h&quot;</span></div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1ierasure.html">c_style_ohandle</a> = <a class="code" href="classfast__io_1_1ierasure.html">ierasure&lt;c_style_io_handle&gt;</a>;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1oerasure.html">c_style_ihandle</a> = <a class="code" href="classfast__io_1_1oerasure.html">oerasure&lt;c_style_io_handle&gt;</a>;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="keyword">inline</span> <a class="code" href="classfast__io_1_1ierasure.html">c_style_ohandle</a> out(stdout);</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="keyword">inline</span> <a class="code" href="classfast__io_1_1tie.html">tie</a>&lt;<a class="code" href="classfast__io_1_1oerasure.html">c_style_ihandle</a>,decltype(out)&gt; in(out,stdin);</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="keyword">inline</span> <a class="code" href="classfast__io_1_1tie.html">tie</a>&lt;<a class="code" href="classfast__io_1_1immediately__flush.html">immediately_flush</a>&lt;decltype(out)&gt;,decltype(out)&gt; err(out,stderr);</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160; </div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__ibuf.html">ibuf_dynamic</a> = <a class="code" href="classfast__io_1_1basic__ibuf.html">basic_ibuf&lt;dynamic_input_stream&gt;</a>;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__obuf.html">obuf_dynamic</a> = <a class="code" href="classfast__io_1_1basic__obuf.html">basic_obuf&lt;dynamic_output_stream&gt;</a>;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__iobuf.html">iobuf_dynamic</a> = <a class="code" href="classfast__io_1_1basic__iobuf.html">basic_iobuf&lt;dynamic_io_stream&gt;</a>;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="aclassfast__io_1_1basic__fsync_html"><div class="ttname"><a href="classfast__io_1_1basic__fsync.html">fast_io::basic_fsync</a></div><div class="ttdef"><b>Definition:</b> <a href="sync_8h_source.html#l00064">sync.h:64</a></div></div>
-<div class="ttc" id="aclassfast__io_1_1basic__istring__view_html"><div class="ttname"><a href="classfast__io_1_1basic__istring__view.html">fast_io::basic_istring_view</a></div><div class="ttdef"><b>Definition:</b> <a href="stringbuf_8h_source.html#l00011">stringbuf.h:11</a></div></div>
-<div class="ttc" id="aclassfast__io_1_1tie_html"><div class="ttname"><a href="classfast__io_1_1tie.html">fast_io::tie</a></div><div class="ttdef"><b>Definition:</b> <a href="tie_8h_source.html#l00008">tie.h:8</a></div></div>
-<div class="ttc" id="aclassfast__io_1_1basic__obuf_html"><div class="ttname"><a href="classfast__io_1_1basic__obuf.html">fast_io::basic_obuf</a></div><div class="ttdef"><b>Definition:</b> <a href="iobuf_8h_source.html#l00015">iobuf.h:15</a></div></div>
-<div class="ttc" id="aclassfast__io_1_1basic__ostring_html"><div class="ttname"><a href="classfast__io_1_1basic__ostring.html">fast_io::basic_ostring</a></div><div class="ttdef"><b>Definition:</b> <a href="stringbuf_8h_source.html#l00051">stringbuf.h:51</a></div></div>
-<div class="ttc" id="astructfast__io_1_1system__io__collections_html"><div class="ttname"><a href="structfast__io_1_1system__io__collections.html">fast_io::system_io_collections</a></div><div class="ttdef"><b>Definition:</b> <a href="fast__io_8h_source.html#l00036">fast_io.h:36</a></div></div>
-<div class="ttc" id="aclassfast__io_1_1ierasure_html"><div class="ttname"><a href="classfast__io_1_1ierasure.html">fast_io::ierasure</a></div><div class="ttdef"><b>Definition:</b> <a href="erasure_8h_source.html#l00007">erasure.h:7</a></div></div>
-<div class="ttc" id="aclassfast__io_1_1immediately__flush_html"><div class="ttname"><a href="classfast__io_1_1immediately__flush.html">fast_io::immediately_flush</a></div><div class="ttdef"><b>Definition:</b> <a href="flush_8h_source.html#l00033">flush.h:33</a></div></div>
-<div class="ttc" id="aclassfast__io_1_1basic__sync_html"><div class="ttname"><a href="classfast__io_1_1basic__sync.html">fast_io::basic_sync</a></div><div class="ttdef"><b>Definition:</b> <a href="sync_8h_source.html#l00009">sync.h:9</a></div></div>
-<div class="ttc" id="aclassfast__io_1_1basic__iobuf_html"><div class="ttname"><a href="classfast__io_1_1basic__iobuf.html">fast_io::basic_iobuf</a></div><div class="ttdef"><b>Definition:</b> <a href="iobuf_8h_source.html#l00227">iobuf.h:227</a></div></div>
-<div class="ttc" id="aclassfast__io_1_1basic__file__wrapper_html"><div class="ttname"><a href="classfast__io_1_1basic__file__wrapper.html">fast_io::basic_file_wrapper</a></div><div class="ttdef"><b>Definition:</b> <a href="wrapper_8h_source.html#l00009">wrapper.h:9</a></div></div>
-<div class="ttc" id="aclassfast__io_1_1basic__ibuf_html"><div class="ttname"><a href="classfast__io_1_1basic__ibuf.html">fast_io::basic_ibuf</a></div><div class="ttdef"><b>Definition:</b> <a href="iobuf_8h_source.html#l00013">iobuf.h:13</a></div></div>
-<div class="ttc" id="aclassfast__io_1_1basic__iomutex_html"><div class="ttname"><a href="classfast__io_1_1basic__iomutex.html">fast_io::basic_iomutex</a></div><div class="ttdef"><b>Definition:</b> <a href="iomutex_8h_source.html#l00011">iomutex.h:11</a></div></div>
-<div class="ttc" id="aclassfast__io_1_1oerasure_html"><div class="ttname"><a href="classfast__io_1_1oerasure.html">fast_io::oerasure</a></div><div class="ttdef"><b>Definition:</b> <a href="erasure_8h_source.html#l00020">erasure.h:20</a></div></div>
+<div class="ttc" id="aclassfast__io_1_1basic__fsync_html"><div class="ttname"><a href="classfast__io_1_1basic__fsync.html">fast_io::basic_fsync</a></div><div class="ttdef"><b>Definition:</b> sync.h:64</div></div>
+<div class="ttc" id="aclassfast__io_1_1basic__istring__view_html"><div class="ttname"><a href="classfast__io_1_1basic__istring__view.html">fast_io::basic_istring_view</a></div><div class="ttdef"><b>Definition:</b> stringbuf.h:11</div></div>
+<div class="ttc" id="aclassfast__io_1_1tie_html"><div class="ttname"><a href="classfast__io_1_1tie.html">fast_io::tie</a></div><div class="ttdef"><b>Definition:</b> tie.h:8</div></div>
+<div class="ttc" id="aclassfast__io_1_1basic__obuf_html"><div class="ttname"><a href="classfast__io_1_1basic__obuf.html">fast_io::basic_obuf</a></div><div class="ttdef"><b>Definition:</b> iobuf.h:15</div></div>
+<div class="ttc" id="aclassfast__io_1_1basic__ostring_html"><div class="ttname"><a href="classfast__io_1_1basic__ostring.html">fast_io::basic_ostring</a></div><div class="ttdef"><b>Definition:</b> stringbuf.h:51</div></div>
+<div class="ttc" id="astructfast__io_1_1system__io__collections_html"><div class="ttname"><a href="structfast__io_1_1system__io__collections.html">fast_io::system_io_collections</a></div><div class="ttdef"><b>Definition:</b> fast_io.h:43</div></div>
+<div class="ttc" id="aclassfast__io_1_1ierasure_html"><div class="ttname"><a href="classfast__io_1_1ierasure.html">fast_io::ierasure</a></div><div class="ttdef"><b>Definition:</b> erasure.h:7</div></div>
+<div class="ttc" id="aclassfast__io_1_1immediately__flush_html"><div class="ttname"><a href="classfast__io_1_1immediately__flush.html">fast_io::immediately_flush</a></div><div class="ttdef"><b>Definition:</b> flush.h:33</div></div>
+<div class="ttc" id="aclassfast__io_1_1basic__sync_html"><div class="ttname"><a href="classfast__io_1_1basic__sync.html">fast_io::basic_sync</a></div><div class="ttdef"><b>Definition:</b> sync.h:9</div></div>
+<div class="ttc" id="aclassfast__io_1_1basic__iobuf_html"><div class="ttname"><a href="classfast__io_1_1basic__iobuf.html">fast_io::basic_iobuf</a></div><div class="ttdef"><b>Definition:</b> iobuf.h:227</div></div>
+<div class="ttc" id="aclassfast__io_1_1basic__file__wrapper_html"><div class="ttname"><a href="classfast__io_1_1basic__file__wrapper.html">fast_io::basic_file_wrapper</a></div><div class="ttdef"><b>Definition:</b> wrapper.h:9</div></div>
+<div class="ttc" id="aclassfast__io_1_1basic__ibuf_html"><div class="ttname"><a href="classfast__io_1_1basic__ibuf.html">fast_io::basic_ibuf</a></div><div class="ttdef"><b>Definition:</b> iobuf.h:13</div></div>
+<div class="ttc" id="aclassfast__io_1_1basic__iomutex_html"><div class="ttname"><a href="classfast__io_1_1basic__iomutex.html">fast_io::basic_iomutex</a></div><div class="ttdef"><b>Definition:</b> iomutex.h:11</div></div>
+<div class="ttc" id="aclassfast__io_1_1oerasure_html"><div class="ttname"><a href="classfast__io_1_1oerasure.html">fast_io::oerasure</a></div><div class="ttdef"><b>Definition:</b> erasure.h:20</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Sep 2 2019 14:48:17 for fast_io by &#160;<a href="http://www.doxygen.org/index.html">
+Generated by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.16
 </small></address>

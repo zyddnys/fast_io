@@ -1,0 +1,46 @@
+\hypertarget{classfast__io_1_1tie}{}\doxysection{fast\+\_\+io\+::tie$<$ T, out $>$ Class Template Reference}
+\label{classfast__io_1_1tie}\index{fast\_io::tie$<$ T, out $>$@{fast\_io::tie$<$ T, out $>$}}
+\doxysubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classfast__io_1_1tie_a7406664770d10be5ea896ddcc82df6d6}\label{classfast__io_1_1tie_a7406664770d10be5ea896ddcc82df6d6}} 
+using {\bfseries native\+\_\+interface\+\_\+t} = T
+\item 
+\mbox{\Hypertarget{classfast__io_1_1tie_a716539a141529725be90b5691b351f62}\label{classfast__io_1_1tie_a716539a141529725be90b5691b351f62}} 
+using {\bfseries char\+\_\+type} = typename native\+\_\+interface\+\_\+t\+::char\+\_\+type
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classfast__io_1_1tie_af54854785bd394dd4fdc72dd4dff3e02}\label{classfast__io_1_1tie_af54854785bd394dd4fdc72dd4dff3e02}} 
+{\footnotesize template$<$typename ... Args$>$ }\\constexpr {\bfseries tie} (out \&oo, Args \&\&...args)
+\item 
+\mbox{\Hypertarget{classfast__io_1_1tie_a50b79b5083e4453e885d5d310b483529}\label{classfast__io_1_1tie_a50b79b5083e4453e885d5d310b483529}} 
+constexpr auto \& {\bfseries to} ()
+\item 
+\mbox{\Hypertarget{classfast__io_1_1tie_a9c45c1bea2c88e120f5f48217d100c07}\label{classfast__io_1_1tie_a9c45c1bea2c88e120f5f48217d100c07}} 
+constexpr auto \& {\bfseries native\+\_\+handle} ()
+\item 
+\mbox{\Hypertarget{classfast__io_1_1tie_aa4ec455adb4ee1da0b583b8c21c58735}\label{classfast__io_1_1tie_aa4ec455adb4ee1da0b583b8c21c58735}} 
+constexpr auto {\bfseries get} () requires standard\+\_\+input\+\_\+stream$<$ T $>$
+\item 
+\mbox{\Hypertarget{classfast__io_1_1tie_adda019e0af4c02eef43f94ec3261e0c3}\label{classfast__io_1_1tie_adda019e0af4c02eef43f94ec3261e0c3}} 
+constexpr auto {\bfseries try\+\_\+get} () requires standard\+\_\+input\+\_\+stream$<$ T $>$
+\item 
+\mbox{\Hypertarget{classfast__io_1_1tie_a3f886afd62aedcfa90a30e66ece4eba8}\label{classfast__io_1_1tie_a3f886afd62aedcfa90a30e66ece4eba8}} 
+constexpr void {\bfseries put} (char\+\_\+type ch) requires standard\+\_\+output\+\_\+stream$<$ T $>$
+\item 
+\mbox{\Hypertarget{classfast__io_1_1tie_a1331ea3d982835c809c488fbd516e55e}\label{classfast__io_1_1tie_a1331ea3d982835c809c488fbd516e55e}} 
+constexpr void {\bfseries flush} () requires output\+\_\+stream$<$ T $>$
+\item 
+\mbox{\Hypertarget{classfast__io_1_1tie_a4ae48bedbf69d0f099013e814f29b324}\label{classfast__io_1_1tie_a4ae48bedbf69d0f099013e814f29b324}} 
+{\footnotesize template$<$typename Contiguous\+\_\+iterator $>$ }\\constexpr Contiguous\+\_\+iterator {\bfseries read} (Contiguous\+\_\+iterator begin, Contiguous\+\_\+iterator end) requires input\+\_\+stream$<$ T $>$
+\item 
+\mbox{\Hypertarget{classfast__io_1_1tie_a85f0265e19de628956c9e75876f16aca}\label{classfast__io_1_1tie_a85f0265e19de628956c9e75876f16aca}} 
+{\footnotesize template$<$typename Contiguous\+\_\+iterator $>$ }\\constexpr void {\bfseries write} (Contiguous\+\_\+iterator begin, Contiguous\+\_\+iterator end) requires output\+\_\+stream$<$ T $>$
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+D\+:/hg/fast\+\_\+io/include/impl/tie.\+h\end{DoxyCompactItemize}

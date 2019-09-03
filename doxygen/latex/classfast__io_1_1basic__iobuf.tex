@@ -1,0 +1,46 @@
+\hypertarget{classfast__io_1_1basic__iobuf}{}\doxysection{fast\+\_\+io\+::basic\+\_\+iobuf$<$ io\+\_\+handler, Buf $>$ Class Template Reference}
+\label{classfast__io_1_1basic__iobuf}\index{fast\_io::basic\_iobuf$<$ io\_handler, Buf $>$@{fast\_io::basic\_iobuf$<$ io\_handler, Buf $>$}}
+\doxysubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__iobuf_a1c7497636a5ec898ffe88538fa1ca9ec}\label{classfast__io_1_1basic__iobuf_a1c7497636a5ec898ffe88538fa1ca9ec}} 
+using {\bfseries native\+\_\+handle\+\_\+type} = io\+\_\+handler
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__iobuf_a6a835258498b9c665a22fc4b6f033740}\label{classfast__io_1_1basic__iobuf_a6a835258498b9c665a22fc4b6f033740}} 
+using {\bfseries char\+\_\+type} = typename native\+\_\+handle\+\_\+type\+::char\+\_\+type
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__iobuf_a96b6cdd5352149da9d332ea1d9a11562}\label{classfast__io_1_1basic__iobuf_a96b6cdd5352149da9d332ea1d9a11562}} 
+{\footnotesize template$<$typename ... Args$>$ }\\{\bfseries basic\+\_\+iobuf} (Args \&\&...args)
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__iobuf_afe49f8bc17ff4efc22dec4943beb6c23}\label{classfast__io_1_1basic__iobuf_afe49f8bc17ff4efc22dec4943beb6c23}} 
+auto \& {\bfseries native\+\_\+handle} ()
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__iobuf_a88bc3ae48ffc1909fb67f0babf5a21df}\label{classfast__io_1_1basic__iobuf_a88bc3ae48ffc1909fb67f0babf5a21df}} 
+void {\bfseries flush} ()
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__iobuf_a9e2f0454b90c6b37cf0e87b2789ecd27}\label{classfast__io_1_1basic__iobuf_a9e2f0454b90c6b37cf0e87b2789ecd27}} 
+void {\bfseries put} (char\+\_\+type ch)
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__iobuf_a9d919960dad108fb71371a6bb059b342}\label{classfast__io_1_1basic__iobuf_a9d919960dad108fb71371a6bb059b342}} 
+{\footnotesize template$<$typename ... Args$>$ }\\void {\bfseries write} (Args \&\&...args)
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__iobuf_a26c721f3ab767bc279203cb3321ca59f}\label{classfast__io_1_1basic__iobuf_a26c721f3ab767bc279203cb3321ca59f}} 
+{\footnotesize template$<$typename ... Args$>$ }\\auto {\bfseries read} (Args \&\&...args)
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__iobuf_a26d9e0291c172483f99cc63f206f997c}\label{classfast__io_1_1basic__iobuf_a26d9e0291c172483f99cc63f206f997c}} 
+auto {\bfseries get} ()
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__iobuf_a52355cd51072cf2ccfc46abd8742e123}\label{classfast__io_1_1basic__iobuf_a52355cd51072cf2ccfc46abd8742e123}} 
+auto {\bfseries try\+\_\+get} ()
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__iobuf_a8a698cb045474821a1ec12f103b23b27}\label{classfast__io_1_1basic__iobuf_a8a698cb045474821a1ec12f103b23b27}} 
+{\footnotesize template$<$typename... Args$>$ }\\void {\bfseries seek} (Args \&\&...args) requires(random\+\_\+access\+\_\+stream$<$ io\+\_\+handler $>$)
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+D\+:/hg/fast\+\_\+io/include/impl/iobuf.\+h\end{DoxyCompactItemize}

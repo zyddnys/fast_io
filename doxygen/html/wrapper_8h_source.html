@@ -22,7 +22,6 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">fast_io
-   &#160;<span id="projectnumber">beta</span>
    </div>
   </td>
  </tr>
@@ -93,11 +92,11 @@ $(function() {
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;};</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keyword">template</span>&lt;input_stream T&gt;</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__file__wrapper.html">input_file_wrapper</a> = <a class="code" href="classfast__io_1_1basic__file__wrapper.html">basic_file_wrapper&lt;T,fast_io::open::in&gt;</a>;</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__file__wrapper.html">input_file_wrapper</a> = <a class="code" href="classfast__io_1_1basic__file__wrapper.html">basic_file_wrapper&lt;T,fast_io::open::in|fast_io::open::binary&gt;</a>;</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keyword">template</span>&lt;output_stream T&gt;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__file__wrapper.html">output_file_wrapper</a> = <a class="code" href="classfast__io_1_1basic__file__wrapper.html">basic_file_wrapper&lt;T,fast_io::open::out&gt;</a>;</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__file__wrapper.html">output_file_wrapper</a> = <a class="code" href="classfast__io_1_1basic__file__wrapper.html">basic_file_wrapper&lt;T,fast_io::open::out|fast_io::open::binary&gt;</a>;</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">template</span>&lt;io_stream T&gt;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__file__wrapper.html">io_file_wrapper</a> = <a class="code" href="classfast__io_1_1basic__file__wrapper.html">basic_file_wrapper&lt;T,fast_io::open::in|fast_io::open::out&gt;</a>;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__file__wrapper.html">io_file_wrapper</a> = <a class="code" href="classfast__io_1_1basic__file__wrapper.html">basic_file_wrapper&lt;T,fast_io::open::in|fast_io::open::out|fast_io::open::binary&gt;</a>;</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">template</span>&lt;stream T,std::<span class="keywordtype">size_t</span> <span class="keywordtype">int</span>erface_mode&gt;</div>
 <div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="classfast__io_1_1basic__wrapper.html">   31</a></span>&#160;<span class="keyword">class </span><a class="code" href="classfast__io_1_1basic__wrapper.html">basic_wrapper</a>:<span class="keyword">public</span> T</div>
@@ -113,22 +112,22 @@ $(function() {
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;};</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="keyword">template</span>&lt;input_stream T&gt;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__wrapper.html">input_wrapper</a> = <a class="code" href="classfast__io_1_1basic__wrapper.html">basic_wrapper&lt;T,fast_io::open::in&gt;</a>;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__wrapper.html">input_wrapper</a> = <a class="code" href="classfast__io_1_1basic__wrapper.html">basic_wrapper&lt;T,fast_io::open::in|fast_io::open::binary&gt;</a>;</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="keyword">template</span>&lt;output_stream T&gt;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__wrapper.html">output_wrapper</a> = <a class="code" href="classfast__io_1_1basic__wrapper.html">basic_wrapper&lt;T,fast_io::open::out&gt;</a>;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__wrapper.html">output_wrapper</a> = <a class="code" href="classfast__io_1_1basic__wrapper.html">basic_wrapper&lt;T,fast_io::open::out|fast_io::open::binary&gt;</a>;</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="keyword">template</span>&lt;io_stream T&gt;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__wrapper.html">io_wrapper</a> = <a class="code" href="classfast__io_1_1basic__wrapper.html">basic_wrapper&lt;T,fast_io::open::in|fast_io::open::out&gt;</a>;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="keyword">using</span> <a class="code" href="classfast__io_1_1basic__wrapper.html">io_wrapper</a> = <a class="code" href="classfast__io_1_1basic__wrapper.html">basic_wrapper&lt;T,fast_io::open::in|fast_io::open::out|fast_io::open::binary&gt;</a>;</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="astructfast__io_1_1open_1_1interface__t_html"><div class="ttname"><a href="structfast__io_1_1open_1_1interface__t.html">fast_io::open::interface_t</a></div><div class="ttdef"><b>Definition:</b> <a href="mode_8h_source.html#l00191">mode.h:191</a></div></div>
-<div class="ttc" id="astructfast__io_1_1open_1_1mode_html"><div class="ttname"><a href="structfast__io_1_1open_1_1mode.html">fast_io::open::mode</a></div><div class="ttdef"><b>Definition:</b> <a href="mode_8h_source.html#l00012">mode.h:12</a></div></div>
-<div class="ttc" id="aclassfast__io_1_1basic__wrapper_html"><div class="ttname"><a href="classfast__io_1_1basic__wrapper.html">fast_io::basic_wrapper</a></div><div class="ttdef"><b>Definition:</b> <a href="wrapper_8h_source.html#l00031">wrapper.h:31</a></div></div>
-<div class="ttc" id="aclassfast__io_1_1basic__file__wrapper_html"><div class="ttname"><a href="classfast__io_1_1basic__file__wrapper.html">fast_io::basic_file_wrapper</a></div><div class="ttdef"><b>Definition:</b> <a href="wrapper_8h_source.html#l00009">wrapper.h:9</a></div></div>
-<div class="ttc" id="astructfast__io_1_1native__interface__t_html"><div class="ttname"><a href="structfast__io_1_1native__interface__t.html">fast_io::native_interface_t</a></div><div class="ttdef"><b>Definition:</b> <a href="mode_8h_source.html#l00202">mode.h:202</a></div></div>
+<div class="ttc" id="astructfast__io_1_1open_1_1interface__t_html"><div class="ttname"><a href="structfast__io_1_1open_1_1interface__t.html">fast_io::open::interface_t</a></div><div class="ttdef"><b>Definition:</b> mode.h:191</div></div>
+<div class="ttc" id="astructfast__io_1_1open_1_1mode_html"><div class="ttname"><a href="structfast__io_1_1open_1_1mode.html">fast_io::open::mode</a></div><div class="ttdef"><b>Definition:</b> mode.h:12</div></div>
+<div class="ttc" id="aclassfast__io_1_1basic__wrapper_html"><div class="ttname"><a href="classfast__io_1_1basic__wrapper.html">fast_io::basic_wrapper</a></div><div class="ttdef"><b>Definition:</b> wrapper.h:31</div></div>
+<div class="ttc" id="aclassfast__io_1_1basic__file__wrapper_html"><div class="ttname"><a href="classfast__io_1_1basic__file__wrapper.html">fast_io::basic_file_wrapper</a></div><div class="ttdef"><b>Definition:</b> wrapper.h:9</div></div>
+<div class="ttc" id="astructfast__io_1_1native__interface__t_html"><div class="ttname"><a href="structfast__io_1_1native__interface__t.html">fast_io::native_interface_t</a></div><div class="ttdef"><b>Definition:</b> mode.h:202</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Sep 2 2019 14:48:17 for fast_io by &#160;<a href="http://www.doxygen.org/index.html">
+Generated by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.16
 </small></address>

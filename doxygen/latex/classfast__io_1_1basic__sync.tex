@@ -1,0 +1,58 @@
+\hypertarget{classfast__io_1_1basic__sync}{}\doxysection{fast\+\_\+io\+::basic\+\_\+sync$<$ output, ostr $>$ Class Template Reference}
+\label{classfast__io_1_1basic__sync}\index{fast\_io::basic\_sync$<$ output, ostr $>$@{fast\_io::basic\_sync$<$ output, ostr $>$}}
+Inheritance diagram for fast\+\_\+io\+::basic\+\_\+sync$<$ output, ostr $>$\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classfast__io_1_1basic__sync}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__sync_a1079be537035758364c0f5610406940a}\label{classfast__io_1_1basic__sync_a1079be537035758364c0f5610406940a}} 
+using {\bfseries native\+\_\+handle\+\_\+type} = output
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__sync_a454b20ef1fd1ccf395c054630455cc28}\label{classfast__io_1_1basic__sync_a454b20ef1fd1ccf395c054630455cc28}} 
+using {\bfseries char\+\_\+type} = typename native\+\_\+handle\+\_\+type\+::char\+\_\+type
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__sync_a9fec7dc5b1b452a03d47708b6cad7116}\label{classfast__io_1_1basic__sync_a9fec7dc5b1b452a03d47708b6cad7116}} 
+using {\bfseries buffer\+\_\+type} = ostr
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__sync_ab016e3c1da1d6d133541350d084ad338}\label{classfast__io_1_1basic__sync_ab016e3c1da1d6d133541350d084ad338}} 
+auto \& {\bfseries buffer} ()
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__sync_ad28860efb58236330916093d5261f82d}\label{classfast__io_1_1basic__sync_ad28860efb58236330916093d5261f82d}} 
+auto \& {\bfseries native\+\_\+handle} ()
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__sync_af6bf0caca5155cb45f408cc52119ecab}\label{classfast__io_1_1basic__sync_af6bf0caca5155cb45f408cc52119ecab}} 
+{\footnotesize template$<$typename ... Args$>$ }\\{\bfseries basic\+\_\+sync} (Args \&\&...args)
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__sync_a213a8b769814dd6a336f7d34d768f537}\label{classfast__io_1_1basic__sync_a213a8b769814dd6a336f7d34d768f537}} 
+void {\bfseries flush} ()
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__sync_a0c1da021efce6f9cd0e3108cb3a5f168}\label{classfast__io_1_1basic__sync_a0c1da021efce6f9cd0e3108cb3a5f168}} 
+{\footnotesize template$<$typename ... Args$>$ }\\void {\bfseries write} (Args \&\&...args)
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__sync_a2e5be1a66324a70a9caf6509cb6af977}\label{classfast__io_1_1basic__sync_a2e5be1a66324a70a9caf6509cb6af977}} 
+void {\bfseries put} (char\+\_\+type ch)
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__sync_a2d561d0dbccb3bf58769d64723723001}\label{classfast__io_1_1basic__sync_a2d561d0dbccb3bf58769d64723723001}} 
+{\footnotesize template$<$typename... Args$>$ }\\void {\bfseries seek} (Args \&\&...args) requires random\+\_\+access\+\_\+stream$<$ native\+\_\+handle\+\_\+type $>$
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__sync_abc2078500f1bd4ce4e26188f7b45125c}\label{classfast__io_1_1basic__sync_abc2078500f1bd4ce4e26188f7b45125c}} 
+{\footnotesize template$<$typename Contiguous\+\_\+iterator $>$ }\\Contiguous\+\_\+iterator {\bfseries read} (Contiguous\+\_\+iterator begin, Contiguous\+\_\+iterator end) requires input\+\_\+stream$<$ native\+\_\+handle\+\_\+type $>$
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__sync_a46e90cba621ca840b1a810d280b6577e}\label{classfast__io_1_1basic__sync_a46e90cba621ca840b1a810d280b6577e}} 
+auto {\bfseries get} () requires standard\+\_\+input\+\_\+stream$<$ native\+\_\+handle\+\_\+type $>$
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__sync_a6347f86c8a2d95378db476b9f31e29e0}\label{classfast__io_1_1basic__sync_a6347f86c8a2d95378db476b9f31e29e0}} 
+auto {\bfseries try\+\_\+get} () requires standard\+\_\+input\+\_\+stream$<$ native\+\_\+handle\+\_\+type $>$
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+D\+:/hg/fast\+\_\+io/include/impl/sync.\+h\end{DoxyCompactItemize}

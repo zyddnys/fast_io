@@ -1,0 +1,49 @@
+\hypertarget{classfast__io_1_1basic__obuf}{}\doxysection{fast\+\_\+io\+::basic\+\_\+obuf$<$ Ohandler, Buf $>$ Class Template Reference}
+\label{classfast__io_1_1basic__obuf}\index{fast\_io::basic\_obuf$<$ Ohandler, Buf $>$@{fast\_io::basic\_obuf$<$ Ohandler, Buf $>$}}
+\doxysubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__obuf_aa72ca69fb8d45870781458b2b7ab6b1e}\label{classfast__io_1_1basic__obuf_aa72ca69fb8d45870781458b2b7ab6b1e}} 
+using {\bfseries native\+\_\+handle\+\_\+type} = Ohandler
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__obuf_a4b4b91794da3c47ef1652a232cc90bea}\label{classfast__io_1_1basic__obuf_a4b4b91794da3c47ef1652a232cc90bea}} 
+using {\bfseries char\+\_\+type} = typename native\+\_\+handle\+\_\+type\+::char\+\_\+type
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__obuf_a0e42341189d9dcb2de283cbcf7526c86}\label{classfast__io_1_1basic__obuf_a0e42341189d9dcb2de283cbcf7526c86}} 
+{\footnotesize template$<$typename... Args$>$ }\\{\bfseries basic\+\_\+obuf} (Args \&\&... args)
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__obuf_a6f78be17466da3a7076e78bc530a9068}\label{classfast__io_1_1basic__obuf_a6f78be17466da3a7076e78bc530a9068}} 
+void {\bfseries flush} ()
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__obuf_a1360ebe7315b3c9b597a6b6287a43e0c}\label{classfast__io_1_1basic__obuf_a1360ebe7315b3c9b597a6b6287a43e0c}} 
+\mbox{\hyperlink{classfast__io_1_1basic__obuf}{basic\+\_\+obuf}} \& {\bfseries operator=} (\mbox{\hyperlink{classfast__io_1_1basic__obuf}{basic\+\_\+obuf}} const \&)=delete
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__obuf_aba21593286589a96a54e1c24c69d8786}\label{classfast__io_1_1basic__obuf_aba21593286589a96a54e1c24c69d8786}} 
+{\bfseries basic\+\_\+obuf} (\mbox{\hyperlink{classfast__io_1_1basic__obuf}{basic\+\_\+obuf}} const \&)=delete
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__obuf_a327c3c6583f94d05c0adff9bb2413c5b}\label{classfast__io_1_1basic__obuf_a327c3c6583f94d05c0adff9bb2413c5b}} 
+{\bfseries basic\+\_\+obuf} (\mbox{\hyperlink{classfast__io_1_1basic__obuf}{basic\+\_\+obuf}} \&\&bmv) noexcept=default
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__obuf_abc14ab29c4b831ac60c6f881bdea683c}\label{classfast__io_1_1basic__obuf_abc14ab29c4b831ac60c6f881bdea683c}} 
+\mbox{\hyperlink{classfast__io_1_1basic__obuf}{basic\+\_\+obuf}} \& {\bfseries operator=} (\mbox{\hyperlink{classfast__io_1_1basic__obuf}{basic\+\_\+obuf}} \&\&b) noexcept
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__obuf_a64872ade3313a844577a824f63112410}\label{classfast__io_1_1basic__obuf_a64872ade3313a844577a824f63112410}} 
+{\footnotesize template$<$typename Contiguous\+\_\+\+Iterator $>$ }\\void {\bfseries write} (Contiguous\+\_\+\+Iterator cbegin, Contiguous\+\_\+\+Iterator cend)
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__obuf_a132518e7d0f291ca0e0e117cd988fc1f}\label{classfast__io_1_1basic__obuf_a132518e7d0f291ca0e0e117cd988fc1f}} 
+void {\bfseries put} (char\+\_\+type ch)
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__obuf_a077c59ee85f3fc0594327317bb5d02e5}\label{classfast__io_1_1basic__obuf_a077c59ee85f3fc0594327317bb5d02e5}} 
+auto \& {\bfseries native\+\_\+handle} ()
+\item 
+\mbox{\Hypertarget{classfast__io_1_1basic__obuf_a525821dd9f5b8fcf4d527c261c3d0cc9}\label{classfast__io_1_1basic__obuf_a525821dd9f5b8fcf4d527c261c3d0cc9}} 
+{\footnotesize template$<$typename... Args$>$ }\\void {\bfseries seek} (Args \&\&...args) requires(random\+\_\+access\+\_\+stream$<$ Ohandler $>$)
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+D\+:/hg/fast\+\_\+io/include/impl/iobuf.\+h\end{DoxyCompactItemize}
