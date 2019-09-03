@@ -46,7 +46,7 @@ public:
 			auto internal(ib.try_get());
 			if(internal.second)
 				return ch;
-			if(internal=='\n')
+			if(internal.first=='\n')
 				return '\n';
 			state.state=true;
 			state.internal_character=internal;
