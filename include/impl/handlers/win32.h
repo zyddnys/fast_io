@@ -9,10 +9,10 @@ namespace details
 
 struct win32_open_mode
 {
-DWORD dwDesiredAccess=0,dwShareMode=0;
+DWORD dwDesiredAccess=0,dwShareMode=FILE_SHARE_READ|FILE_SHARE_WRITE;
 LPSECURITY_ATTRIBUTES lpSecurityAttributes=nullptr;
 DWORD dwCreationDisposition=0;	//depends on EXCL
-DWORD dwFlagsAndAttributes=FILE_ATTRIBUTE_NORMAL;
+DWORD dwFlagsAndAttributes=FILE_ATTRIBUTE_NORMAL|FILE_FLAG_RANDOM_ACCESS;
 };
 
 
@@ -22,20 +22,11 @@ inline constexpr win32_open_mode calculate_win32_open_mode(open::mode const &om)
 	std::size_t value(remove_ate(om).value);
 	win32_open_mode mode;
 	if(value&open::app.value)
-	{
-		mode.dwShareMode|=FILE_APPEND_DATA;
-//		mode.dwDesiredAccess|=0;
-	}
+		mode.dwDesiredAccess|=FILE_APPEND_DATA;
 	else if(value&open::out.value)
-	{
-		mode.dwShareMode|=FILE_SHARE_WRITE;
 		mode.dwDesiredAccess|=GENERIC_WRITE;
-	}
 	if(value&open::in.value)
-	{
-		mode.dwShareMode|=FILE_SHARE_READ;
 		mode.dwDesiredAccess|=GENERIC_READ;
-	}
 	if(value&open::excl.value)
 	{
 		mode.dwCreationDisposition=CREATE_NEW;
