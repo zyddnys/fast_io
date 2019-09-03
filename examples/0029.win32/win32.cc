@@ -3,8 +3,8 @@
 int main()
 try
 {
-	fast_io::obuf file("abc.txt");
-	println(file,"hello world");
+	fast_io::win32_file file("abc.txt","wx");
+//	println(file,"hello world");
 }
 catch(std::exception const & e)
 {

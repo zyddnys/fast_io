@@ -23,50 +23,22 @@ inline constexpr win32_open_mode calculate_win32_open_mode(open::mode const &om)
 	win32_open_mode mode;
 	if(value&open::binary.value)
 		value &= ~open::binary.value;
+	if(value&open::in.value)
+		mode.dwDesiredAccess|=FILE_SHARE_READ;
+	if(value&open::out.value)
+		mode.dwDesiredAccess|=FILE_SHARE_WRITE;
+	if(value&open::app.value)
+		mode.dwDesiredAccess|=FILE_APPEND_DATA;
 	if(value&open::excl.value)
 	{
-		mode.dwCreationDisposition |=OPEN_EXISTING;
-		value &= ~open::excl.value;
+		mode.dwCreationDisposition=CREATE_NEW;
+		if(value&open::trunc.value)
+			throw std::runtime_error("cannot create new while truncating existed file");
 	}
-	if(value&open::trunc.value)
-	{
-		mode.dwCreationDisposition |= TRUNCATE_EXISTING;
-		value &= ~open::trunc.value;
-	}
-	switch(value)
-	{
-//Action if file already exists;	Action if file does not exist;	c-style mode;	Explanation
-//Read from start;	Failure to open;	"r";	Open a file for reading
-	case open::in:
-		mode.dwDesiredAccess=FILE_SHARE_READ;
-		mode.dwCreationDisposition |=OPEN_EXISTING;
-	break;
-//Destroy contents;	Create new;	"w";	Create a file for writing
-	case open::out:
-		mode.dwDesiredAccess=FILE_SHARE_WRITE;
-		mode.dwCreationDisposition|=CREATE_ALWAYS;
-	break;
-//Append to file;	Create new;	"a";	Append to a file
-	case open::app:
-	case open::out|open::app:
-		mode.dwDesiredAccess=FILE_APPEND_DATA;
-		mode.dwCreationDisposition|=CREATE_ALWAYS;	
-	break;
-//Read from start;	Error;	"r+";		Open a file for read/write
-	case open::out|open::in:
-		mode.dwDesiredAccess=FILE_SHARE_READ|FILE_SHARE_WRITE;
-		mode.dwCreationDisposition |=OPEN_EXISTING;
-	break;
-//Write to end;	Create new;	"a+";	Open a file for read/write
-	case open::out|open::in|open::app:
-	case open::in|open::app:
-		mode.dwDesiredAccess=FILE_SHARE_READ|FILE_APPEND_DATA;
-		mode.dwCreationDisposition |=CREATE_ALWAYS;
-	break;
-//Destroy contents;	Error;	"wx";	Create a file for writing
-	default:
-		throw std::runtime_error("unknown win32 file openmode");
-	}
+	else if(value&open::trunc.value)
+		mode.dwCreationDisposition=TRUNCATE_EXISTING;
+	else
+		mode.dwCreationDisposition=CREATE_ALWAYS;
 	return mode;
 }
 template<std::size_t om>
@@ -97,7 +69,7 @@ public:
 	template<typename T>
 	void seek(seek_type_t<T>,Integral i,seekdir s=seekdir::beg)
 	{
-		LONG distance_to_move(0),distance_to_move_high(0);
+		LONG distance_to_move_high(0);
 		if(SetFilePointer(mhandle,seek_precondition<LONG,T,char_type>(i),std::addressof(distance_to_move_high),static_cast<DWORD>(s))== INVALID_SET_FILE_POINTER)
 		{
 			auto const last_error(GetLastError());
