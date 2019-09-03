@@ -12,7 +12,7 @@ struct win32_open_mode
 DWORD dwDesiredAccess=0,dwShareMode=0;
 LPSECURITY_ATTRIBUTES lpSecurityAttributes=nullptr;
 DWORD dwCreationDisposition=0;	//depends on EXCL
-DWORD dwFlagsAndAttributes=0;
+DWORD dwFlagsAndAttributes=FILE_FLAG_RANDOM_ACCESS;
 };
 
 
@@ -33,9 +33,7 @@ inline constexpr win32_open_mode calculate_win32_open_mode(open::mode const &om)
 		if(value&open::trunc.value)
 			throw std::runtime_error("cannot create new while truncating existed file");
 	}
-	else if(value&open::trunc.value)
-		mode.dwCreationDisposition=TRUNCATE_EXISTING;
-	else
+	else if(!(value&open::in.value))
 		mode.dwCreationDisposition=CREATE_ALWAYS;
 	return mode;
 }
