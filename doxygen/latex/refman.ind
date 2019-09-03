@@ -1,0 +1,69 @@
+\begin{theindex}
+
+  \item {fast\_io::basic\_buf\_handler$<$ CharT, Allocator, buffer\_size $>$}, 
+		\hyperpage{5}
+  \item {fast\_io::basic\_dynamic\_input\_stream$<$ T $>$}, 
+		\hyperpage{5}
+  \item {fast\_io::basic\_dynamic\_io\_stream$<$ T $>$}, \hyperpage{6}
+  \item {fast\_io::basic\_dynamic\_output\_stream$<$ T $>$}, 
+		\hyperpage{6}
+  \item {fast\_io::basic\_dynamic\_standard\_input\_stream$<$ T $>$}, 
+		\hyperpage{7}
+  \item {fast\_io::basic\_dynamic\_standard\_output\_stream$<$ T $>$}, 
+		\hyperpage{7}
+  \item {fast\_io::basic\_file\_wrapper$<$ T, interface\_mode $>$}, 
+		\hyperpage{8}
+  \item {fast\_io::basic\_fsync$<$ output, ostr $>$}, \hyperpage{8}
+  \item {fast\_io::basic\_ibuf$<$ Ihandler, Buf $>$}, \hyperpage{9}
+  \item {fast\_io::basic\_iobuf$<$ io\_handler, Buf $>$}, \hyperpage{9}
+  \item {fast\_io::basic\_iomutex$<$ T $>$}, \hyperpage{10}
+  \item {fast\_io::basic\_istring\_view$<$ T $>$}, \hyperpage{11}
+  \item {fast\_io::basic\_obuf$<$ Ohandler, Buf $>$}, \hyperpage{11}
+  \item {fast\_io::basic\_ostring$<$ T $>$}, \hyperpage{12}
+  \item {fast\_io::basic\_sync$<$ output, ostr $>$}, \hyperpage{12}
+  \item {fast\_io::basic\_wrapper$<$ T, interface\_mode $>$}, 
+		\hyperpage{13}
+  \item {fast\_io::c\_style\_file}, \hyperpage{14}
+  \item {fast\_io::c\_style\_io\_handle}, \hyperpage{14}
+  \item {fast\_io::char\_flush$<$ Ohandler, flush\_character $>$}, 
+		\hyperpage{15}
+  \item {fast\_io::details::char\_view\_t$<$ T $>$}, \hyperpage{16}
+  \item {fast\_io::details::fake\_basic\_ihandler$<$ io\_handler, Buf $>$}, 
+		\hyperpage{16}
+  \item {fast\_io::details::fixed$<$ T $>$}, \hyperpage{16}
+  \item {fast\_io::details::floating\_point\_default$<$ T $>$}, 
+		\hyperpage{17}
+  \item {fast\_io::details::posix\_file\_openmode$<$ om $>$}, 
+		\hyperpage{21}
+  \item {fast\_io::details::scientific$<$ T $>$}, \hyperpage{22}
+  \item {fast\_io::details::setw\_fill\_t$<$ T, char\_type $>$}, 
+		\hyperpage{23}
+  \item {fast\_io::details::setw\_t$<$ T $>$}, \hyperpage{23}
+  \item {fast\_io::details::signed\_view\_t$<$ T $>$}, \hyperpage{24}
+  \item {fast\_io::details::text\_view\_interal\_variable$<$ T $>$}, 
+		\hyperpage{25}
+  \item {fast\_io::details::text\_view\_interal\_variable$<$ typename $>$}, 
+		\hyperpage{25}
+  \item {fast\_io::details::unsigned\_view\_t$<$ T $>$}, \hyperpage{26}
+  \item {fast\_io::details::win32\_file\_openmode$<$ om $>$}, 
+		\hyperpage{27}
+  \item {fast\_io::details::win32\_open\_mode}, \hyperpage{27}
+  \item {fast\_io::ierasure$<$ io $>$}, \hyperpage{17}
+  \item {fast\_io::immediately\_flush$<$ Ohandler $>$}, \hyperpage{17}
+  \item {fast\_io::native\_interface\_t}, \hyperpage{19}
+  \item {fast\_io::nobuf\_reader$<$ Ihandler $>$}, \hyperpage{19}
+  \item {fast\_io::oerasure$<$ io $>$}, \hyperpage{19}
+  \item {fast\_io::open::interface\_t$<$ om $>$}, \hyperpage{18}
+  \item {fast\_io::open::mode}, \hyperpage{18}
+  \item {fast\_io::posix\_file}, \hyperpage{20}
+  \item {fast\_io::posix\_io\_handle}, \hyperpage{21}
+  \item {fast\_io::posix\_pipe}, \hyperpage{22}
+  \item {fast\_io::seek\_type\_t$<$ T $>$}, \hyperpage{22}
+  \item {fast\_io::seekerasure$<$ io $>$}, \hyperpage{23}
+  \item {fast\_io::system\_io\_collections}, \hyperpage{24}
+  \item {fast\_io::text\_view$<$ T $>$}, \hyperpage{24}
+  \item {fast\_io::tie$<$ T, out $>$}, \hyperpage{25}
+  \item {fast\_io::win32\_error}, \hyperpage{26}
+  \item {fast\_io::win32\_file}, \hyperpage{26}
+
+\end{theindex}
