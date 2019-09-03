@@ -23,12 +23,6 @@ try
 		fout<<i<<'\n';
 	}
 	{
-	cqw::timer t("std::ofstream");
-	std::ofstream fout("ofstream.txt",std::ofstream::binary);
-	for(std::size_t i(0);i!=N;++i)
-		fout<<i<<'\n';
-	}
-	{
 	cqw::timer t("std::ofstream with tricks");
 	std::ofstream fout("ofstream_tricks.txt",std::ofstream::binary);
 	auto &rdbuf(*fout.rdbuf());
