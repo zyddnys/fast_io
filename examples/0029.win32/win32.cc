@@ -4,7 +4,7 @@ int main()
 try
 {
 	fast_io::win32_file file("abc.txt","wx");
-//	println(file,"hello world");
+	print(file,"hello world\n");
 }
 catch(std::exception const & e)
 {
