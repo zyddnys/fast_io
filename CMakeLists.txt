@@ -69,4 +69,7 @@ add_executable(define_custom_type "./examples/0007.define_custom_type/define_cus
 add_executable(define_custom_type2 "./examples/0007.define_custom_type/define_custom_type2.cc")
 add_executable(pipe "./examples/0028.pipe/pipe.cc")
 
+add_executable(text_view "./examples/0030.text_view/text_view.cc")
+add_executable(read_text_view "./examples/0030.text_view/read_text_view.cc")
+
 cmake_minimum_required(VERSION 3.10)
