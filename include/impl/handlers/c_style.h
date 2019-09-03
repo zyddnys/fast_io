@@ -4,7 +4,6 @@
 #include"../mode.h"
 #include<system_error>
 #include<memory>
-//#include"exploiting_file_ptr.h"
 
 namespace fast_io
 {
