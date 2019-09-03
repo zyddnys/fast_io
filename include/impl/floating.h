@@ -111,7 +111,46 @@ inline void print(output& out,details::floating_point_default<T> a)
 template<standard_input_stream input>
 inline constexpr void scan(input& in,Floating_point &t)
 {
-//	for(;;);
+/*	bool negative(false);
+	bool has_point(false);
+	while(true)
+	{
+		auto ch(in.get());
+		if((48<=ch&&ch<=57))
+		{
+			t=ch-48;
+			break;
+		}
+		else if(ch=='-')
+		{
+			t=0;
+			negative=true;
+			break;
+		}
+		else if(ch=='.')
+		{
+			t=0;
+			has_point=true;
+			break;
+		}
+	}
+	if(!has_point)
+	{
+		while(true)
+		{
+			auto ch(in.try_get());
+			if(ch.second)
+				break;
+			else if((48<=ch.first&&ch.first<=57))
+			{
+				t=t*10+ch.first-48;
+				break;
+			}
+			else if(ch.first=='E'||ch.first=='e')
+		}
+	}
+	if(negative)
+		t=-t;*/
 }
 
 }
