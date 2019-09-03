@@ -14,7 +14,13 @@ template<typename T>
 concept bool Unsigned_integer=Integral<T>&&!Signed_integer<T>;
 
 template<typename T>
+concept bool Floating_point = std::numeric_limits<T>::is_iec559;
+
+template<typename T>
 concept bool Trivial_copyable=std::is_trivially_copyable_v<T>;
+
+template<typename T>
+concept bool Integral = std::numeric_limits<T>::is_integer;
 
 template<typename Cont>
 concept bool Container()
