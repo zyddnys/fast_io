@@ -26,11 +26,11 @@
 
 namespace fast_io
 {
-#ifdef _WIN32_WINNT
+/*#ifdef _WIN32_WINNT
 using system_file = win32_file;
-#else
+#else*/
 using system_file = posix_file;
-#endif
+//#endif
 
 using iposix_pipe = nobuf_reader<input_wrapper<posix_pipe>>;
 using oposix_pipe = immediately_flush<nobuf_reader<output_wrapper<posix_pipe>>>;
