@@ -95,9 +95,8 @@ public:
 #ifdef _WIN32_WINNT
 		if(ch=='\n')
 			ib.put('\r');
-#else
-		ib.put(ch);
 #endif
+		ib.put(ch);
 	}
 	template<typename Contiguous_iterator>
 	constexpr void write(Contiguous_iterator b,Contiguous_iterator e)
