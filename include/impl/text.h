@@ -92,18 +92,25 @@ public:
 	}
 	constexpr void put(char_type ch)	requires standard_output_stream<T>
 	{
+#ifdef _WIN32_WINNT
 		if(ch=='\n')
 			ib.put('\r');
+#else
 		ib.put(ch);
+#endif
 	}
 	template<typename Contiguous_iterator>
 	constexpr void write(Contiguous_iterator b,Contiguous_iterator e)
 		requires standard_output_stream<T>
 	{
+#ifdef _WIN32_WINNT
 		write_precondition<char_type>(b,e);
 		auto pb(std::addressof(*b));
 		for(auto pi(pb),pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));pi!=pe;++pi)
 			put(*pi);
+#else
+		ib.write(b,e);
+#endif
 	}
 	constexpr void flush() requires standard_output_stream<T>
 	{
