@@ -49,7 +49,7 @@ public:
 			if(internal.first=='\n')
 				return '\n';
 			state.state=true;
-			state.internal_character=internal;
+			state.internal_character=internal.first;
 			return ch;
 		}
 		else
@@ -60,7 +60,7 @@ public:
 		if(state.state)
 		{
 			state.state=false;
-			return state.internal_character;
+			return {state.internal_character,false};
 		}
 		auto ch(ib.try_get());
 		if(ch.second)
@@ -71,7 +71,7 @@ public:
 			if(internal.second)
 				return ch;
 			if(internal.first=='\n')
-				return '\n';
+				return internal;
 			state.state=true;
 			state.internal_character=internal.first;
 			return ch;
