@@ -23,6 +23,8 @@
 #include"impl/erasure.h"
 #include"impl/dynamic.h"
 #include"impl/sync.h"
+#include"impl/streambuf_view.h"
+#include"impl/stream_view.h"
 
 namespace fast_io
 {

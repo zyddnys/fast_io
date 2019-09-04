@@ -92,7 +92,7 @@ public:
 	template<typename ContiguousIterator>
 	ContiguousIterator read(ContiguousIterator begin,ContiguousIterator end)
 	{
-		auto read_bytes(::read(fd,std::addressof(*begin),std::addressof(*end)-std::addressof(*begin)));
+		auto read_bytes(::read(fd,std::addressof(*begin),(end-begin)*sizeof(*begin)));
 		if(read_bytes==-1)
 			throw std::system_error(errno,std::system_category());
 		return begin+(read_bytes/sizeof(*begin));
@@ -100,7 +100,7 @@ public:
 	template<typename ContiguousIterator>
 	ContiguousIterator write(ContiguousIterator begin,ContiguousIterator end)
 	{
-		auto write_bytes(::write(fd,std::addressof(*begin),std::addressof(*end)-std::addressof(*begin)));
+		auto write_bytes(::write(fd,std::addressof(*begin),(end-begin)*sizeof(*begin)));
 		if(write_bytes==-1)
 			throw std::system_error(errno,std::system_category());
 		return begin+(write_bytes/sizeof(*begin));
@@ -318,7 +318,7 @@ public:
 	template<typename ContiguousIterator>
 	ContiguousIterator read(ContiguousIterator begin,ContiguousIterator end)
 	{
-		auto read_bytes(::read(pipes.front(),std::addressof(*begin),std::addressof(*end)-std::addressof(*begin)));
+		auto read_bytes(::read(pipes.front(),std::addressof(*begin),(end-begin)*sizeof(*begin)));
 		if(read_bytes==-1)
 			throw std::system_error(errno,std::system_category());
 		return begin+(read_bytes/sizeof(*begin));
@@ -326,7 +326,7 @@ public:
 	template<typename ContiguousIterator>
 	ContiguousIterator write(ContiguousIterator begin,ContiguousIterator end)
 	{
-		auto write_bytes(::write(pipes.back(),std::addressof(*begin),std::addressof(*end)-std::addressof(*begin)));
+		auto write_bytes(::write(pipes.back(),std::addressof(*begin),(end-begin)*sizeof(*begin)));
 		if(write_bytes==-1)
 			throw std::system_error(errno,std::system_category());
 		return begin+(write_bytes/sizeof(*begin));

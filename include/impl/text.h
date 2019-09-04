@@ -117,7 +117,7 @@ public:
 	}
 };
 
-template<typename stream>
-text_view(stream&) -> text_view<stream>;
+template<stream srm>
+text_view(srm&) -> text_view<srm>;
 
 }
