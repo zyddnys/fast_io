@@ -72,4 +72,10 @@ add_executable(pipe "./examples/0028.pipe/pipe.cc")
 add_executable(text_view "./examples/0030.text_view/text_view.cc")
 add_executable(read_text_view "./examples/0030.text_view/read_text_view.cc")
 
+add_executable(ifstream "./examples/0031.iostream/ifstream.cc")
+add_executable(ofstream "./examples/0031.iostream/ofstream.cc")
+add_executable(sstream "./examples/0031.iostream/sstream.cc")
+add_executable(stream_view "./examples/0031.iostream/stream_view.cc")
+add_executable(streambuf_view "./examples/0031.iostream/streambuf_view.cc")
+
 cmake_minimum_required(VERSION 3.10)
