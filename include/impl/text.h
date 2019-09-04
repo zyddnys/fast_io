@@ -104,9 +104,19 @@ public:
 	{
 #ifdef _WIN32_WINNT
 		write_precondition<char_type>(b,e);
-		auto pb(std::addressof(*b));
-		for(auto pi(pb),pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));pi!=pe;++pi)
-			put(*pi);
+		auto pb(static_cast<char_type const*>(static_cast<void const*>(std::addressof(*b))));
+		auto last(pb);
+		auto pi(pb),pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));
+		for(;pi!=pe;++pi)
+			if(*pi=='\n')
+			{
+				if(last!=pi)
+					ib.write(last,pi-1);
+				ib.put('\r');
+				ib.put('\n');
+				last=pi+1;
+			}
+		ib.write(last,pe);
 #else
 		ib.write(b,e);
 #endif

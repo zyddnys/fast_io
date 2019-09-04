@@ -116,7 +116,7 @@ public:
 		requires standard_output_stream<T>
 	{
 		write_precondition<char_type>(b,e);
-		auto pb(std::addressof(*b));
+		auto pb(static_cast<char_type const*>(static_cast<void const*>(std::addressof(*b))));
 		for(auto pi(pb),pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));pi!=pe;++pi)
 			put(*pi);
 	}
