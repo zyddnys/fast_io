@@ -29,13 +29,27 @@ try
 	}
 	{
 	cqw::timer t("std::ifstream");
-	std::ifstream fin("cfilestar.txt",std::ofstream::binary);
+	std::ifstream fin("cfilestar.txt",std::ifstream::binary);
 	for(std::size_t i(0);i!=N;++i)
 		fin>>v[i];
 	}
 	{
+	cqw::timer t("stream_view for std::ifstream");
+	std::ifstream fin("cfilestar.txt",std::ifstream::binary);
+	fast_io::stream_view view(fin);
+	for(std::size_t i(0);i!=N;++i)
+		scan(view,v[i]);
+	}
+	{
+	cqw::timer t("streambuf_view for std::ifstream");
+	std::ifstream fin("cfilestar.txt",std::ifstream::binary);
+	fast_io::streambuf_view view(fin.rdbuf());
+	for(std::size_t i(0);i!=N;++i)
+		scan(view,v[i]);
+	}
+	{
 	cqw::timer t("ibuf");
-	fast_io::ibuf ibuf("cfilestar.txt",fast_io::open::interface<fast_io::open::binary>);
+	fast_io::ibuf ibuf("cfilestar.txt");
 	for(std::size_t i(0);i!=N;++i)
 		scan(ibuf,v[i]);
 	}
@@ -48,13 +62,13 @@ try
 	}
 	{
 	cqw::timer t("dynamic standard input stream ibuf");
-	fast_io::dynamic_standard_input_stream ibuf(std::in_place_type<fast_io::ibuf>,"cfilestar.txt",fast_io::open::interface<fast_io::open::binary>);
+	fast_io::dynamic_standard_input_stream ibuf(std::in_place_type<fast_io::ibuf>,"cfilestar.txt");
 	for(std::size_t i(0);i!=N;++i)
 		scan(ibuf,v[i]);
 	}
 	{
 	cqw::timer t("ibuf_dynamic isystem_file");
-	fast_io::ibuf_dynamic ibuf(std::in_place_type<fast_io::isystem_file>,"cfilestar.txt",fast_io::open::interface<fast_io::open::binary>);
+	fast_io::ibuf_dynamic ibuf(std::in_place_type<fast_io::isystem_file>,"cfilestar.txt");
 	for(std::size_t i(0);i!=N;++i)
 		scan(ibuf,v[i]);
 	}
