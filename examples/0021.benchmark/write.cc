@@ -12,6 +12,7 @@ try
 {
 	std::size_t constexpr N(10000);
 	std::vector<std::size_t> vec(10000,5);
+//THIS IS A WRONG BENCHMARK!!! You can basically manipulate the result by changing order
 	{
 	cqw::timer t("std::FILE*");
 	std::unique_ptr<std::FILE,decltype(fclose)*> fp(std::fopen("cfilestar.txt","wb"),fclose);
