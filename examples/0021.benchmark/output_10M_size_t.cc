@@ -46,6 +46,20 @@ try
 		println(view,i);
 	}
 	{
+	cqw::timer t("steam_view for ofstream");
+	std::ofstream fout("stream_view_ofstream.txt",std::ofstream::binary);
+	fast_io::stream_view view(fout);
+	for(std::size_t i(0);i!=N;++i)
+		println(view,i);
+	}
+	{
+	cqw::timer t("steambuf_view for ofstream");
+	std::ofstream fout("streambuf_view_ofstream.txt",std::ofstream::binary);
+	fast_io::streambuf_view view(fout.rdbuf());
+	for(std::size_t i(0);i!=N;++i)
+		println(view,i);
+	}
+	{
 	cqw::timer t("obuf ucs_view");
 	fast_io::obuf obuf("obuf_ucsview.txt");
 	fast_io::ucs_view<decltype(obuf),char32_t> uv(obuf);
