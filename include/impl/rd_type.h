@@ -50,7 +50,7 @@ inline void scan(input& in,std::basic_string<typename input::char_type> &str)
 {
 	str.clear();
 	str.push_back(eat_space_get(in));
-	for(decltype(in.try_get()) ch;!details::isspace((ch=in.try_get()).first);str.push_back(ch.first));
+	for(decltype(in.try_get()) ch;!(ch=in.try_get()).second&&!details::isspace(ch.first);str.push_back(ch.first));
 }
 
 template<standard_input_stream input>
