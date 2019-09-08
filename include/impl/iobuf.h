@@ -86,7 +86,10 @@ public:
 		if(bh.end==bh.curr)		//cache miss
 		{
 			if((bh.end=ih.read(bh.beg,bh.beg+Buf::size()))==bh.beg)
+			{
+				bh.curr=bh.beg;
 				return {0,true};
+			}
 			bh.curr=bh.beg;
 		}
 		return {*bh.curr++,false};
@@ -96,7 +99,10 @@ public:
 		if(bh.end==bh.curr)		//cache miss
 		{
 			if((bh.end=ih.read(bh.beg,bh.beg+Buf::size()))==bh.beg)
+			{
+				bh.curr=bh.beg;
 				throw eof();
+			}
 			bh.curr=bh.beg;
 		}
 		return *bh.curr++;
