@@ -41,7 +41,7 @@ public:
 		if(!strm.put(ch))
 			throw std::runtime_error("put() failed for streambuf view");
 	}
-	void flush()
+	void flush() requires fast_io::details::output_stream_impl<T>()
 	{
 		strm.flush();
 	}
