@@ -103,7 +103,7 @@ public:
 		if(bh.end==bh.curr)		//cache miss
 		{
 			if((bh.end=ih.read(bh.beg,bh.beg+Buf::size()))==bh.beg)
-				throw std::runtime_error("Try to read data from EOF stream");
+				throw eof();
 			bh.curr=bh.beg;
 		}
 		return *bh.curr++;

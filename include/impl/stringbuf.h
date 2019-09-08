@@ -32,7 +32,7 @@ public:
 	constexpr char_type get()
 	{
 		if(s.empty())
-			throw std::runtime_error("Try to read data from EOF ibuf string view");
+			throw eof();
 		auto ch(s.front());
 		s.remove_prefix(1);
 		return ch;

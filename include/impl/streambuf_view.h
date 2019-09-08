@@ -27,7 +27,7 @@ public:
 	{
 		auto ch(rdbuf.sbumpc());
 		if(ch==traits_type::eof())
-			throw std::runtime_error("try to get() from EOF streambuf view");
+			throw eof();
 		return traits_type::to_char_type(ch);
 	}
 	std::pair<char_type,bool> try_get()

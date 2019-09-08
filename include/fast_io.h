@@ -1,4 +1,5 @@
 #pragma once
+#include"impl/eof.h"
 #include"impl/concept.h"
 #include"impl/precondition.h"
 #include"impl/mode.h"

@@ -23,6 +23,13 @@ inline constexpr auto eat_space_get(standard_input_stream& in)
 	return ch;
 }
 
+inline constexpr auto try_eat_space_get(standard_input_stream& in)
+{
+	auto ch(in.try_get());
+	for(;details::isspace(ch.first);ch=in.try_get());
+	return ch;
+}
+
 template<standard_input_stream input>
 inline void scan(input& in,Integral& a)
 {

@@ -60,7 +60,11 @@ public:
 	{
 		auto ch(fgetc(fp));
 		if(ch==EOF)
+		{
+			if(feof(fp))
+				throw eof();
 			throw std::system_error(errno,std::system_category());
+		}
 		return ch;
 	}
 	void put(char_type ch)

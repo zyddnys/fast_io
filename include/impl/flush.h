@@ -16,7 +16,7 @@ public:
 		char_type ch;
 		auto address(std::addressof(ch));
 		if(Ihandler::read(address,address+1)==address)
-			throw std::runtime_error("Try to read EOF stream from nobuf_reader");
+			throw eof();
 		return ch;
 	}
 	std::pair<char_type,bool> try_get() requires !standard_input_stream<Ihandler>
