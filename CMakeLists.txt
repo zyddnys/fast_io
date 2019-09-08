@@ -2,10 +2,7 @@ project(fastio)
 find_package(Threads)
 
 
-
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -fconcepts")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -fconcepts")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -fconcepts")
+add_definitions(-fconcepts)
 set(CMAKE_CXX_STANDARD 17)
 
 add_executable(compile "./examples/0000.Hello World/compile.cc")
