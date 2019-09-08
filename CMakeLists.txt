@@ -79,5 +79,5 @@ add_executable(sstream "./examples/0031.iostream/sstream.cc")
 add_executable(stream_view "./examples/0031.iostream/stream_view.cc")
 add_executable(streambuf_view "./examples/0031.iostream/streambuf_view.cc")
 
-add_executable(scan_in_until_eof "./examples/0032.eof/scan_in_until_eof.cc")
+add_executable(scan_int_until_eof "./examples/0032.eof/scan_int_until_eof.cc")
 cmake_minimum_required(VERSION 3.10)
