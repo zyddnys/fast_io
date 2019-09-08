@@ -1,6 +1,6 @@
 #pragma once
 
-#include<windows.h>
+#include<wtypes.h>
 #ifdef interface
 #undef interface			//what a joke. Who did this?
 #endif
