@@ -1,16 +1,6 @@
 #pragma once
 #include<unistd.h>
 #include<fcntl.h>
-#include<stdexcept>
-#include<string_view>
-#include<cstddef>
-#include<type_traits>
-#include"../mode.h"
-#include"../concept.h"
-#include"../seek.h"
-#include<system_error>
-#include<tuple>
-#include<memory>
 
 namespace fast_io
 {

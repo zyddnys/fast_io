@@ -1,8 +1,5 @@
 #pragma once
 
-#include<memory>
-#include<stdexcept>
-
 #include<windows.h>
 #ifdef interface
 #undef interface			//what a joke. Who did this?

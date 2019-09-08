@@ -1,9 +1,4 @@
 #pragma once
-#include"concept.h"
-#include<bitset>
-#include<stdexcept>
-#include<array>
-#include"stringbuf.h"
 
 namespace fast_io
 {

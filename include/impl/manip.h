@@ -1,9 +1,5 @@
 #pragma once
 
-#include"concept.h"
-#include"stringbuf.h"
-#include"rd_type.h"
-#include<type_traits>
 #include<cmath>
 
 namespace fast_io

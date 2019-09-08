@@ -1,6 +1,4 @@
 #pragma once
-#include"concept.h"
-#include<memory>
 
 namespace fast_io
 {

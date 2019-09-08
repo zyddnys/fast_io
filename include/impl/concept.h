@@ -1,9 +1,6 @@
 #pragma once
-#include<utility>
-#include<limits>
-#include<type_traits>
+
 #include"before_cpp20_concept.h"
-#include"seek.h"
 
 namespace fast_io
 {

@@ -1,12 +1,5 @@
 #pragma once
 
-#include<memory>
-#include<string>
-#include<cstddef>
-#include"concept.h"
-#include"precondition.h"
-#include<memory>
-
 namespace fast_io
 {
 template<input_stream Ihandler,typename Buf>

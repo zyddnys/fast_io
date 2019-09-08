@@ -1,9 +1,4 @@
 #pragma once
-#include<cstdio>
-#include<cstddef>
-#include"../mode.h"
-#include<system_error>
-#include<memory>
 
 namespace fast_io
 {

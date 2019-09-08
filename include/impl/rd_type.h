@@ -1,10 +1,4 @@
 #pragma once
-#include<type_traits>
-#include<array>
-#include<stdexcept>
-#include"concept.h"
-#include"stringbuf.h"
-#include<string_view>
 
 namespace fast_io
 {

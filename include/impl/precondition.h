@@ -1,6 +1,4 @@
 #pragma once
-#include"concept.h"
-#include<stdexcept>
 
 namespace fast_io
 {

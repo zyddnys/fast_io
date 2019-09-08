@@ -1,8 +1,5 @@
 #pragma once
 
-#include"concept.h"
-#include"stringbuf.h"
-#include<memory>
 namespace fast_io
 {
 template<output_stream output,typename ostr = basic_ostring<std::string>>			// the output device itself must be atomic

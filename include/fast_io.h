@@ -1,11 +1,26 @@
 #pragma once
+#include<exception>
+#include<cstddef>
+#include<system_error>
+#include<array>
+#include<utility>
+#include<limits>
+#include<type_traits>
+#include<memory>
+#include<type_traits>
+#include<stdexcept>
+#include<string_view>
+#include<string>
+#include<bitset>
+
 #include"impl/eof.h"
+#include"impl/seek.h"
 #include"impl/concept.h"
 #include"impl/precondition.h"
 #include"impl/mode.h"
-#include"impl/handlers/c_style.h"
-#include"impl/mode.h"
 #include"impl/base.h"
+#include"impl/stringbuf.h"
+#include"impl/handlers/c_style.h"
 #include"impl/rd_type.h"
 #include"impl/manip.h"
 #include"impl/read_write.h"
@@ -15,7 +30,6 @@
 #include"impl/handlers/win32.h"
 #endif
 #include"impl/handlers/posix.h"	
-#include"impl/stringbuf.h"
 #include"impl/iobuf.h"
 #include"impl/iomutex.h"
 #include"impl/wrapper.h"
