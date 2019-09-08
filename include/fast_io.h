@@ -20,7 +20,6 @@
 #include"impl/mode.h"
 #include"impl/base.h"
 #include"impl/stringbuf.h"
-#include"impl/handlers/c_style.h"
 #include"impl/rd_type.h"
 #include"impl/manip.h"
 #include"impl/read_write.h"
@@ -29,7 +28,7 @@
 #ifdef _WIN32_WINNT
 #include"impl/handlers/win32.h"
 #endif
-#include"impl/handlers/posix.h"	
+#include"impl/handlers/posix.h"
 #include"impl/iobuf.h"
 #include"impl/iomutex.h"
 #include"impl/wrapper.h"
@@ -93,15 +92,30 @@ using obuf_mutex = basic_iomutex<obuf>;
 using iobuf_mutex = basic_iomutex<iobuf>;
 using istring_view_mutex = basic_iomutex<istring_view>;
 using ostring_mutex = basic_iomutex<ostring>;
-
-using c_style_ohandle = ierasure<c_style_io_handle>;
-using c_style_ihandle = oerasure<c_style_io_handle>;
-inline c_style_ohandle out(stdout);
-inline tie<c_style_ihandle,decltype(out)> in(out,stdin);
-inline tie<immediately_flush<decltype(out)>,decltype(out)> err(out,stderr);
-
-
 using ibuf_dynamic = basic_ibuf<dynamic_input_stream>;
 using obuf_dynamic = basic_obuf<dynamic_output_stream>;
 using iobuf_dynamic = basic_iobuf<dynamic_io_stream>;
 }
+
+#ifdef FAST_IO_IOSTREAM_AS_IO_HANDLE
+#include"impl/handlers/iostreams.h"
+#elif FAST_IO_CSTDIO_AS_IO_HANDLE
+#include"impl/handlers/c_style.h"
+namespace fast_io
+{
+inline c_style_ohandle out(stdout);
+inline tie<c_style_ihandle,decltype(out)> in(out,stdin);
+inline tie<immediately_flush<decltype(out)>,decltype(out)> err(out,stderr);
+
+using c_style_ohandle = ierasure<c_style_io_handle>;
+using c_style_ihandle = oerasure<c_style_io_handle>;
+}
+#else
+namespace fast_io
+{
+inline basic_obuf<system_ohandle> out(1);
+inline tie<basic_ibuf<system_io_handle>,decltype(out)> in(out,0);
+inline tie<immediately_flush<system_ohandle>,decltype(out)> err(out,2);
+inline basic_obuf<system_ohandle> log(3);
+}
+#endif
