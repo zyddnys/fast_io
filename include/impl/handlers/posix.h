@@ -84,7 +84,7 @@ public:
 	{
 		auto read_bytes(::read(fd,std::addressof(*begin),(end-begin)*sizeof(*begin)));
 		if(read_bytes==-1)
-			throw std::system_error(errno,std::system_category());
+			throw std::system_error(errno,std::generic_category());
 		return begin+(read_bytes/sizeof(*begin));
 	}
 	template<typename ContiguousIterator>
@@ -92,14 +92,14 @@ public:
 	{
 		auto write_bytes(::write(fd,std::addressof(*begin),(end-begin)*sizeof(*begin)));
 		if(write_bytes==-1)
-			throw std::system_error(errno,std::system_category());
+			throw std::system_error(errno,std::generic_category());
 		return begin+(write_bytes/sizeof(*begin));
 	}
 	template<typename T>
 	void seek(seek_type_t<T>,Integral i,seekdir s=seekdir::beg)
 	{
 		if(::lseek64(fd,seek_precondition<off64_t,T,char_type>(i),static_cast<int>(s))==-1)
-			throw std::system_error(errno,std::system_category()); 
+			throw std::system_error(errno,std::generic_category()); 
 	}
 	void seek(Integral i,seekdir s=seekdir::beg)
 	{
@@ -109,7 +109,7 @@ public:
 	{
 		// no need fsync. OS can deal with it
 //		if(::fsync(fd)==-1)
-//			throw std::system_error(errno,std::system_category());
+//			throw std::system_error(errno,std::generic_category());
 	}
 
 	posix_io_handle(posix_io_handle const& dp):fd(dup(dp.fd))
@@ -192,7 +192,7 @@ public:
 #else
 		if(::pipe(pipes.data())==-1)
 #endif
-			throw std::system_error(errno,std::system_category());
+			throw std::system_error(errno,std::generic_category());
 	}
 	posix_pipe(posix_pipe&& other) noexcept:pipes(other.pipes)
 	{
@@ -310,7 +310,7 @@ public:
 	{
 		auto read_bytes(::read(pipes.front(),std::addressof(*begin),(end-begin)*sizeof(*begin)));
 		if(read_bytes==-1)
-			throw std::system_error(errno,std::system_category());
+			throw std::system_error(errno,std::generic_category());
 		return begin+(read_bytes/sizeof(*begin));
 	}
 	template<typename ContiguousIterator>
@@ -318,7 +318,7 @@ public:
 	{
 		auto write_bytes(::write(pipes.back(),std::addressof(*begin),(end-begin)*sizeof(*begin)));
 		if(write_bytes==-1)
-			throw std::system_error(errno,std::system_category());
+			throw std::system_error(errno,std::generic_category());
 		return begin+(write_bytes/sizeof(*begin));
 	}
 };
