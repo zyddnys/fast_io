@@ -22,6 +22,7 @@ add_executable(getwhole "./examples/0002.input string/getwhole.cc")
 
 add_executable(output_10M_size_t "./examples/0021.benchmark/output_10M_size_t.cc")
 add_executable(input_10M_size_t "./examples/0021.benchmark/input_10M_size_t.cc")
+add_executable(input_10M_size_t_until_eof "./examples/0021.benchmark/input_10M_size_t_until_eof.cc")
 
 add_executable(hexa+b "./examples/0018.base/hexa+b.cc")
 add_executable(base "./examples/0018.base/base.cc")
