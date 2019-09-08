@@ -1,4 +1,5 @@
 #pragma once
+#include<cstdio>
 
 namespace fast_io
 {

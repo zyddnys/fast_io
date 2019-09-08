@@ -103,12 +103,13 @@ using iobuf_dynamic = basic_iobuf<dynamic_io_stream>;
 #include"impl/handlers/c_style.h"
 namespace fast_io
 {
+
+using c_style_ohandle = ierasure<c_style_io_handle>;
+using c_style_ihandle = oerasure<c_style_io_handle>;
 inline c_style_ohandle out(stdout);
 inline tie<c_style_ihandle,decltype(out)> in(out,stdin);
 inline tie<immediately_flush<decltype(out)>,decltype(out)> err(out,stderr);
 
-using c_style_ohandle = ierasure<c_style_io_handle>;
-using c_style_ihandle = oerasure<c_style_io_handle>;
 }
 #else
 namespace fast_io
