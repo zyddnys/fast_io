@@ -114,49 +114,82 @@ inline void print(standard_output_stream &output,T const& p)
 	print(output,floating_point_default(p,3));
 }
 
-template<standard_input_stream input>
-inline constexpr void scan(input& in,Floating_point &t)
+template<standard_input_stream input,Floating_point T>
+inline constexpr void scan(input& in,T &t)
 {
-/*	bool negative(false);
-	bool has_point(false);
-	while(true)
+	decltype(in.get()) ch;
+	bool negative(false);
+	bool phase2(false);
+	for(;;)
 	{
-		auto ch(in.get());
-		if((48<=ch&&ch<=57))
-		{
-			t=ch-48;
+		ch=in.get();
+		if(48<=ch&&ch<=57)
 			break;
-		}
-		else if(ch=='-')
+		else
 		{
-			t=0;
-			negative=true;
-			break;
-		}
-		else if(ch=='.')
-		{
-			t=0;
-			has_point=true;
-			break;
+			if(ch=='-')
+				negative=true;			
+			else if(ch=='.')
+				phase2=true;
+			else
+				continue;
+			ch=in.get();
+			if(48<=ch&&ch<=57)
+				break;
+			else
+			{
+				negative=false;
+				phase2=false;
+			}
 		}
 	}
-	if(!has_point)
+	t=0;
+	bool phase3(false);
+	if(!phase2)
 	{
 		while(true)
 		{
-			auto ch(in.try_get());
-			if(ch.second)
-				break;
-			else if((48<=ch.first&&ch.first<=57))
+			auto try_ch(in.try_get());
+			if(48<=try_ch.first&&try_ch.first<=57)
+				t=t*10+try_ch.first-48;
+			else if(try_ch.first=='.')
 			{
-				t=t*10+ch.first-48;
+				phase2 = true;
 				break;
 			}
-			else if(ch.first=='E'||ch.first=='e')
+			else if(try_ch.first=='e'||try_ch.first=='E')
+				break;
+			else
+			{
+				if(negative)
+					t=-t;
+				return;
+			}
 		}
 	}
+	if(phase2)
+	{
+		T current(10);
+		for(;;current*=10)
+		{
+			auto try_ch(in.try_get());
+			if(48<=try_ch.first&&try_ch.first<=57)
+				t+=(try_ch.first-48)/current;
+			else if(try_ch.first=='e'||try_ch.first=='E')
+				break;
+			else
+			{
+				if(negative)
+					t=-t;
+				return;
+			}
+		}
+	}
+	std::ptrdiff_t p;
+	scan(in,p);
+	t*=std::pow(10,p);
 	if(negative)
-		t=-t;*/
+		t=-t;
 }
 
 }
