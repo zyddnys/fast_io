@@ -3,9 +3,11 @@
 #ifdef __WINNT__
 #include <winsock2.h>
 #else
-#include <sys/socket.h>
-#include <sys/socket.h>
-#include<netinet/in.h>
+#include<sys/socket.h>
+#include<sys/un.h>
+#include<unistd.h>
+#include<fcntl.h>
+#include<arpa/inet.h>
 #endif
 
 namespace fast_io
@@ -15,7 +17,6 @@ namespace sock
 enum class family
 {
 unspec = AF_UNSPEC,
-unix = AF_UNIX,
 ipx = AF_IPX,
 apple_talk = AF_APPLETALK, 
 ipv4 = AF_INET,
