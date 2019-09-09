@@ -82,4 +82,9 @@ add_executable(scan_int_until_eof "./examples/0032.eof/scan_int_until_eof.cc")
 add_executable(client "./examples/0033.socket/client.cc")
 add_executable(server "./examples/0033.socket/server.cc")
 
+add_executable(double_default "./examples/0009.floating point/double_default.cc")
+add_executable(double_scientific "./examples/0009.floating point/double_scientific.cc")
+add_executable(double_fixed "./examples/0009.floating point/double_fixed.cc")
+add_executable(double_fixed_setw "./examples/0009.floating point/double_fixed_setw.cc")
+
 cmake_minimum_required(VERSION 3.10)
