@@ -111,7 +111,7 @@ inline void print(output& out,details::floating_point_default<T const> a)
 template<Floating_point T>
 inline void print(standard_output_stream &output,T const& p)
 {
-	print(output,floating_point_default(p,3));
+	print(output,floating_point_default(p,5));
 }
 
 template<standard_input_stream input,Floating_point T>
