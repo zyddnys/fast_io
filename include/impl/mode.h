@@ -202,10 +202,5 @@ struct native_interface_t
 };
 inline native_interface_t constexpr native_interface;
 
-struct native_handle_t
-{
-	explicit native_handle_t() = default;
-};
-inline native_handle_t constexpr native_handle;
 
 }

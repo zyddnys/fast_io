@@ -51,7 +51,7 @@ class address
 	std::uint16_t prt;
 	std::string_view add;
 public:
-	constexpr address(std::uint16_t port,std::string_view a=std::string_view()):prt(port),add(a){}
+	constexpr address(std::uint16_t port,std::string_view a=""):prt(port),add(a){}
 	constexpr auto port() const {return prt;}
 	constexpr auto addr() const {return add;}
 };
@@ -62,3 +62,12 @@ public:
 #else
 #include "posix_socket.h"
 #endif
+
+namespace fast_io
+{
+using acceptor_buf = fast_io::basic_iobuf<fast_io::acceptor>;
+using client_buf = fast_io::basic_iobuf<fast_io::client>;
+using acceptor_buf_mutex = fast_io::basic_iomutex<acceptor_buf>;
+using client_buf_mutex = fast_io::basic_iomutex<client_buf>;
+
+}

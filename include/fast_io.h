@@ -117,7 +117,7 @@ namespace fast_io
 inline basic_obuf<system_ohandle> out(1);
 inline tie<basic_ibuf<system_io_handle>,decltype(out)> in(out,0);
 inline tie<immediately_flush<system_ohandle>,decltype(out)> err(out,2);
-inline basic_obuf<system_ohandle> log(3);
+inline basic_obuf<system_ohandle> log(2);
 }
 #endif
 
