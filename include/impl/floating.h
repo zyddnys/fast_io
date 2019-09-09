@@ -31,11 +31,6 @@ inline bool constexpr output_inf(standard_output_stream& out,T e)
 		print(out,"inf");
 		return true;
 	}
-	else if(e == 0)
-	{
-		out.put('0');
-		return true;
-	}
 	return false;
 }
 
@@ -71,6 +66,18 @@ template<Floating_point T>
 inline void print(standard_output_stream& out,details::scientific<T const> a)
 {
 	auto e(a.reference);
+	if(e==0)	//if e==0 then log10 is UNDEFINED
+	{
+		out.put('0');
+		if(a.precision)
+		{
+			out.put('.');
+			for(std::size_t i(0);i!=a.precision;++i)
+				out.put('0');
+		}
+		print(out,"e0");
+		return;
+	}
 	if(e<0)
 	{
 		e=-e;
@@ -95,6 +102,11 @@ template<standard_output_stream output,Floating_point T>
 inline void print(output& out,details::floating_point_default<T const> a)
 {
 	auto e(a.reference);
+	if(e==0)	//if e==0 then log10 is UNDEFINED
+	{
+		out.put('0');
+		return;
+	}
 	if(e<0)
 	{
 		e=-e;
