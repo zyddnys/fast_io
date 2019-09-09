@@ -19,8 +19,8 @@ inline auto constexpr log2_minus_10(-std::log2(10));
 
 }
 
-template<typename T>
-inline void print(standard_output_stream& out,details::fixed<T> a)
+template<Floating_point T>
+inline void print(standard_output_stream& out,details::fixed<T const> a)
 {
 	auto e(a.reference);
 	if(e<0)
@@ -43,8 +43,8 @@ inline void print(standard_output_stream& out,details::fixed<T> a)
 	}
 }
 
-template<typename T>
-inline void print(standard_output_stream& out,details::scientific<T> a)
+template<Floating_point T>
+inline void print(standard_output_stream& out,details::scientific<T const> a)
 {
 	auto e(a.reference);
 	if(e<0)
@@ -67,8 +67,8 @@ inline void print(standard_output_stream& out,details::scientific<T> a)
 	print(out,static_cast<std::uint64_t>(x));
 }
 
-template<standard_output_stream output,typename T>
-inline void print(output& out,details::floating_point_default<T> a)
+template<standard_output_stream output,Floating_point T>
+inline void print(output& out,details::floating_point_default<T const> a)
 {
 	auto e(a.reference);
 	if(e<0)
@@ -111,7 +111,7 @@ inline void print(output& out,details::floating_point_default<T> a)
 template<Floating_point T>
 inline void print(standard_output_stream &output,T const& p)
 {
-	print(output,floating_point_default<T const>(p));
+	print(output,floating_point_default(p,3));
 }
 
 template<standard_input_stream input>

@@ -2,5 +2,5 @@
 
 int main()
 {
-	fprint(fast_io::out,"%\n%\n",5.0,fast_io::fixed(5,3));
+	fprint(fast_io::out,"%\n",5);
 }
