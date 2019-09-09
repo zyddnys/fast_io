@@ -4,5 +4,5 @@ int main()
 {
 	double v;
 	scan(fast_io::in,v);
-	println(fast_io::out,fast_io::scientific(v,3));
+	println(fast_io::out,fast_io::scientific(v,6));
 }

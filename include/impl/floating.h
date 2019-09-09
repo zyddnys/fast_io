@@ -107,8 +107,6 @@ inline void print(standard_output_stream& out,details::scientific<T const> a)
 		return;
 	auto x(std::floor(std::log10(e)));
 	print(out,fixed(e*std::pow(10,-x),a.precision));
-	if(x==0)
-		return;
 	out.put('e');
 	if(x<0)
 	{
