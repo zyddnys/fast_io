@@ -46,6 +46,13 @@ inline void print(output_stream& out,std::exception const &e)
 {
 	print(out,e.what());
 }
+
+inline void print(output_stream& out,std::system_error const &e)
+{
+	auto const& code(e.code());
+	print(out,"std::system_error, value:",code.value(),"\tmessage:",code.message());
+}
+
 template<standard_input_stream input>
 inline void scan(input& in,std::basic_string<typename input::char_type> &str)
 {
