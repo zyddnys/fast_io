@@ -200,4 +200,58 @@ public:
 	}
 };
 using dynamic_io_stream = basic_dynamic_io_stream<char>;
+
+template<typename T>
+class basic_dynamic_standard_io_stream
+{
+public:
+	using char_type = T;
+private:
+	struct base
+	{
+		virtual void write(char_type const*,char_type const*) = 0;
+		virtual void flush() = 0;
+		virtual char_type* read(char_type*,char_type*) = 0;
+		virtual void put(char_type) = 0;
+		virtual char_type get() = 0;
+		virtual std::pair<char_type,bool> try_get() = 0;
+		virtual ~base() = default;
+	};
+	template<standard_io_stream iod>
+	struct derv:base
+	{
+		iod out;
+		template<typename ...Args>
+		derv(std::in_place_type_t<iod>,Args&& ...args):out(std::forward<Args>(args)...){}
+		void write(char_type const* b,char_type const* e) {out.write(b,e);}
+		void flush() {out.flush();}
+		char_type* read(char_type* b,char_type* e) {return out.read(b,e);}
+		void put(char_type ch){up->put(ch);}
+		char_type get() {return out.get();}
+		std::pair<char_type,bool> try_get() {return out.try_get();}
+	};
+	std::unique_ptr<base> up;
+public:
+	template<standard_io_stream P,typename ...Args>
+	basic_dynamic_standard_io_stream(std::in_place_type_t<P>,Args&& ...args):
+		up(new derv<P>(std::in_place_type<P>,std::forward<Args>(args)...)){}
+	template<typename Contiguous_iterator>
+	void write(Contiguous_iterator b,Contiguous_iterator e)
+	{
+		up->write(static_cast<char_type const*>(static_cast<void const*>(std::addressof(*b))),
+							static_cast<char_type const*>(static_cast<void const*>(std::addressof(*e))));
+	}
+	void flush() { return up->flush();}
+	template<typename Contiguous_iterator>
+	Contiguous_iterator read(Contiguous_iterator b,Contiguous_iterator e)
+	{
+		char_type *pb(static_cast<char_type*>(static_cast<void*>(std::addressof(*b))));
+		char_type *pe(static_cast<char_type*>(static_cast<void*>(std::addressof(*e))));
+		return b+(up->read(pb,pe)-pb)*sizeof(*b)/sizeof(char_type);
+	}
+	void put(char_type ch){up->put(ch);}
+	char_type get() {return up->get();}
+	auto try_get() {return up->try_get();}
+};
+using dynamic_standard_io_stream = basic_dynamic_standard_io_stream<char>;
 }
