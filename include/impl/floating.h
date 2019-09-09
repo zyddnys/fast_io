@@ -36,8 +36,8 @@ inline bool constexpr output_inf(standard_output_stream& out,T e)
 
 }
 
-template<Floating_point T>
-inline void print(standard_output_stream& out,details::fixed<T const> a)
+template<standard_output_stream output,Floating_point T>
+inline void print(output& out,details::fixed<T const> a)
 {
 	auto e(a.reference);
 	if(e<0)
@@ -61,20 +61,20 @@ inline void print(standard_output_stream& out,details::fixed<T const> a)
 		}
 		else
 		{
-			auto p2(p);
-			for(;p2%10==9;p2/=10);
-			if(p2==0)
+			basic_ostring<std::basic_string<typename output::char_type>> ostr;
+			print(ostr,setw(a.precision,pt+1,'0'));
+			if(ostr.str().size()==a.precision)
+			{
+				print(out,u);
+				out.put('.');
+				print(out,ostr.str());
+			}
+			else
 			{
 				print(out,u+1);
 				out.put('.');
 				for(std::size_t i(0);i!=a.precision;++i)
 					out.put('0');
-			}
-			else
-			{
-				print(out,u);
-				out.put('.');
-				print(out,setw(a.precision,pt+1,'0'));
 			}
 		}
 	}
