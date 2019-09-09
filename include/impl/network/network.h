@@ -4,10 +4,9 @@
 #include <winsock2.h>
 #else
 #include<sys/socket.h>
-#include<sys/un.h>
 #include<unistd.h>
-#include<fcntl.h>
 #include<arpa/inet.h>
+#include<fcntl.h>
 #endif
 
 namespace fast_io
@@ -17,10 +16,11 @@ namespace sock
 enum class family
 {
 unspec = AF_UNSPEC,
+local = AF_LOCAL,
 ipx = AF_IPX,
 apple_talk = AF_APPLETALK, 
 ipv4 = AF_INET,
-ipv6 = AF_INET6,
+ipv6 = AF_INET6
 /*icmp = PF_ICMP,
 igmp = PF_IGMP,
 bluetooth_rfcomm = RFCOMM,
