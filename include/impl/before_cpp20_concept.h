@@ -5,22 +5,19 @@ namespace fast_io
 {
 
 template<typename T>
-concept bool Integral = std::numeric_limits<T>::is_integer;
+concept bool Integral = std::is_integral_v<T>;
 
 template<typename T>
-concept bool Signed_integer=Integral<T>&&std::numeric_limits<T>::is_signed;
+concept bool Signed_integer=Integral<T>&&std::is_signed_v<T>;
 
 template<typename T>
 concept bool Unsigned_integer=Integral<T>&&!Signed_integer<T>;
 
 template<typename T>
-concept bool Floating_point = std::numeric_limits<T>::is_iec559;
+concept bool Floating_point = std::is_floating_point_v<T>;
 
 template<typename T>
 concept bool Trivial_copyable=std::is_trivially_copyable_v<T>;
-
-template<typename T>
-concept bool Integral = std::numeric_limits<T>::is_integer;
 
 template<typename Cont>
 concept bool Container()

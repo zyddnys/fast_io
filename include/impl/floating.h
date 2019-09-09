@@ -44,7 +44,7 @@ inline void print(standard_output_stream& out,details::fixed<T> a)
 }
 
 template<typename T>
-void print(standard_output_stream& out,details::scientific<T> a)
+inline void print(standard_output_stream& out,details::scientific<T> a)
 {
 	auto e(a.reference);
 	if(e<0)
@@ -106,6 +106,12 @@ inline void print(output& out,details::floating_point_default<T> a)
 		x=-x;
 	}
 	print(out,static_cast<std::uint64_t>(x));
+}
+
+template<Floating_point T>
+inline void print(standard_output_stream &output,T const& p)
+{
+	print(output,floating_point_default<T const>(p));
 }
 
 template<standard_input_stream input>
