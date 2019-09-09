@@ -1,8 +1,7 @@
+#include<iostream>
 #include"../../include/fast_io.h"
 
 int main()
 {
-	double v;
-	scan(fast_io::in,v);
-	println(fast_io::out,fast_io::fixed(v,3));
+	println(fast_io::out,fast_io::fixed(1.999999999,5));
 }

@@ -47,19 +47,39 @@ inline void print(standard_output_stream& out,details::fixed<T const> a)
 	}
 	if(details::output_inf(out,e))
 		return;
-	std::uint_fast64_t u(e);
-	print(out,u);
+	std::uintmax_t u(e);
 	e-=u;
 	if(a.precision)
 	{
-		out.put('.');
 		auto p(static_cast<decltype(u)>(e*details::exp10_array.at(a.precision+1)));
 		auto md(p%10),pt(p/10);
 		if(md<5||(md==5&&!(pt&1)))
+		{
+			print(out,u);
+			out.put('.');
 			print(out,setw(a.precision,pt,'0'));
+		}
 		else
-			print(out,setw(a.precision,pt+1,'0'));
+		{
+			auto p2(p);
+			for(;p2%10==9;p2/=10);
+			if(p2==0)
+			{
+				print(out,u+1);
+				out.put('.');
+				for(std::size_t i(0);i!=a.precision;++i)
+					out.put('0');
+			}
+			else
+			{
+				print(out,u);
+				out.put('.');
+				print(out,setw(a.precision,pt+1,'0'));
+			}
+		}
 	}
+	else
+		print(out,u);
 }
 
 template<Floating_point T>
