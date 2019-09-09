@@ -8,7 +8,9 @@
 
 namespace fast_io
 {
-enum class socket_family
+namespace sock
+{
+enum class family
 {
 unspec = AF_UNSPEC,
 unix = AF_UNIX,
@@ -22,7 +24,7 @@ bluetooth_rfcomm = RFCOMM,
 icmpv6 = IPPROTO_ICMPV6*/
 };
 
-enum class socket_type
+enum class type
 {
 stream = SOCK_STREAM,
 datagrams =SOCK_DGRAM,
@@ -31,16 +33,16 @@ raw = SOCK_RAW,
 reliable_datagram_layer=SOCK_RDM,
 };
 
-enum class socket_protocal
+enum class protocal
 {
 
 };
 
-/*
-class socket_address
+class address
 {
-sockaddr_in
-};*/
+
+};
+}
 
 }
 #ifdef __WINNT__

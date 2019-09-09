@@ -37,20 +37,21 @@ class socket
 	SOCKET handle;
 public:
 	using native_handle_type = SOCKET;
-	using char_type = char;
 	template<typename ...Args>
 	socket(native_interface_t,Args&& ...args):handle(details::socket(std::forward<Args>(args)...))
 	{
 		if(handle==INVALID_SOCKET)
 			throw std::system_error(details::WSAGetLastError(),std::generic_category());
 	}
-	socket(socket_family const & family,socket_type const &type):socket(native_interface,static_cast<int>(family),static_cast<int>(type),0){}
+	socket(sock::family const & family,sock::type const &type):socket(native_interface,static_cast<int>(family),static_cast<int>(type),0){}
 	auto native_handle() const {return handle;}
 };
 
 class client
 {
-	
+public:
+	using char_type = char;
+
 };
 
 
