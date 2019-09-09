@@ -16,7 +16,7 @@ namespace sock
 enum class family
 {
 unspec = AF_UNSPEC,
-local = AF_LOCAL,
+local = 1,
 ipx = AF_IPX,
 apple_talk = AF_APPLETALK, 
 ipv4 = AF_INET,
