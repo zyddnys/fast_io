@@ -5,6 +5,7 @@ namespace fast_io
 	
 namespace details
 {
+
 template<std::size_t v>
 inline auto constexpr compiler_time_10_exp_calculation()
 {
@@ -17,6 +18,22 @@ inline auto constexpr compiler_time_10_exp_calculation()
 inline auto constexpr exp10_array(compiler_time_10_exp_calculation<20>());
 inline auto constexpr log2_minus_10(-std::log2(10));
 
+template<Floating_point T>
+inline bool constexpr output_inf(standard_output_stream& out,T e)
+{
+	if(e==std::numeric_limits<T>::signaling_NaN()||e==std::numeric_limits<T>::quiet_NaN())
+	{
+		print(out,"nan");
+		return true;		
+	}
+	else if(e==std::numeric_limits<T>::infinity())
+	{
+		print(out,"inf");
+		return true;
+	}
+	return false;
+}
+
 }
 
 template<Floating_point T>
@@ -28,6 +45,8 @@ inline void print(standard_output_stream& out,details::fixed<T const> a)
 		e=-e;
 		out.put('-');
 	}
+	if(details::output_inf(out,e))
+		return;
 	std::uint_fast64_t u(e);
 	print(out,u);
 	e-=u;
@@ -52,17 +71,17 @@ inline void print(standard_output_stream& out,details::scientific<T const> a)
 		e=-e;
 		out.put('-');
 	}
+	if(details::output_inf(out,e))
+		return;
 	auto x(std::floor(std::log10(e)));
-	if(0<x)
-		++x;
-	print(out,fixed(e*std::exp2(x*details::log2_minus_10),a.precision));
+	print(out,fixed(e*std::pow(10,-x),a.precision));
 	if(x==0)
 		return;
 	out.put('e');
 	if(x<0)
 	{
 		out.put('-');
-		print(out,static_cast<std::uint64_t>(-x));
+		x=-x;
 	}
 	print(out,static_cast<std::uint64_t>(x));
 }
@@ -71,39 +90,21 @@ template<standard_output_stream output,Floating_point T>
 inline void print(output& out,details::floating_point_default<T const> a)
 {
 	auto e(a.reference);
-	auto constexpr inf(std::numeric_limits<T>::infinity());
-	if(e==std::numeric_limits<T>::signaling_NaN()||e==std::numeric_limits<T>::quiet_NaN())
-	{
-		print(out,"NaN");
-		return;		
-	}
-	else if(e==inf)
-	{
-		print(out,"inf");
-		return;
-	}
-	else if(e==-inf)
-	{
-		print(out,"-inf");
-	}
 	if(e<0)
 	{
 		e=-e;
 		out.put('-');
 	}
+	if(details::output_inf(out,e))
+		return;
 	auto x(std::floor(std::log10(e)));
-	if(0<x)
-		++x;
 	{
 	auto fix(std::fabs(x)<=a.precision);
 	basic_ostring<std::basic_string<typename output::char_type>> bas;
 	if(fix)
 		print(bas,fixed(e,a.precision));
 	else
-	{
-		print(bas,fixed(10*e*std::exp2(x*details::log2_minus_10),a.precision));
-		--x;
-	}
+		print(bas,fixed(e*std::pow(10,-x),a.precision));
 	auto& str(bas.str());
 	if(str.find('.')!=std::string::npos)
 	{
@@ -155,6 +156,13 @@ inline constexpr void scan(input& in,T &t)
 				{
 					negative=true;
 					t=ch-48;
+					break;
+				}
+				else if(ch=='.')
+				{
+					negative=true;
+					phase2=true;
+					t=0;
 					break;
 				}
 			}
