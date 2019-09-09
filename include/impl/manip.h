@@ -174,12 +174,6 @@ inline void print(output& out,details::setw_t<auto> a)
 	print(out,bas.str());
 }
 
-/*
-inline void print(standard_output_stream& out,double v)
-{
-	print(out,floating_point_default(v,14));
-}*/
-
 }
 
 #include"floating.h"

@@ -242,4 +242,26 @@ inline constexpr void scan(input& in,T &t)
 		t=-t;
 }
 
+inline void print(standard_output_stream& out,details::floating_point_default<Integral const> a)
+{
+	print(out,a.reference);
+}
+
+inline void print(standard_output_stream& out,details::fixed<Integral const> a)
+{
+	print(out,a.reference);
+	if(a.precision)
+	{
+		out.put('.');
+		for(std::size_t i(0);i!=a.precision;++i)
+			out.put('0');
+	}
+}
+
+template<standard_output_stream output>
+inline void print(output& out,details::scientific<Integral const> sc)
+{
+	print(out,scientific(static_cast<long double>(sc.reference),sc.precision));
+}
+
 }
