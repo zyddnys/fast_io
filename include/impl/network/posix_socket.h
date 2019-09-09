@@ -155,7 +155,7 @@ public:
 	template<typename ...Args>
 	server(sock::family const & fm,address const& add,Args&& ...args):soc(fm,std::forward<Args>(args)...)
 	{
-		sockaddr_in servaddr{static_cast<std::int16_t>(fm),htons(add.port())};
+		sockaddr_in servaddr{static_cast<sa_family_t>(fm),htons(add.port()),{},{}};
 		if(::inet_pton(static_cast<int>(fm),add.addr().data(),std::addressof(servaddr.sin_addr))==-1)
 			throw std::system_error(errno,std::generic_category());
 		if(::bind(soc.native_handle(),static_cast<sockaddr const*>(static_cast<void const*>(std::addressof(servaddr))),sizeof(servaddr))==-1)
