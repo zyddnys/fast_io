@@ -48,12 +48,12 @@ udp = IPPROTO_UDP,
 
 class address
 {
-	std::string_view add;
 	std::uint16_t prt;
+	std::string_view add;
 public:
-	constexpr address(std::string_view a,std::uint16_t port):add(a),prt(port){}
-	constexpr auto addr() const {return add;}
+	constexpr address(std::uint16_t port,std::string_view a=std::string_view()):prt(port),add(a){}
 	constexpr auto port() const {return prt;}
+	constexpr auto addr() const {return add;}
 };
 
 }
