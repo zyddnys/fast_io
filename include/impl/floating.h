@@ -31,6 +31,11 @@ inline bool constexpr output_inf(standard_output_stream& out,T e)
 		print(out,"inf");
 		return true;
 	}
+	else if(e == 0)
+	{
+		out.put('0');
+		return true;
+	}
 	return false;
 }
 
