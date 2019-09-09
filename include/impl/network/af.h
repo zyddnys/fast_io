@@ -51,13 +51,7 @@ class address
 	std::string_view add;
 	std::uint16_t prt;
 public:
-	template<typename Contiguous_iterator>
-	constexpr address(Contiguous_iterator cbegin,Contiguous_iterator cend,std::uint16_t port):
-			add(static_cast<void const*>(cbegin),static_cast<void const*>(cend)),prt(port)
-	{
-		if(sizeof(sockaddr{}.sa_data)<add.size())
-			throw std::invalid_argument("address is too long");
-	}
+	constexpr address(std::string_view a,std::uint16_t port):add(a),prt(port){}
 	constexpr auto addr() const {return add;}
 	constexpr auto port() const {return prt;}
 };
