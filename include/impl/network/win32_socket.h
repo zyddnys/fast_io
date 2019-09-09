@@ -12,7 +12,7 @@ inline auto closesocket(reinterpret_cast<decltype(::closesocket)*>(reinterpret_c
 inline auto send(reinterpret_cast<decltype(::send)*>(reinterpret_cast<void(*)()>(GetProcAddress(ws2_32_dll,"send"))));
 inline auto recv(reinterpret_cast<decltype(::recv)*>(reinterpret_cast<void(*)()>(GetProcAddress(ws2_32_dll,"recv"))));
 inline auto htons(reinterpret_cast<decltype(::htons)*>(reinterpret_cast<void(*)()>(GetProcAddress(ws2_32_dll,"htons"))));
-inline auto inet_pton(reinterpret_cast<decltype(::inet_pton)*>(reinterpret_cast<void(*)()>(GetProcAddress(ws2_32_dll,"inet_pton"))));
+inline auto InetPtonW(reinterpret_cast<decltype(::InetPtonW)*>(reinterpret_cast<void(*)()>(GetProcAddress(ws2_32_dll,"InetPtonW"))));
 inline auto bind(reinterpret_cast<decltype(::bind)*>(reinterpret_cast<void(*)()>(GetProcAddress(ws2_32_dll,"bind"))));
 inline auto listen(reinterpret_cast<decltype(::listen)*>(reinterpret_cast<void(*)()>(GetProcAddress(ws2_32_dll,"listen"))));
 inline auto accept(reinterpret_cast<decltype(::accept)*>(reinterpret_cast<void(*)()>(GetProcAddress(ws2_32_dll,"accept"))));
@@ -116,9 +116,9 @@ public:
 	template<typename ...Args>
 	client(sock::family const & fm,address const& add,Args&& ...args):soc(fm,std::forward<Args>(args)...)
 	{
-		auto addr(add.addr());
+		auto addr(fast_io::utf8_to_ucs<std::wstring>(add.addr()));
 		sockaddr_in servaddr{static_cast<std::int16_t>(fm),details::htons(add.port()),{},{}};
-		if(details::inet_pton(static_cast<int>(fm),addr.data(),std::addressof(servaddr.sin_addr))==-1)
+		if(details::InetPtonW(static_cast<int>(fm),addr.data(),std::addressof(servaddr.sin_addr))==-1)
 			throw std::system_error(details::WSAGetLastError(),std::generic_category());
 		if(details::connect(soc.native_handle(),static_cast<sockaddr const*>(static_cast<void const*>(std::addressof(servaddr))),sizeof(servaddr))==-1)
 			throw std::system_error(details::WSAGetLastError(),std::generic_category());
@@ -151,7 +151,8 @@ public:
 	server(sock::family const & fm,address const& add,Args&& ...args):soc(fm,std::forward<Args>(args)...)
 	{
 		sockaddr_in servaddr{static_cast<std::int16_t>(fm),details::htons(add.port()),{},{}};
-		if(details::inet_pton(static_cast<int>(fm),add.addr().data(),std::addressof(servaddr.sin_addr))==-1)
+		auto addr(fast_io::utf8_to_ucs<std::wstring>(add.addr()));
+		if(details::InetPtonW(static_cast<int>(fm),addr.data(),std::addressof(servaddr.sin_addr))==-1)
 			throw std::system_error(details::WSAGetLastError(),std::generic_category());
 		if(details::bind(soc.native_handle(),static_cast<sockaddr const*>(static_cast<void const*>(std::addressof(servaddr))),sizeof(servaddr))==SOCKET_ERROR)
 			throw std::system_error(details::WSAGetLastError(),std::generic_category());
