@@ -124,26 +124,34 @@ inline constexpr void scan(input& in,T &t)
 	{
 		ch=in.get();
 		if(48<=ch&&ch<=57)
+		{
+			t=ch-48;
 			break;
+		}
 		else
 		{
 			if(ch=='-')
-				negative=true;			
-			else if(ch=='.')
-				phase2=true;
-			else
-				continue;
-			ch=in.get();
-			if(48<=ch&&ch<=57)
-				break;
-			else
 			{
-				negative=false;
-				phase2=false;
+				ch=in.get();
+				if(48<=ch&&ch<=57)
+				{
+					negative=true;
+					t=ch-48;
+					break;
+				}
+			}
+			else if(ch=='.')
+			{
+				ch=in.get();
+				if(48<=ch&&ch<=57)
+				{
+					phase2=true;
+					t=0;
+					break;
+				}
 			}
 		}
 	}
-	t=0;
 	if(!phase2)
 	{
 		while(true)
