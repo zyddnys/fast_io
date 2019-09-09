@@ -120,3 +120,5 @@ inline tie<immediately_flush<system_ohandle>,decltype(out)> err(out,2);
 inline basic_obuf<system_ohandle> log(3);
 }
 #endif
+
+#include"impl/network/network.h"
