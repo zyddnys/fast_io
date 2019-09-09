@@ -194,7 +194,7 @@ public:
 			throw std::system_error(details::WSAGetLastError(),std::generic_category());
 		if(details::bind(soc.native_handle(),static_cast<sockaddr const*>(static_cast<void const*>(std::addressof(servaddr))),sizeof(servaddr))==SOCKET_ERROR)
 			throw std::system_error(details::WSAGetLastError(),std::generic_category());
-		if(listen(soc.native_handle(),10)==SOCKET_ERROR)
+		if(details::listen(soc.native_handle(),10)==SOCKET_ERROR)
 			throw std::system_error(details::WSAGetLastError(),std::generic_category());			
 	}
 	auto& handle()
