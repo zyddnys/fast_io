@@ -71,6 +71,21 @@ template<standard_output_stream output,Floating_point T>
 inline void print(output& out,details::floating_point_default<T const> a)
 {
 	auto e(a.reference);
+	auto constexpr inf(std::numeric_limits<T>::infinity());
+	if(e==std::numeric_limits<T>::signaling_NaN()||e==std::numeric_limits<T>::quiet_NaN())
+	{
+		print(out,"NaN");
+		return;		
+	}
+	else if(e==inf)
+	{
+		print(out,"inf");
+		return;
+	}
+	else if(e==-inf)
+	{
+		print(out,"-inf");
+	}
 	if(e<0)
 	{
 		e=-e;
@@ -85,7 +100,10 @@ inline void print(output& out,details::floating_point_default<T const> a)
 	if(fix)
 		print(bas,fixed(e,a.precision));
 	else
-		print(bas,fixed(e*std::exp2(x*details::log2_minus_10),a.precision));
+	{
+		print(bas,fixed(10*e*std::exp2(x*details::log2_minus_10),a.precision));
+		--x;
+	}
 	auto& str(bas.str());
 	if(str.find('.')!=std::string::npos)
 	{
@@ -93,7 +111,7 @@ inline void print(output& out,details::floating_point_default<T const> a)
 		if(!str.empty()&&str.back()=='.')
 			str.pop_back();
 		print(out,str);
-	}
+	}		
 	if(fix)
 		return;
 	}
