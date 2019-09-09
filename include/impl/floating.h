@@ -144,7 +144,6 @@ inline constexpr void scan(input& in,T &t)
 		}
 	}
 	t=0;
-	bool phase3(false);
 	if(!phase2)
 	{
 		while(true)

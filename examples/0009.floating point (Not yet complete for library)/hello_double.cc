@@ -2,5 +2,7 @@
 
 int main()
 {
-	fprint(fast_io::out,"%\n",5);
+	double v;
+	scan(fast_io::in,v);
+	fprint(fast_io::out,"%\n",v);
 }
