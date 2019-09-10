@@ -108,23 +108,6 @@ inline void print(output& out,details::fixed<T const> a)
 				for(std::size_t i(0);i!=a.precision;++i)
 					out.put('0');
 			}
-/*
-			std::uintmax_t pt(ptg);
-			basic_ostring<std::basic_string<typename output::char_type>> ostr;
-			print(ostr,setw(a.precision,pt+1,'0'));
-			if(ostr.str().size()==a.precision)
-			{
-				print(out,u);
-				out.put('.');
-				print(out,ostr.str());
-			}
-			else
-			{
-				print(out,u+1);
-				out.put('.');
-				for(std::size_t i(0);i!=a.precision;++i)
-					out.put('0');
-			}*/
 		}
 	}
 	else
