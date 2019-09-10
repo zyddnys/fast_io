@@ -40,8 +40,9 @@ inline void print(output& out,details::fixed<T const> a)
 	if(a.precision)
 	{
 		auto p(e*pow(10,a.precision+1));
-		auto mdg(fmod(round(p),10)),ptg(round(p)/10);
-		if(mdg<5||(mdg==5&&fmod(p,2)<std::numeric_limits<T>::epsilon()))
+		auto pround(round(p));
+		auto mdg(fmod(pround,10)),ptg(pround/10);
+		if(mdg<5||(mdg==5&&fmod(p,2)==0))
 		{
 			std::basic_string<typename output::char_type> bas;
 			auto pu(u);
@@ -67,47 +68,30 @@ inline void print(output& out,details::fixed<T const> a)
 		}
 		else
 		{
-			auto q(log10(p+1));
-			if(std::numeric_limits<T>::epsilon()<fabs(q-round(q)))
+			++ptg;
+			if(pround+1==round(pow(static_cast<T>(10),-a.precision)))
+				++u;				
+			std::basic_string<typename output::char_type> bas;
+			do
 			{
-				std::basic_string<typename output::char_type> bas;
-				++u;
-				do
-				{
-					bas.push_back(fmod(u,10)+48);
-				}
-				while((u=floor(u/10)));
-				std::reverse(bas.begin(),bas.end());
-				print(out,bas);
-				out.put('.');
-				bas.clear();
-				++ptg;
-				do
-				{
-					if(a.precision<=bas.size())
-						break;
-					bas.push_back(fmod(ptg,10)+48);
-				}
-				while((ptg=floor(ptg/10)));
-				std::reverse(bas.begin(),bas.end());
-				for(std::size_t i(bas.size());i<a.precision;++i)
-					out.put('0');
-				print(out,bas);
+				bas.push_back(fmod(u,10)+48);
 			}
-			else
+			while((u=floor(u/10)));
+			std::reverse(bas.begin(),bas.end());
+			print(out,bas);
+			out.put('.');
+			bas.clear();
+			do
 			{
-				std::basic_string<typename output::char_type> bas;
-				do
-				{
-					bas.push_back(fmod(u,10)+48);
-				}
-				while((u=floor(u/10)));
-				std::reverse(bas.begin(),bas.end());
-				print(out,bas);
-				out.put('.');
-				for(std::size_t i(0);i!=a.precision;++i)
-					out.put('0');
+				if(a.precision<=bas.size())
+					break;
+				bas.push_back(fmod(ptg,10)+48);
 			}
+			while((ptg=floor(ptg/10)));
+			std::reverse(bas.begin(),bas.end());
+			for(std::size_t i(bas.size());i<a.precision;++i)
+				out.put('0');
+			print(out,bas);
 		}
 	}
 	else
