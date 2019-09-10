@@ -11,56 +11,48 @@ namespace fast_io
 {
 
 template<typename T>
-concept bool Trivial_copyable=std::is_trivially_copyable_v<T>;
+concept Trivial_copyable=std::is_trivially_copyable_v<T>;
 
 template<typename Cont>
-concept bool Container()
+concept Container = requires(Cont c)
 {
-	return requires(Cont c)
-	{
-		{begin(c)};
-		{end(c)};
-	};
+	{begin(c)};
+	{end(c)};
 };
 
 template<typename Cont>
-concept bool Dynamic_size_container()
+concept Dynamic_size_container = 
+Container<Cont> && requires(Cont c)
 {
-	return Container<Cont>() && requires(Cont c)
-	{
-		{c.insert};
-		{size(c)};
-	};
+	{c.insert};
+	{size(c)};
 };
 
 template<typename Cont>
-concept bool Contiguous_container()
+concept Contiguous_container = Container<Cont> && requires(Cont c)
 {
-	return Container<Cont>() && requires(Cont c)
-	{
-		{data(c)};
-	};
+	{data(c)};
 };
 
 template<typename Cont>
-concept bool Trivial_copyable_container = Container<Cont>() && Trivial_copyable<typename Cont::value_type>;
+concept Trivial_copyable_container = Container<Cont> && Trivial_copyable<typename Cont::value_type>;
 
 template<typename Cont>
-concept bool Contiguous_trivial_container = Contiguous_container<Cont>() && Trivial_copyable_container<Cont>;
+concept Contiguous_trivial_container = Contiguous_container<Cont> && Trivial_copyable_container<Cont>;
 
 template<typename Cont>
-concept bool Contiguous_dynamic_size_container = Dynamic_size_container<Cont>()&&Contiguous_container<Cont>();
+concept Contiguous_dynamic_size_container = Dynamic_size_container<Cont>&&Contiguous_container<Cont>;
 
 template<typename Cont>
-concept bool Contiguous_trivial_dynamic_size_container = Contiguous_trivial_container<Cont>&&Contiguous_dynamic_size_container<Cont>;
+concept Contiguous_trivial_dynamic_size_container = Contiguous_trivial_container<Cont>&&Contiguous_dynamic_size_container<Cont>;
 
 template<typename Cont>
-concept bool Contiguous_fixed_size_container = Contiguous_container<Cont>()&&!Dynamic_size_container<Cont>();
+concept Contiguous_fixed_size_container = Contiguous_container<Cont>&&!Dynamic_size_container<Cont>;
 
 template<typename Cont>
-concept bool Contiguous_fixed_size_trivial_copyable_container = Contiguous_fixed_size_container<Cont>&& Trivial_copyable_container<Cont>;
+concept Contiguous_fixed_size_trivial_copyable_container = Contiguous_fixed_size_container<Cont>&& Trivial_copyable_container<Cont>;
 
 template<typename Cont>
-concept bool Contiguous_fixed_size_none_trivial_copyable_container =Contiguous_fixed_size_container<Cont>&&!Contiguous_fixed_size_trivial_copyable_container<Cont>;
+concept Contiguous_fixed_size_none_trivial_copyable_container =Contiguous_fixed_size_container<Cont>&&!Contiguous_fixed_size_trivial_copyable_container<Cont>;
 
 }

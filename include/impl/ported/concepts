@@ -6,7 +6,7 @@ Migrator: Cqwrteur
 #define _GLIBCXX_EXPERIMENTAL_CONCEPTS_ 1
 
 #pragma GCC system_header
-#if __cplusplus >= 201703L
+#if __cplusplus > 201703L
 #include <functional>
 #include <type_traits>
 #include "__type_traits.h"
