@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.15)
 project(fastio)
 find_package(Threads)
 
@@ -97,4 +98,3 @@ add_executable(double_fixed "./examples/0009.floating point/double_fixed.cc")
 add_executable(double_fixed_setw "./examples/0009.floating point/double_fixed_setw.cc")
 add_executable(integer_scientific "./examples/0009.floating point/integer_scientific.cc")
 add_executable(floating_view "./examples/0009.floating point/floating_view.cc")
-cmake_minimum_required(VERSION 3.10)
