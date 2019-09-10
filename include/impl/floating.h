@@ -41,8 +41,8 @@ inline void print(output& out,details::fixed<T const> a)
 	{
 		auto p(e*pow(10,a.precision+1));
 		auto pround(round(p));
-		auto mdg(fmod(pround,10)),ptg(pround/10);
-		if(mdg<5||(mdg==5&&fmod(p,2)==0))
+		auto mdg(fmod(p,10)),ptg(floor(p/10));
+		if(mdg<5||(mdg==5&&(fmod(ptg,2)==0||floor(p)!=p)))
 		{
 			std::basic_string<typename output::char_type> bas;
 			auto pu(u);
@@ -79,8 +79,8 @@ inline void print(output& out,details::fixed<T const> a)
 			while((u=floor(u/10)));
 			std::reverse(bas.begin(),bas.end());
 			print(out,bas);
-			out.put('.');
 			bas.clear();
+			out.put('.');
 			do
 			{
 				if(a.precision<=bas.size())
