@@ -54,6 +54,12 @@ try
 		scan(ibuf,v[i]);
 	}
 	{
+	cqw::timer t("ibuf_mutex");
+	fast_io::ibuf ibuf("cfilestar.txt");
+	for(std::size_t i(0);i!=N;++i)
+		scan(ibuf,v[i]);
+	}
+	{
 	cqw::timer t("ibuf text");
 	fast_io::ibuf ibuf("obuf_text.txt");
 	fast_io::text_view view(ibuf);
