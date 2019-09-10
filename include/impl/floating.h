@@ -6,18 +6,6 @@ namespace fast_io
 namespace details
 {
 
-template<std::size_t v>
-inline auto constexpr compiler_time_10_exp_calculation()
-{
-	std::array<std::uint64_t,v> a{1};
-	for(std::size_t i(1);i<a.size();++i)
-		a[i]=a[i-1]*10;
-	return a;
-}
-
-inline auto constexpr exp10_array(compiler_time_10_exp_calculation<20>());
-inline auto constexpr log2_minus_10(-std::log2(10));
-
 template<Floating_point T>
 inline bool constexpr output_inf(standard_output_stream& out,T e)
 {
@@ -47,20 +35,81 @@ inline void print(output& out,details::fixed<T const> a)
 	}
 	if(details::output_inf(out,e))
 		return;
-	std::uintmax_t u(e);
+	auto u(floor(e));
 	e-=u;
 	if(a.precision)
 	{
-		auto p(static_cast<decltype(u)>(e*details::exp10_array.at(a.precision+1)));
-		auto md(p%10),pt(p/10);
-		if(md<5||(md==5&&!(pt&1)))
+		auto p(e*pow(10,a.precision+1));
+		auto mdg(fmod(p,10)),ptg(p/10);
+		if(mdg<5||(mdg==5&&fmod(p,2)==0))
 		{
-			print(out,u);
+			std::basic_string<typename output::char_type> bas;
+			auto pu(u);
+			do
+			{
+				bas.push_back(fmod(pu,10)+48);
+			}
+			while((pu=floor(pu/10)));
+			std::reverse(bas.begin(),bas.end());
+			out.write(bas.cbegin(),bas.cend());
 			out.put('.');
-			print(out,setw(a.precision,pt,'0'));
+			bas.clear();
+			auto pv(ptg);
+			do
+			{
+				bas.push_back(fmod(pv,10)+48);
+			}
+			while((pv=floor(pv/10))&&bas.size()<=a.precision);
+			std::reverse(bas.begin(),bas.end());
+			for(std::size_t i(bas.size());i<a.precision;++i)
+				out.put(48);
+			print(out,bas);
 		}
 		else
 		{
+			auto q(log10(p+1));
+			if(std::numeric_limits<T>::epsilon()<fabs(q-round(q)))
+			{
+				std::basic_string<typename output::char_type> bas;
+				do
+				{
+					bas.push_back(fmod(u,10)+48);
+				}
+				while((u=floor(u/10)));
+				std::reverse(bas.begin(),bas.end());
+				print(out,bas);
+				out.put('.');
+				bas.clear();
+				++ptg;
+				do
+				{
+					if(a.precision<=bas.size())
+						break;
+					bas.push_back(fmod(ptg,10)+48);
+				}
+				while((ptg=floor(ptg/10)));
+				std::reverse(bas.begin(),bas.end());
+				for(std::size_t i(bas.size());i<a.precision;++i)
+					out.put('0');
+				print(out,bas);
+			}
+			else
+			{
+				std::basic_string<typename output::char_type> bas;
+				++u;
+				do
+				{
+					bas.push_back(fmod(u,10)+48);
+				}
+				while((u=floor(u/10)));
+				std::reverse(bas.begin(),bas.end());
+				print(out,bas);
+				out.put('.');
+				for(std::size_t i(0);i!=a.precision;++i)
+					out.put('0');
+			}
+/*
+			std::uintmax_t pt(ptg);
 			basic_ostring<std::basic_string<typename output::char_type>> ostr;
 			print(ostr,setw(a.precision,pt+1,'0'));
 			if(ostr.str().size()==a.precision)
@@ -75,7 +124,7 @@ inline void print(output& out,details::fixed<T const> a)
 				out.put('.');
 				for(std::size_t i(0);i!=a.precision;++i)
 					out.put('0');
-			}
+			}*/
 		}
 	}
 	else

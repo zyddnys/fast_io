@@ -12,6 +12,7 @@
 #include<string_view>
 #include<string>
 #include<bitset>
+#include<algorithm>
 
 #include"impl/eof.h"
 #include"impl/seek.h"
