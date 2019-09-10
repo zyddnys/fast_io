@@ -6,7 +6,7 @@ namespace fast_io
 namespace details
 {
 
-template<Floating_point T>
+template<std::floating_point T>
 inline bool constexpr output_inf(standard_output_stream& out,T e)
 {
 	if(e==std::numeric_limits<T>::signaling_NaN()||e==std::numeric_limits<T>::quiet_NaN())
@@ -24,7 +24,7 @@ inline bool constexpr output_inf(standard_output_stream& out,T e)
 
 }
 
-template<standard_output_stream output,Floating_point T>
+template<standard_output_stream output,std::floating_point T>
 inline void print(output& out,details::fixed<T const> a)
 {
 	auto e(a.reference);
@@ -39,7 +39,7 @@ inline void print(output& out,details::fixed<T const> a)
 	e-=u;
 	if(a.precision)
 	{
-		auto p(e*pow(10,a.precision+1));
+		auto p(e*pow(static_cast<T>(10),a.precision+1));
 		auto pround(round(p));
 		auto mdg(fmod(p,10)),ptg(floor(p/10));
 		if(mdg<5||(mdg==5&&(fmod(ptg,2)==0||floor(p)!=p)))
@@ -98,7 +98,7 @@ inline void print(output& out,details::fixed<T const> a)
 		print(out,u);
 }
 
-template<Floating_point T>
+template<std::floating_point T>
 inline void print(standard_output_stream& out,details::scientific<T const> a)
 {
 	auto e(a.reference);
@@ -132,7 +132,7 @@ inline void print(standard_output_stream& out,details::scientific<T const> a)
 	print(out,static_cast<std::uint64_t>(x));
 }
 
-template<standard_output_stream output,Floating_point T>
+template<standard_output_stream output,std::floating_point T>
 inline void print(output& out,details::floating_point_default<T const> a)
 {
 	auto e(a.reference);
@@ -178,13 +178,13 @@ inline void print(output& out,details::floating_point_default<T const> a)
 	print(out,static_cast<std::uint64_t>(x));
 }
 
-template<Floating_point T>
+template<std::floating_point T>
 inline void print(standard_output_stream &output,T const& p)
 {
 	print(output,floating_point_default(p,6));
 }
 
-template<standard_input_stream input,Floating_point T>
+template<standard_input_stream input,std::floating_point T>
 inline constexpr void scan(input& in,T &t)
 {
 	decltype(in.get()) ch;
@@ -276,12 +276,12 @@ inline constexpr void scan(input& in,T &t)
 		t=-t;
 }
 
-inline void print(standard_output_stream& out,details::floating_point_default<Integral const> a)
+inline void print(standard_output_stream& out,details::floating_point_default<std::integral const> a)
 {
 	print(out,a.reference);
 }
 
-inline void print(standard_output_stream& out,details::fixed<Integral const> a)
+inline void print(standard_output_stream& out,details::fixed<std::integral const> a)
 {
 	print(out,a.reference);
 	if(a.precision)
@@ -293,7 +293,7 @@ inline void print(standard_output_stream& out,details::fixed<Integral const> a)
 }
 
 template<standard_output_stream output>
-inline void print(output& out,details::scientific<Integral const> sc)
+inline void print(output& out,details::scientific<std::integral const> sc)
 {
 	print(out,scientific(static_cast<long double>(sc.reference),sc.precision));
 }

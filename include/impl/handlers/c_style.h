@@ -74,12 +74,12 @@ public:
 			throw std::system_error(errno,std::system_category());
 	}
 	template<typename T>
-	void seek(seek_type_t<T>,Integral i,seekdir s=seekdir::beg)
+	void seek(seek_type_t<T>,std::integral i,seekdir s=seekdir::beg)
 	{
 		if(fseek(fp,seek_precondition<long,T,char_type>(i),static_cast<int>(s)))
 			throw std::system_error(errno,std::system_category()); 
 	}
-	void seek(Integral i,seekdir s=seekdir::beg)
+	void seek(std::integral i,seekdir s=seekdir::beg)
 	{
 		seek(seek_type<char_type>,i,s);
 	}

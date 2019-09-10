@@ -35,8 +35,8 @@ public:
 	using char_type = typename io::char_type;
 	template<typename ...Args>
 	seekerasure(Args&& ...args):io(std::forward<Args>(args)...){}
-	void seek(Integral,seekdir)=delete;
-	template<typename T> void seek(seek_type_t<T>,Integral,seekdir) = delete;
+	void seek(std::integral,seekdir)=delete;
+	template<typename T> void seek(seek_type_t<T>,std::integral,seekdir) = delete;
 };
 
 

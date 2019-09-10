@@ -10,7 +10,7 @@ inline constexpr void write_precondition(Contiguous_iterator b,Contiguous_iterat
 			throw std::runtime_error("incorrect write size");
 }
 
-template<Signed_integer offset_type,typename T,typename char_type, Integral integr>
+template<std::signed_integral offset_type,typename T,typename char_type, std::integral integr>
 inline constexpr auto seek_precondition(integr i)
 {
 	std::make_unsigned_t<offset_type> constexpr offset_max(std::numeric_limits<offset_type>::max());

@@ -12,13 +12,13 @@ struct char_view_t
 	T& reference;
 };
 
-template<Integral T>
+template<std::integral T>
 struct unsigned_view_t
 {
 	T& reference;
 };
 
-template<Integral T>
+template<std::integral T>
 struct signed_view_t
 {
 	T& reference;
@@ -31,7 +31,7 @@ struct setw_t
 	T& reference;
 };
 
-template<typename T,Integral char_type>
+template<typename T,std::integral char_type>
 struct setw_fill_t
 {
 	std::size_t width;
@@ -60,59 +60,59 @@ public:
 	std::size_t precision;
 };
 }
-template<Integral T>
+template<std::integral T>
 inline constexpr details::char_view_t<T> char_view(T& ch)
 {
 	return {ch};
 }
-template<Integral T>
+template<std::integral T>
 inline constexpr details::char_view_t<T const> char_view(T const& ch)
 {
 	return {ch};
 }
 
-template<Integral T>
-inline constexpr decltype(auto) unsigned_view(T& integral)
+template<std::integral T>
+inline constexpr decltype(auto) unsigned_view(T& value)
 {
-	return reinterpret_cast<std::make_unsigned_t<T>&>(integral);
+	return reinterpret_cast<std::make_unsigned_t<T>&>(value);
 }
 
-template<Integral T>
-inline constexpr decltype(auto) signed_view(T& integral)
+template<std::integral T>
+inline constexpr decltype(auto) signed_view(T& value)
 {
-	return reinterpret_cast<std::make_signed_t<T>&>(integral);
+	return reinterpret_cast<std::make_signed_t<T>&>(value);
 }
 
-template<Integral T>
-inline constexpr decltype(auto) unsigned_view(T const& integral)
+template<std::integral T>
+inline constexpr decltype(auto) unsigned_view(T const& value)
 {
-	return reinterpret_cast<std::make_unsigned_t<T const>&>(integral);
+	return reinterpret_cast<std::make_unsigned_t<T const>&>(value);
 }
 
-inline constexpr decltype(auto) floating_view(Integral const& integral)
+inline constexpr decltype(auto) floating_view(std::integral const& value)
 {
-	return static_cast<long double>(integral);
+	return static_cast<long double>(value);
 }
 
-inline constexpr decltype(auto) floating_view(Floating_point const& p)
+inline constexpr decltype(auto) floating_view(std::floating_point const& p)
 {
 	return p;
 }
 
-inline constexpr decltype(auto) unsigned_view(Floating_point const& f)
+inline constexpr decltype(auto) unsigned_view(std::floating_point const& f)
 {
 	return static_cast<std::uintmax_t>(f);
 }
 
-inline constexpr decltype(auto) signed_view(Floating_point const& f)
+inline constexpr decltype(auto) signed_view(std::floating_point const& f)
 {
 	return static_cast<std::intmax_t>(f);
 }
 
-template<Integral T>
-inline constexpr decltype(auto) signed_view(T const& integral)
+template<std::integral T>
+inline constexpr decltype(auto) signed_view(T const& value)
 {
-	return reinterpret_cast<std::make_signed_t<T const>&>(integral);
+	return reinterpret_cast<std::make_signed_t<T const>&>(value);
 }
 
 inline constexpr std::size_t unsigned_view(auto * const pointer)
@@ -120,33 +120,33 @@ inline constexpr std::size_t unsigned_view(auto * const pointer)
 	return reinterpret_cast<std::size_t>(pointer);
 }
 
-template<Floating_point T>
+template<std::floating_point T>
 inline constexpr details::char_view_t<T const> char_view(T const& ch)
 {
 	return {ch};
 }
 
-template<Floating_point T>
+template<std::floating_point T>
 inline constexpr details::char_view_t<T> char_view(T& ch)
 {
 	return {ch};
 }
 
 /*
-template<Integral T>
-inline constexpr details::unsigned_view_t<T const> unsigned_view(T const& integral)
+template<std::integral T>
+inline constexpr details::unsigned_view_t<T const> unsigned_view(T const& value)
 {
-	return {integral};
+	return {std::integral};
 }
 
-template<Integral T>
-inline constexpr details::signed_view_t<T const> signed_view(T const& integral)
+template<std::integral T>
+inline constexpr details::signed_view_t<T const> signed_view(T const& value)
 {
-	return {integral};
+	return {std::integral};
 }*/
 
 //	template<template T>
-//	requires requires std::is_floating_point_v<T>
+//	requires requires std::is_std::floating_point_v<T>
 template<typename T>
 inline constexpr details::fixed<T const> fixed(T const &f,std::size_t precision)
 {
@@ -163,22 +163,22 @@ inline constexpr details::floating_point_default<T const> floating_point_default
 	return {f,precision};
 }
 
-inline void scan(standard_input_stream& in,details::char_view_t<Integral> a)
+inline void scan(standard_input_stream& in,details::char_view_t<std::integral> a)
 {
 	a.reference = in.get();
 }
 
-inline void print(standard_output_stream& out,details::char_view_t<Integral> a)
+inline void print(standard_output_stream& out,details::char_view_t<std::integral> a)
 {
 	out.put(a.reference);
 }
 
-inline void scan(standard_input_stream& in,details::char_view_t<Floating_point> a)
+inline void scan(standard_input_stream& in,details::char_view_t<std::floating_point> a)
 {
 	a.reference = in.get();
 }
 
-inline void print(standard_output_stream& out,details::char_view_t<Floating_point> a)
+inline void print(standard_output_stream& out,details::char_view_t<std::floating_point> a)
 {
 	out.put(a.reference);
 }
@@ -189,14 +189,14 @@ inline details::setw_t<T const> setw(std::size_t width,T const&t)
 	return {width,t};
 }
 
-template<typename T,Integral char_type>
+template<typename T,std::integral char_type>
 inline constexpr details::setw_fill_t<T const,char_type> setw(std::size_t width,T const&t,char_type ch)
 {
 	return {width,t,ch};
 }
 
 template<standard_output_stream output>
-inline void print(output& out,details::setw_fill_t<auto,Integral> a)
+inline void print(output& out,details::setw_fill_t<auto,std::integral> a)
 {
 	basic_ostring<std::basic_string<typename output::char_type>> bas;
 	print(bas,a.reference);

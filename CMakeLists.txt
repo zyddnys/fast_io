@@ -1,9 +1,18 @@
 project(fastio)
 find_package(Threads)
 
-
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 add_definitions(-fconcepts)
-set(CMAKE_CXX_STANDARD 17)
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  # using Visual Studio C++
+add_definitions(/experimental:concepts)
+#if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+#if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+else()
+message(FATAL_ERROR "Your compiler does not support concepts lite.")
+endif()
+
+set(CMAKE_CXX_STANDARD 20)
 
 add_executable(compile "./examples/0000.Hello World/compile.cc")
 add_executable(hello_world "./examples/0000.Hello World/hello_world.cc")
@@ -88,5 +97,4 @@ add_executable(double_fixed "./examples/0009.floating point/double_fixed.cc")
 add_executable(double_fixed_setw "./examples/0009.floating point/double_fixed_setw.cc")
 add_executable(integer_scientific "./examples/0009.floating point/integer_scientific.cc")
 add_executable(floating_view "./examples/0009.floating point/floating_view.cc")
-
 cmake_minimum_required(VERSION 3.10)

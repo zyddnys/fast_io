@@ -5,7 +5,7 @@ int main()
 	using namespace fast_io;
 	fast_io::obuf ob("emoji.txt");
 	fast_io::ucs_view<decltype(ob),char32_t> view(ob);
-	std::string_view const emoji(u8"☭🚄😀我wubi😄😊😉😍😘😚😜😝😳😁😣😢😂😭😪😥😰😩㍿🀀🀁🀂🀃🀄🀅🀆🀇🀈🀉🀊🀋🀌🀍🀎🀏");
+	std::string_view const emoji("☭🚄😀我wubi😄😊😉😍😘😚😜😝😳😁😣😢😂😭😪😥😰😩㍿🀀🀁🀂🀃🀄🀅🀆🀇🀈🀉🀊🀋🀌🀍🀎🀏");
 	println(ob,"original emoji string:\n",emoji);
 	for(auto const & e : emoji)
 		print(ob,unsigned_view(e)," ");

@@ -4,7 +4,7 @@ namespace fast_io
 {
 namespace details
 {
-inline constexpr bool isspace(Integral ch)
+inline constexpr bool isspace(std::integral ch)
 {
 	return ch==0x20||ch==0x0a||ch==0x0d||ch==0x09||ch==0x0b;
 }
@@ -25,13 +25,13 @@ inline constexpr auto try_eat_space_get(standard_input_stream& in)
 }
 
 template<standard_input_stream input>
-inline void scan(input& in,Integral& a)
+inline void scan(input& in,std::integral& a)
 {
 	details::input_base_number<10>(in,a);
 }
 
 template<standard_output_stream output>
-inline constexpr void print(output& out,Integral a)
+inline constexpr void print(output& out,std::integral a)
 {
 	details::output_base_number<10,false>(out,a);
 }

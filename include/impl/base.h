@@ -7,7 +7,7 @@ namespace details
 {
 	
 template<char base,bool uppercase,standard_output_stream output>
-inline void output_base_number(output& out,Unsigned_integer a)
+inline void output_base_number(output& out,std::unsigned_integral a)
 {
 //number: 0:48 9:57
 //upper: 65 :A 70: F
@@ -42,7 +42,7 @@ inline void output_base_number(output& out,Unsigned_integer a)
 		out.put(48);
 }
 
-template<char base,bool uppercase,Signed_integer T>
+template<char base,bool uppercase,std::signed_integral T>
 inline void output_base_number(standard_output_stream& out,T a)
 {
 	if(a<0)
@@ -54,7 +54,7 @@ inline void output_base_number(standard_output_stream& out,T a)
 }
 
 template<char base>
-inline constexpr void input_base_number(standard_input_stream& in,Unsigned_integer& a)
+inline constexpr void input_base_number(standard_input_stream& in,std::unsigned_integral& a)
 {
 	auto constexpr baseed(48+base);
 	while(true)
@@ -98,7 +98,7 @@ inline constexpr void input_base_number(standard_input_stream& in,Unsigned_integ
 	}
 }
 template<char base>
-inline constexpr void input_base_number(standard_input_stream& in,Signed_integer& a)
+inline constexpr void input_base_number(standard_input_stream& in,std::signed_integral& a)
 {
 	auto constexpr baseed(48+base);
 	bool rev(false);
@@ -181,13 +181,13 @@ template<typename T> inline constexpr details::base_t<2,false,T> bin(T& t){retur
 template<typename T> inline constexpr details::base_t<2,false,T const> bin(T const& t) {return {t};}
 
 template<std::size_t base,bool uppercase>
-inline constexpr void print(standard_output_stream& out,details::base_t<base,uppercase,Integral> v)
+inline constexpr void print(standard_output_stream& out,details::base_t<base,uppercase,std::integral> v)
 {
 	details::output_base_number<base,uppercase>(out,v.reference);
 }
 
 template<std::size_t base,bool uppercase>
-inline constexpr void scan(standard_input_stream& in,details::base_t<base,uppercase,Integral> v)
+inline constexpr void scan(standard_input_stream& in,details::base_t<base,uppercase,std::integral> v)
 {
 	details::input_base_number<base>(in,v.reference);
 }

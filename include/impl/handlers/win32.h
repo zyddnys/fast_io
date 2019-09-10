@@ -72,7 +72,7 @@ public:
 	}
 
 	template<typename T>
-	void seek(seek_type_t<T>,Integral i,seekdir s=seekdir::beg)
+	void seek(seek_type_t<T>,std::integral i,seekdir s=seekdir::beg)
 	{
 		LONG distance_to_move_high(0);
 		if(SetFilePointer(mhandle,seek_precondition<LONG,T,char_type>(i),std::addressof(distance_to_move_high),static_cast<DWORD>(s))== INVALID_SET_FILE_POINTER)
@@ -82,7 +82,7 @@ public:
 				throw win32_error(last_error);
 		}
 	}
-	void seek(Integral i,seekdir s=seekdir::beg)
+	void seek(std::integral i,seekdir s=seekdir::beg)
 	{
 		seek(seek_type<char_type>,i,s);
 	}

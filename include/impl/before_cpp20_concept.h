@@ -1,20 +1,14 @@
 #pragma once
 // Since the library is written before C++20. Will use standard libraries concepts after C++ 20 being official published. PLEASE Do not use these concepts!!!
+#include<type_traits>
+#ifdef __cpp_lib_concepts
+#include<concepts>
+#else
+#include"ported/concepts"		//use my migrated version of concepts
+#endif
 
 namespace fast_io
 {
-
-template<typename T>
-concept bool Integral = std::is_integral_v<T>;
-
-template<typename T>
-concept bool Signed_integer=Integral<T>&&std::is_signed_v<T>;
-
-template<typename T>
-concept bool Unsigned_integer=Integral<T>&&!Signed_integer<T>;
-
-template<typename T>
-concept bool Floating_point = std::is_floating_point_v<T>;
 
 template<typename T>
 concept bool Trivial_copyable=std::is_trivially_copyable_v<T>;

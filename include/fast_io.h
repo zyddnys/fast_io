@@ -7,16 +7,15 @@
 #include<limits>
 #include<type_traits>
 #include<memory>
-#include<type_traits>
 #include<stdexcept>
 #include<string_view>
 #include<string>
 #include<bitset>
 #include<algorithm>
 
+#include"impl/concept.h"
 #include"impl/eof.h"
 #include"impl/seek.h"
-#include"impl/concept.h"
 #include"impl/precondition.h"
 #include"impl/mode.h"
 #include"impl/base.h"

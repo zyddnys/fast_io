@@ -96,12 +96,12 @@ public:
 		return begin+(write_bytes/sizeof(*begin));
 	}
 	template<typename T>
-	void seek(seek_type_t<T>,Integral i,seekdir s=seekdir::beg)
+	void seek(seek_type_t<T>,std::integral i,seekdir s=seekdir::beg)
 	{
 		if(::lseek64(fd,seek_precondition<off64_t,T,char_type>(i),static_cast<int>(s))==-1)
 			throw std::system_error(errno,std::generic_category()); 
 	}
-	void seek(Integral i,seekdir s=seekdir::beg)
+	void seek(std::integral i,seekdir s=seekdir::beg)
 	{
 		seek(seek_type<char_type>,i,s);
 	}
