@@ -40,8 +40,8 @@ inline void print(output& out,details::fixed<T const> a)
 	if(a.precision)
 	{
 		auto p(e*pow(10,a.precision+1));
-		auto mdg(fmod(p,10)),ptg(p/10);
-		if(mdg<5||(mdg==5&&fmod(p,2)==0))
+		auto mdg(fmod(round(p),10)),ptg(round(p)/10);
+		if(mdg<5||(mdg==5&&fmod(p,2)<std::numeric_limits<T>::epsilon()))
 		{
 			std::basic_string<typename output::char_type> bas;
 			auto pu(u);
