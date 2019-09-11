@@ -23,19 +23,19 @@ try
 	cqw::timer t("std::FILE*");
 	std::unique_ptr<std::FILE,decltype(fclose)*> fp(std::fopen("cfilestardb.txt","wb"),fclose);
 	for(std::size_t i(0);i!=N;++i)
-		fprintf(fp.get(),"%.10f\n",vec[i]);
+		fprintf(fp.get(),"%.6f\n",vec[i]);
 	}
 	{
 	cqw::timer t("std::ofstream");
 	std::ofstream fout("ofstreamdb.txt",std::ofstream::binary);
-	fout<<std::scientific<<std::setprecision(10);
+	fout<<std::fixed<<std::setprecision(6);
 	for(std::size_t i(0);i!=N;++i)
 		fout<<vec[i]<<'\n';
 	}
 	{
 	cqw::timer t("std::ofstream with tricks");
 	std::ofstream fout("ofstream_tricksdb.txt",std::ofstream::binary);
-	fout<<std::scientific<<std::setprecision(10);
+	fout<<std::fixed<<std::setprecision(6);
 	auto &rdbuf(*fout.rdbuf());
 	for(std::size_t i(0);i!=N;++i)
 	{
@@ -47,7 +47,7 @@ try
 	cqw::timer t("obuf");
 	fast_io::obuf obuf("obufdb.txt");
 	for(std::size_t i(0);i!=N;++i)
-		println(obuf,fast_io::scientific(vec[i],10));
+		println(obuf,fast_io::fixed(vec[i],6));
 	}
 }
 catch(std::exception const& e)
