@@ -100,6 +100,13 @@ inline constexpr void fprint(output &out,Args&& ...args)
 }
 
 template<mutex_output_stream output,typename ...Args>
+inline constexpr void write(output& out,Args&& ...args)
+{
+	std::lock_guard lg(out.mutex());
+	write(out.native_handle(),std::forward<Args>(args)...);
+}
+
+template<mutex_output_stream output,typename ...Args>
 inline constexpr void print_flush(output &out,Args&& ...args)
 {
 	std::lock_guard lg{out.mutex()};
