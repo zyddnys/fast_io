@@ -55,7 +55,7 @@ try
 	}
 	{
 	cqw::timer t("ibuf_mutex");
-	fast_io::ibuf ibuf("cfilestar.txt");
+	fast_io::ibuf_mutex ibuf("cfilestar.txt");
 	for(std::size_t i(0);i!=N;++i)
 		scan(ibuf,v[i]);
 	}

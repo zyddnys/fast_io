@@ -89,22 +89,26 @@ inline constexpr decltype(auto) unsigned_view(T const& value)
 	return reinterpret_cast<std::make_unsigned_t<T const>&>(value);
 }
 
-inline constexpr decltype(auto) floating_view(std::integral const& value)
+template<std::integral T>
+inline constexpr decltype(auto) floating_view(T const& value)
 {
 	return static_cast<long double>(value);
 }
 
-inline constexpr decltype(auto) floating_view(std::floating_point const& p)
+template<std::floating_point F>
+inline constexpr decltype(auto) floating_view(F const& p)
 {
 	return p;
 }
 
-inline constexpr decltype(auto) unsigned_view(std::floating_point const& f)
+template<std::floating_point F>
+inline constexpr decltype(auto) unsigned_view(F const& f)
 {
 	return static_cast<std::uintmax_t>(f);
 }
 
-inline constexpr decltype(auto) signed_view(std::floating_point const& f)
+template<std::floating_point F>
+inline constexpr decltype(auto) signed_view(F const& f)
 {
 	return static_cast<std::intmax_t>(f);
 }
@@ -115,7 +119,8 @@ inline constexpr decltype(auto) signed_view(T const& value)
 	return reinterpret_cast<std::make_signed_t<T const>&>(value);
 }
 
-inline constexpr std::size_t unsigned_view(auto * const pointer)
+template<typename T>
+inline constexpr std::size_t unsigned_view(T * const pointer)
 {
 	return reinterpret_cast<std::size_t>(pointer);
 }
@@ -132,21 +137,6 @@ inline constexpr details::char_view_t<T> char_view(T& ch)
 	return {ch};
 }
 
-/*
-template<std::integral T>
-inline constexpr details::unsigned_view_t<T const> unsigned_view(T const& value)
-{
-	return {std::integral};
-}
-
-template<std::integral T>
-inline constexpr details::signed_view_t<T const> signed_view(T const& value)
-{
-	return {std::integral};
-}*/
-
-//	template<template T>
-//	requires requires std::is_std::floating_point_v<T>
 template<typename T>
 inline constexpr details::fixed<T const> fixed(T const &f,std::size_t precision)
 {
@@ -163,22 +153,25 @@ inline constexpr details::floating_point_default<T const> floating_point_default
 	return {f,precision};
 }
 
-inline void scan(standard_input_stream& in,details::char_view_t<std::integral> a)
+template<standard_input_stream input,std::integral T>
+inline void scan(input& in,details::char_view_t<T> a)
 {
 	a.reference = in.get();
 }
 
-inline void print(standard_output_stream& out,details::char_view_t<std::integral> a)
+template<standard_output_stream output,std::integral T>
+inline void print(output& out,details::char_view_t<T> a)
 {
 	out.put(a.reference);
 }
-
-inline void scan(standard_input_stream& in,details::char_view_t<std::floating_point> a)
+template<standard_input_stream input,std::floating_point T>
+inline void scan(input& in,details::char_view_t<T> a)
 {
 	a.reference = in.get();
 }
 
-inline void print(standard_output_stream& out,details::char_view_t<std::floating_point> a)
+template<standard_output_stream output,std::floating_point T>
+inline void print(output& out,details::char_view_t<T> a)
 {
 	out.put(a.reference);
 }
@@ -195,8 +188,8 @@ inline constexpr details::setw_fill_t<T const,char_type> setw(std::size_t width,
 	return {width,t,ch};
 }
 
-template<standard_output_stream output>
-inline void print(output& out,details::setw_fill_t<auto,std::integral> a)
+template<standard_output_stream output,typename T,std::integral U>
+inline void print(output& out,details::setw_fill_t<T,U> a)
 {
 	basic_ostring<std::basic_string<typename output::char_type>> bas;
 	print(bas,a.reference);
@@ -205,8 +198,8 @@ inline void print(output& out,details::setw_fill_t<auto,std::integral> a)
 	print(out,bas.str());
 }
 
-template<standard_output_stream output>
-inline void print(output& out,details::setw_t<auto> a)
+template<standard_output_stream output,typename T>
+inline void print(output& out,details::setw_t<T> a)
 {
 	basic_ostring<std::basic_string<typename output::char_type>> bas;
 	print(bas,a.reference);

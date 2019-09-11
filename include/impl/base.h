@@ -5,9 +5,16 @@ namespace fast_io
 
 namespace details
 {
-	
-template<char base,bool uppercase,standard_output_stream output>
-inline void output_base_number(output& out,std::unsigned_integral a)
+
+template<std::size_t bs,bool uppercase=false>
+struct base_number_upper_constraints
+{
+	explicit base_number_upper_constraints() = default;
+	static constexpr bool value = 2<=bs&&bs<=36&&((bs<=10&&!uppercase)||10<bs);
+};
+
+template<char base,bool uppercase,standard_output_stream output,std::unsigned_integral U>
+inline void output_base_number(output& out,U a)
 {
 //number: 0:48 9:57
 //upper: 65 :A 70: F
@@ -42,8 +49,8 @@ inline void output_base_number(output& out,std::unsigned_integral a)
 		out.put(48);
 }
 
-template<char base,bool uppercase,std::signed_integral T>
-inline void output_base_number(standard_output_stream& out,T a)
+template<char base,bool uppercase,standard_output_stream output,std::signed_integral T>
+inline void output_base_number(output& out,T a)
 {
 	if(a<0)
 	{
@@ -53,8 +60,8 @@ inline void output_base_number(standard_output_stream& out,T a)
 	output_base_number<base,uppercase>(out,static_cast<std::make_unsigned_t<T>>(a));
 }
 
-template<char base>
-inline constexpr void input_base_number(standard_input_stream& in,std::unsigned_integral& a)
+template<char base,standard_input_stream input,std::unsigned_integral U>
+inline constexpr void input_base_number(input& in,U& a)
 {
 	auto constexpr baseed(48+base);
 	while(true)
@@ -97,8 +104,8 @@ inline constexpr void input_base_number(standard_input_stream& in,std::unsigned_
 			return;
 	}
 }
-template<char base>
-inline constexpr void input_base_number(standard_input_stream& in,std::signed_integral& a)
+template<char base,standard_input_stream input, std::signed_integral T>
+inline constexpr void input_base_number(input& in,T& a)
 {
 	auto constexpr baseed(48+base);
 	bool rev(false);
@@ -152,7 +159,7 @@ inline constexpr void input_base_number(standard_input_stream& in,std::signed_in
 }
 
 template<std::size_t bs,bool uppercase,typename T>
-requires 2<=bs&&bs<=36&&((bs<=10&&!uppercase)||10<bs)
+requires base_number_upper_constraints<bs,uppercase>::value
 struct base_t
 {
 	T& reference;
@@ -180,14 +187,14 @@ template<typename T> inline constexpr details::base_t<10,false,T const> dec(T co
 template<typename T> inline constexpr details::base_t<2,false,T> bin(T& t){return {t};}
 template<typename T> inline constexpr details::base_t<2,false,T const> bin(T const& t) {return {t};}
 
-template<std::size_t base,bool uppercase>
-inline constexpr void print(standard_output_stream& out,details::base_t<base,uppercase,std::integral> v)
+template<std::size_t base,bool uppercase,standard_output_stream output,std::integral T>
+inline constexpr void print(output& out,details::base_t<base,uppercase,T> v)
 {
 	details::output_base_number<base,uppercase>(out,v.reference);
 }
 
-template<std::size_t base,bool uppercase>
-inline constexpr void scan(standard_input_stream& in,details::base_t<base,uppercase,std::integral> v)
+template<std::size_t base,bool uppercase,standard_input_stream input,std::integral T>
+inline constexpr void scan(input& in,details::base_t<base,uppercase,T> v)
 {
 	details::input_base_number<base>(in,v.reference);
 }

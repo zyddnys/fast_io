@@ -2,17 +2,21 @@
 
 namespace fast_io
 {
-inline constexpr void read(input_stream&){}
-inline constexpr void write(output_stream&){}
+template<input_stream input>
+inline constexpr void read(input&){}
+template<output_stream output>
+inline constexpr void write(output&){}
 
-inline void read(input_stream& in,Trivial_copyable& v)
+template<input_stream input,Trivial_copyable T>
+inline void read(input& in,T& v)
 {
 	auto address(std::addressof(v));
 	if(in.read(address,address+1)!=(address+1))
 		throw std::runtime_error("cannot read data from input_stream&");
 }
 
-inline void write(output_stream& out,Trivial_copyable const& v)
+template<output_stream output,Trivial_copyable T>
+inline void write(output& out,T const& v)
 {
 	auto address(std::addressof(v));
 	out.write(address,address+1);
@@ -47,49 +51,54 @@ inline void write_size(output& out,std::size_t size)
 	out.put(size);
 }
 
-inline void read(standard_input_stream& in,Dynamic_size_container& v)
+template<standard_input_stream input,Dynamic_size_container D>
+inline void read(input& in,D& v)
 {
 	v.resize(read_size(in));
 	for(auto & e : v)
 		read(in,e);
 }
 
-inline void read(standard_input_stream& in,Contiguous_trivial_dynamic_size_container& v)
+template<standard_input_stream input,Contiguous_trivial_dynamic_size_container D>
+inline void read(input& in,D& v)
 {
 	v.resize(read_size(in));
 	if(in.read(v.begin(),v.end())!=v.end())
 		throw std::runtime_error("read contiguous trivial containers error");
 }
 
-inline void write(standard_output_stream& out,Contiguous_trivial_dynamic_size_container const& v)
+template<standard_output_stream output,Contiguous_trivial_dynamic_size_container D>
+inline void write(output& out,D const& v)
 {
 	write_size(out,v.size());
 	out.write(v.begin(),v.end());
 }
 
-inline void write(standard_output_stream& out,Dynamic_size_container const& v)
+template<standard_output_stream output,Dynamic_size_container D>
+inline void write(output& out,D const& v)
 {
 	write_size(out,v.size());
 	for(auto const& e : v)
 		write(out,e);
 }
 
-inline void write(standard_output_stream& out,Contiguous_fixed_size_none_trivial_copyable_container const& v)
+template<standard_output_stream output,Contiguous_fixed_size_none_trivial_copyable_container D>
+inline void write(output& out,D const& v)
 {
 	for(auto const& e : v)
 		write(out,e);
 }
 
-template<typename T,typename R,typename ...Args>
-inline constexpr void write(output_stream& out,T&& t,R&& r,Args&& ...args)
+template<output_stream output,typename T,typename R,typename ...Args>
+inline constexpr void write(output& out,T&& t,R&& r,Args&& ...args)
 {
 	write(out,std::forward<T>(t));
 	write(out,std::forward<R>(r));
 	write(out,std::forward<Args>(args)...);
 }
 
-template<typename T,typename R,typename ...Args>
-inline constexpr void read(input_stream& in,T&& t,R&& r,Args&& ...args)
+template<input_stream input,typename T,typename R,typename ...Args>
+inline constexpr void read(input& in,T&& t,R&& r,Args&& ...args)
 {
 	read(in,std::forward<T>(t));
 	read(in,std::forward<R>(r));

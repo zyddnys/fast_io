@@ -4,34 +4,37 @@ namespace fast_io
 {
 namespace details
 {
-inline constexpr bool isspace(std::integral ch)
+template<std::integral T>
+inline constexpr bool isspace(T ch)
 {
 	return ch==0x20||ch==0x0a||ch==0x0d||ch==0x09||ch==0x0b;
 }
 }
 
-inline constexpr auto eat_space_get(standard_input_stream& in)
+template<standard_input_stream input>
+inline constexpr auto eat_space_get(input& in)
 {
 	decltype(in.get()) ch(in.get());
 	for(;details::isspace(ch);ch=in.get());
 	return ch;
 }
 
-inline constexpr auto try_eat_space_get(standard_input_stream& in)
+template<standard_input_stream input>
+inline constexpr auto try_eat_space_get(input& in)
 {
 	auto ch(in.try_get());
 	for(;details::isspace(ch.first);ch=in.try_get());
 	return ch;
 }
 
-template<standard_input_stream input>
-inline void scan(input& in,std::integral& a)
+template<standard_input_stream input,std::integral T>
+inline void scan(input& in,T& a)
 {
 	details::input_base_number<10>(in,a);
 }
 
-template<standard_output_stream output>
-inline constexpr void print(output& out,std::integral a)
+template<standard_output_stream output,std::integral T>
+inline constexpr void print(output& out,T const& a)
 {
 	details::output_base_number<10,false>(out,a);
 }
@@ -42,12 +45,14 @@ inline void print(output& out,std::basic_string_view<typename output::char_type>
 	out.write(str.cbegin(),str.cend());
 }
 
-inline void print(output_stream& out,std::exception const &e)
+template<output_stream output>
+inline void print(output& out,std::exception const &e)
 {
 	print(out,e.what());
 }
 
-inline void print(output_stream& out,std::system_error const &e)
+template<output_stream output>
+inline void print(output& out,std::system_error const &e)
 {
 	auto const& code(e.code());
 	print(out,"std::system_error, value:",code.value(),"\tmessage:",code.message());
@@ -116,56 +121,58 @@ inline constexpr void fprint(os &out,std::basic_string_view<typename os::char_ty
 }
 
 
-inline constexpr void scan(input_stream&){}
+template<input_stream input>
+inline constexpr void scan(input&){}
 
-inline constexpr void print(output_stream&){}
+template<output_stream output>
+inline constexpr void print(output&){}
 
-template<typename T,typename R,typename ...Args>
-inline constexpr void scan(input_stream &in,T&& ref,R&& ref1,Args&& ...args)
+template<input_stream input,typename T,typename R,typename ...Args>
+inline constexpr void scan(input &in,T&& ref,R&& ref1,Args&& ...args)
 {
 	scan(in,std::forward<T>(ref));
 	scan(in,std::forward<R>(ref1));
 	scan(in,std::forward<Args>(args)...);
 }
 
-template<typename T,typename R,typename ...Args>
-inline constexpr void print(output_stream &out,T&&cr,R&&cr1,Args&& ...args)
+template<output_stream output,typename T,typename R,typename ...Args>
+inline constexpr void print(output &out,T&&cr,R&&cr1,Args&& ...args)
 {
 	print(out,std::forward<T>(cr));
 	print(out,std::forward<R>(cr1));
 	print(out,std::forward<Args>(args)...);
 }
 
-template<typename ...Args>
-inline constexpr void println(output_stream &out,Args&& ...args)
+template<output_stream output,typename ...Args>
+inline constexpr void println(output &out,Args&& ...args)
 {
 	print(out,std::forward<Args>(args)...);
 	out.put('\n');
 }
 
-template<typename ...Args>
-inline constexpr void print_flush(output_stream &out,Args&& ...args)
+template<output_stream output,typename ...Args>
+inline constexpr void print_flush(output &out,Args&& ...args)
 {
 	print(out,std::forward<Args>(args)...);
 	out.flush();
 }
 
-template<typename ...Args>
-inline constexpr void println_flush(output_stream &out,Args&& ...args)
+template<output_stream output,typename ...Args>
+inline constexpr void println_flush(output &out,Args&& ...args)
 {
 	println(out,std::forward<Args>(args)...);
 	out.flush();
 }
 
-template<typename ...Args>
-inline constexpr void fprint_flush(output_stream &out,Args&& ...args)
+template<output_stream output,typename ...Args>
+inline constexpr void fprint_flush(output &out,Args&& ...args)
 {
 	fprint(out,std::forward<Args>(args)...);
 	out.flush();
 }
 
-template<typename ...Args>
-inline constexpr void write_flush(output_stream& out,Args&& ...args)
+template<output_stream output,typename ...Args>
+inline constexpr void write_flush(output& out,Args&& ...args)
 {
 	write(out,std::forward<Args>(args)...);
 	out.flush();

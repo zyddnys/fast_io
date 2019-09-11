@@ -3,8 +3,20 @@
 namespace fast_io
 {
 
+namespace details
+{
+
 template<stream T,typename CharT>
-requires sizeof(typename T::char_type)<sizeof(CharT)
+struct ucs_char_size_max_cal
+{
+	explicit ucs_char_size_max_cal() = default;
+	static constexpr bool value = sizeof(typename T::char_type)<sizeof(CharT);
+};
+
+}
+
+template<stream T,typename CharT>
+requires details::ucs_char_size_max_cal<T,CharT>::value
 class ucs_view
 {
 	T& ib;

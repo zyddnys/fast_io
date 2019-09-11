@@ -6,8 +6,8 @@ namespace fast_io
 namespace details
 {
 
-template<std::floating_point T>
-inline bool constexpr output_inf(standard_output_stream& out,T e)
+template<standard_output_stream output,std::floating_point T>
+inline bool constexpr output_inf(output& out,T e)
 {
 	if(e==std::numeric_limits<T>::signaling_NaN()||e==std::numeric_limits<T>::quiet_NaN())
 	{
@@ -98,8 +98,8 @@ inline void print(output& out,details::fixed<T const> a)
 		print(out,u);
 }
 
-template<std::floating_point T>
-inline void print(standard_output_stream& out,details::scientific<T const> a)
+template<standard_output_stream output,std::floating_point T>
+inline void print(output& out,details::scientific<T const> a)
 {
 	auto e(a.reference);
 	if(e==0)	//if e==0 then log10 is UNDEFINED
@@ -178,8 +178,8 @@ inline void print(output& out,details::floating_point_default<T const> a)
 	print(out,static_cast<std::uint64_t>(x));
 }
 
-template<std::floating_point T>
-inline void print(standard_output_stream &output,T const& p)
+template<standard_output_stream soutp,std::floating_point T>
+inline void print(soutp &output,T const& p)
 {
 	print(output,floating_point_default(p,6));
 }
@@ -276,12 +276,14 @@ inline constexpr void scan(input& in,T &t)
 		t=-t;
 }
 
-inline void print(standard_output_stream& out,details::floating_point_default<std::integral const> a)
+template<standard_output_stream output,std::integral T>
+inline void print(output& out,details::floating_point_default<T const> a)
 {
 	print(out,a.reference);
 }
 
-inline void print(standard_output_stream& out,details::fixed<std::integral const> a)
+template<standard_output_stream output,std::integral T>
+inline void print(output& out,details::fixed<T const> a)
 {
 	print(out,a.reference);
 	if(a.precision)
@@ -292,8 +294,8 @@ inline void print(standard_output_stream& out,details::fixed<std::integral const
 	}
 }
 
-template<standard_output_stream output>
-inline void print(output& out,details::scientific<std::integral const> sc)
+template<standard_output_stream output,std::integral T>
+inline void print(output& out,details::scientific<T const> sc)
 {
 	print(out,scientific(static_cast<long double>(sc.reference),sc.precision));
 }

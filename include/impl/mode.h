@@ -189,10 +189,11 @@ struct interface_t
 {
 inline static fast_io::open::mode constexpr mode = {om};
 inline static auto constexpr c_style = fast_io::open::c_style(mode);
+explicit interface_t()=default;
 };
 
 template<std::size_t om>
-inline interface_t<om> constexpr interface;
+inline interface_t<om> constexpr interface{};
 
 }
 

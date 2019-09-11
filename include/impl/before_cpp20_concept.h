@@ -3,6 +3,15 @@
 #include<type_traits>
 #ifdef __cpp_lib_concepts
 #include<concepts>
+
+#ifdef _MSC_VER
+namespace std
+{
+template<typename T>
+concept floating_point = std::is_floating_point_v<T>;
+}
+#endif
+
 #else
 #include"ported/concepts"		//use my migrated version of concepts
 #endif

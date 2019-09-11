@@ -64,50 +64,64 @@ public:
 };
 
 
-template<typename ...Args>
-inline constexpr void print(mutex_output_stream &out,Args&& ...args)
+template<mutex_input_stream input,typename ...Args>
+inline constexpr void scan(input &in,Args&& ...args)
+{
+	std::lock_guard lg{in.mutex()};
+	scan(in.native_handle(),std::forward<Args>(args)...);
+}
+
+template<mutex_input_stream input,typename ...Args>
+inline constexpr void read(input &in,Args&& ...args)
+{
+	std::lock_guard lg{in.mutex()};
+	read(in.native_handle(),std::forward<Args>(args)...);
+}
+
+template<mutex_output_stream output,typename ...Args>
+inline constexpr void print(output &out,Args&& ...args)
 {
 	std::lock_guard lg{out.mutex()};
 	print(out.native_handle(),std::forward<Args>(args)...);
 }
 
-template<typename ...Args>
-inline constexpr void println(mutex_output_stream &out,Args&& ...args)
+template<mutex_output_stream output,typename ...Args>
+inline constexpr void println(output &out,Args&& ...args)
 {
 	std::lock_guard lg{out.mutex()};
 	println(out.native_handle(),std::forward<Args>(args)...);
 }
 
-template<typename ...Args>
-inline constexpr void fprint(mutex_output_stream &out,Args&& ...args)
+template<mutex_output_stream output,typename ...Args>
+inline constexpr void fprint(output &out,Args&& ...args)
 {
 	std::lock_guard lg{out.mutex()};
 	fprint(out.native_handle(),std::forward<Args>(args)...);
 }
 
-template<typename ...Args>
-inline constexpr void print_flush(mutex_output_stream &out,Args&& ...args)
+template<mutex_output_stream output,typename ...Args>
+inline constexpr void print_flush(output &out,Args&& ...args)
 {
 	std::lock_guard lg{out.mutex()};
 	print_flush(out.native_handle(),std::forward<Args>(args)...);
 }
 
-template<typename ...Args>
-inline constexpr void println_flush(mutex_output_stream &out,Args&& ...args)
+template<mutex_output_stream output,typename ...Args>
+inline constexpr void println_flush(output &out,Args&& ...args)
 {
 	std::lock_guard lg{out.mutex()};
 	println_flush(out.native_handle(),std::forward<Args>(args)...);
 }
 
-template<typename ...Args>
-inline constexpr void fprint_flush(mutex_output_stream &out,Args&& ...args)
+template<mutex_output_stream output,typename ...Args>
+inline constexpr void fprint_flush(output &out,Args&& ...args)
 {
 	std::lock_guard lg{out.mutex()};
 	fprint_flush(out.native_handle(),std::forward<Args>(args)...);
 }
 
-template<typename ...Args>
-inline constexpr void write_flush(mutex_output_stream& out,Args&& ...args)
+template<mutex_output_stream output,typename ...Args>
+inline constexpr void write_flush(output& out,Args&& ...args)
 {
 	std::lock_guard lg(out.mutex());
 	write_flush(out.native_handle(),std::forward<Args>(args)...);
