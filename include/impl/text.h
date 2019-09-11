@@ -92,7 +92,7 @@ public:
 	}
 	constexpr void put(char_type ch)	requires standard_output_stream<T>
 	{
-#ifdef _WIN32_WINNT
+#if defined(__WINNT__) || defined(_MSC_VER)
 		if(ch=='\n')
 			ib.put('\r');
 #endif
@@ -102,7 +102,7 @@ public:
 	constexpr void write(Contiguous_iterator b,Contiguous_iterator e)
 		requires standard_output_stream<T>
 	{
-#ifdef _WIN32_WINNT
+#if defined(__WINNT__) || defined(_MSC_VER)
 		write_precondition<char_type>(b,e);
 		auto pb(static_cast<char_type const*>(static_cast<void const*>(std::addressof(*b))));
 		auto last(pb);
