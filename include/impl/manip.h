@@ -162,7 +162,7 @@ inline void scan(input& in,details::char_view_t<T> a)
 template<standard_output_stream output,std::integral T>
 inline void print(output& out,details::char_view_t<T> a)
 {
-	out.put(a.reference);
+	out.put(static_cast<typename output::char_type>(a.reference));
 }
 template<standard_input_stream input,std::floating_point T>
 inline void scan(input& in,details::char_view_t<T> a)
@@ -173,7 +173,7 @@ inline void scan(input& in,details::char_view_t<T> a)
 template<standard_output_stream output,std::floating_point T>
 inline void print(output& out,details::char_view_t<T> a)
 {
-	out.put(a.reference);
+	out.put(static_cast<typename output::char_type>(a.reference));
 }
 
 template<typename T>

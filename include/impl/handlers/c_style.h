@@ -73,13 +73,14 @@ public:
 		if(std::fflush(fp))
 			throw std::system_error(errno,std::system_category());
 	}
-	template<typename T>
-	void seek(seek_type_t<T>,std::integral i,seekdir s=seekdir::beg)
+	template<typename T,std::integral U>
+	void seek(seek_type_t<T>,U i,seekdir s=seekdir::beg)
 	{
 		if(fseek(fp,seek_precondition<long,T,char_type>(i),static_cast<int>(s)))
 			throw std::system_error(errno,std::system_category()); 
 	}
-	void seek(std::integral i,seekdir s=seekdir::beg)
+	template<std::integral U>
+	void seek(U i,seekdir s=seekdir::beg)
 	{
 		seek(seek_type<char_type>,i,s);
 	}

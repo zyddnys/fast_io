@@ -9,13 +9,15 @@ struct foo
 };
 
 // standard_input_stream is a CONCEPT. THIS IS NOT OBJECT ORIENTED PROGRAMMING!
-inline constexpr void read(fast_io::standard_input_stream& in, foo& f)
+template<fast_io::standard_input_stream input>
+inline constexpr void read(input& in, foo& f)
 {
 // most standard library containers can all be directly read/write
 	read(in,f.str,f.vec);
 }
 
-inline constexpr void write(fast_io::standard_output_stream& out, foo const& f)
+template<fast_io::standard_output_stream output>
+inline constexpr void write(output& out, foo const& f)
 {
 //Their order must be same with read
 	write(out,f.str,f.vec);

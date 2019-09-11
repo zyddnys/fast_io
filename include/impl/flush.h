@@ -8,7 +8,7 @@ class nobuf_reader:public Ihandler
 {
 public:
 	using char_type = typename Ihandler::char_type;
-	char_type get() requires !standard_input_stream<Ihandler>
+	char_type get()
 	{
 		char_type ch;
 		auto address(std::addressof(ch));
@@ -16,7 +16,7 @@ public:
 			throw eof();
 		return ch;
 	}
-	std::pair<char_type,bool> try_get() requires !standard_input_stream<Ihandler>
+	std::pair<char_type,bool> try_get()
 	{
 		char_type ch;
 		auto address(std::addressof(ch));

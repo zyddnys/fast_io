@@ -98,7 +98,7 @@ public:
 		unsigned_native_char_type constexpr utf8_limit(1<<(native_char_bits-2));
 		if(ch<fair)
 		{
-			ib.put(ch);
+			ib.put(static_cast<native_char_type>(ch));
 			return;
 		}
 		std::array<unsigned_native_char_type,sizeof(char_type)/sizeof(unsigned_native_char_type)+1> v{};

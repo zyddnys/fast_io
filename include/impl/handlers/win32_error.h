@@ -1,5 +1,4 @@
 #pragma once
-
 #include <winsock2.h>
 #include <Ws2tcpip.h>
 #include"../handlers/win32_error.h"

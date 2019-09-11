@@ -48,7 +48,7 @@ inline void print(output& out,details::fixed<T const> a)
 			auto pu(u);
 			do
 			{
-				bas.push_back(fmod(pu,10)+48);
+				bas.push_back(static_cast<typename output::char_type>(fmod(pu,10)+48));
 			}
 			while((pu=floor(pu/10)));
 			std::reverse(bas.begin(),bas.end());
@@ -58,7 +58,7 @@ inline void print(output& out,details::fixed<T const> a)
 			auto pv(ptg);
 			do
 			{
-				bas.push_back(fmod(pv,10)+48);
+				bas.push_back(static_cast<typename output::char_type>(fmod(pv,10)+48));
 			}
 			while((pv=floor(pv/10))&&bas.size()<=a.precision);
 			std::reverse(bas.begin(),bas.end());
@@ -69,12 +69,12 @@ inline void print(output& out,details::fixed<T const> a)
 		else
 		{
 			++ptg;
-			if(pround+1==round(pow(static_cast<T>(10),-a.precision)))
+			if(pround+1==round(pow(static_cast<T>(10),-static_cast<T>(a.precision))))
 				++u;				
 			std::basic_string<typename output::char_type> bas;
 			do
 			{
-				bas.push_back(fmod(u,10)+48);
+				bas.push_back(static_cast<typename output::char_type>(fmod(u,10)+48));
 			}
 			while((u=floor(u/10)));
 			std::reverse(bas.begin(),bas.end());
@@ -85,7 +85,7 @@ inline void print(output& out,details::fixed<T const> a)
 			{
 				if(a.precision<=bas.size())
 					break;
-				bas.push_back(fmod(ptg,10)+48);
+				bas.push_back(static_cast<typename output::char_type>(fmod(ptg,10)+48));
 			}
 			while((ptg=floor(ptg/10)));
 			std::reverse(bas.begin(),bas.end());

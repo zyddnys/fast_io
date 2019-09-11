@@ -28,15 +28,21 @@ inline constexpr auto try_eat_space_get(input& in)
 }
 
 template<standard_input_stream input,std::integral T>
-inline void scan(input& in,T& a)
+requires std::same_as<T,bool>
+inline constexpr void scan(input& in, T& b)
 {
-	details::input_base_number<10>(in,a);
+	auto value(eat_space_get(in));
+	if(value=='0')
+		b=0;
+	else
+		b=1;
 }
 
 template<standard_output_stream output,std::integral T>
-inline constexpr void print(output& out,T const& a)
+requires std::same_as<T,bool>
+inline constexpr void print(output& out, T const& b)
 {
-	details::output_base_number<10,false>(out,a);
+	out.put(b);
 }
 
 template<output_stream output>
@@ -119,7 +125,6 @@ inline constexpr void fprint(os &out,std::basic_string_view<typename os::char_ty
 {
 	details::fprint(out,format,std::forward<Args>(args)...);
 }
-
 
 template<input_stream input>
 inline constexpr void scan(input&){}

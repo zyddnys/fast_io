@@ -11,7 +11,7 @@ int main()
 		seeds.emplace_back(rdv());
 	std::seed_seq sq(seeds.cbegin(),seeds.cend());
 	std::mt19937_64 eng(sq);
-	std::uniform_int_distribution<char> ud(0,61);
+	std::uniform_int_distribution<std::uint16_t> ud(0,61);
 	std::uniform_int_distribution<std::size_t> rlen(8,20);
 	fast_io::obuf ob("pass.txt");
 	for(std::size_t i(0);i!=1000;++i)

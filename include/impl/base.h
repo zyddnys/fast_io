@@ -13,7 +13,7 @@ struct base_number_upper_constraints
 	static constexpr bool value = 2<=bs&&bs<=36&&((bs<=10&&!uppercase)||10<bs);
 };
 
-template<char base,bool uppercase,standard_output_stream output,std::unsigned_integral U>
+template<std::uint8_t base,bool uppercase,standard_output_stream output,std::unsigned_integral U>
 inline void output_base_number(output& out,U a)
 {
 //number: 0:48 9:57
@@ -30,17 +30,17 @@ inline void output_base_number(output& out,U a)
 				--ed;
 				auto temp(a%base);
 				if(temp<10)
-					*ed = temp+48;
+					*ed = static_cast<typename output::char_type>(temp+48);
 				else
 				{
 					if constexpr (uppercase)
-						*ed = temp+55;	
+						*ed = static_cast<typename output::char_type>(temp+55);	
 					else
-						*ed = temp+87;
+						*ed = static_cast<typename output::char_type>(temp+87);
 				}
 			}
 			else
-				*--ed = a%base+48;
+				*--ed = static_cast<typename output::char_type>(a%base+48);
 		}
 		while(a/=base);
 		out.write(ed,v.data()+v.size());
@@ -49,7 +49,7 @@ inline void output_base_number(output& out,U a)
 		out.put(48);
 }
 
-template<char base,bool uppercase,standard_output_stream output,std::signed_integral T>
+template<std::uint8_t base,bool uppercase,standard_output_stream output,std::signed_integral T>
 inline void output_base_number(output& out,T a)
 {
 	if(a<0)
@@ -60,7 +60,7 @@ inline void output_base_number(output& out,T a)
 	output_base_number<base,uppercase>(out,static_cast<std::make_unsigned_t<T>>(a));
 }
 
-template<char base,standard_input_stream input,std::unsigned_integral U>
+template<std::uint8_t base,standard_input_stream input,std::unsigned_integral U>
 inline constexpr void input_base_number(input& in,U& a)
 {
 	auto constexpr baseed(48+base);
@@ -104,7 +104,7 @@ inline constexpr void input_base_number(input& in,U& a)
 			return;
 	}
 }
-template<char base,standard_input_stream input, std::signed_integral T>
+template<std::uint8_t base,standard_input_stream input, std::signed_integral T>
 inline constexpr void input_base_number(input& in,T& a)
 {
 	auto constexpr baseed(48+base);
@@ -197,6 +197,19 @@ template<std::size_t base,bool uppercase,standard_input_stream input,std::integr
 inline constexpr void scan(input& in,details::base_t<base,uppercase,T> v)
 {
 	details::input_base_number<base>(in,v.reference);
+}
+
+
+template<standard_input_stream input,std::integral T>
+inline void scan(input& in,T& a)
+{
+	details::input_base_number<10>(in,a);
+}
+
+template<standard_output_stream output,std::integral T>
+inline constexpr void print(output& out,T const& a)
+{
+	details::output_base_number<10,false>(out,a);
 }
 
 }

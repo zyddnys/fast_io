@@ -8,12 +8,14 @@ struct foo
 
 //fast_io::output_stream is a concept. NOT A TYPE. This is GP not OOP!
 // this needs standard_output_stream since output_stream does not guarantee your type can output character
-inline constexpr void print(fast_io::standard_output_stream& out,foo const& d)
+template<fast_io::standard_output_stream output>
+inline constexpr void print(output& out,foo const& d)
 {
 	print(out,d.str,fast_io::char_view('\t'),d.t);
 }
 
-inline constexpr void scan(fast_io::standard_input_stream& in,foo& d)
+template<fast_io::standard_input_stream input>
+inline constexpr void scan(input& in,foo& d)
 {
 	scan(in,d.str);
 }
