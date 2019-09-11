@@ -48,7 +48,7 @@ inline void write_size(output& out,std::size_t size)
 	auto constexpr limit(static_cast<std::size_t>(1)<<lshift);
 	auto constexpr limitm1(limit-1);
 	for(;limitm1<size;size>>=lshift)
-		out.put(static_cast<ch_type>(size&limitm1|limit));
+		out.put(static_cast<ch_type>((size&limitm1)|limit));
 	out.put(static_cast<ch_type>(size));
 }
 
