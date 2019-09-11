@@ -23,15 +23,15 @@ inline bool constexpr output_inf(output& out,T e)
 }
 
 template<std::floating_point F,std::unsigned_integral U>
-inline constexpr F mpow10(F const &f,U const& u)
+inline constexpr F mpow(F const &f,U const& u)
 {
 	if(u==0)
 		return 1;
 	else if(u==1)
-		return 10;
+		return f;
 	else
 	{
-		F d(mpow10(f,u>>1));
+		F d(mpow(f,u>>1));
 		d*=d;
 		if(u&1)
 			return d*f;
@@ -46,7 +46,7 @@ inline void output_fixed_floats(output& out,T e,std::size_t precision)
 {
 	auto u(floor(e));
 	e-=u;
-	auto gggg(details::mpow10(static_cast<T>(10),precision));
+	auto gggg(details::mpow(static_cast<T>(10),precision));
 	auto p(e*gggg*10);
 	auto mdg(fmod(p,10)),ptg(floor(p/10));
 	if(mdg<5||(mdg==5&&(fmod(ptg,2)==0||floor(p)!=p)))
