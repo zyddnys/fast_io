@@ -2,8 +2,8 @@
 
 int main()
 {
-	fast_io::line_flush<fast_io::basic_obuf<fast_io::posix_io_handle>> lnflush(1);	//STDOUT_FILENO
-	fast_io::basic_ibuf<fast_io::posix_io_handle> ib(0);			//STDIN_FILENO
+	fast_io::line_flush<fast_io::basic_obuf<fast_io::system_io_handle>> lnflush(fast_io::native_stdout);
+	fast_io::basic_ibuf<fast_io::system_io_handle> ib(fast_io::native_stdin);
 	print(lnflush,"Please input 2 numbers\n");
 	std::size_t a,b;
 	scan(ib,a,b);

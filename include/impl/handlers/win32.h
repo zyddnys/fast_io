@@ -53,26 +53,23 @@ struct win32_file_openmode
 };
 }
 
-class win32_file
+class win32_io_handle
 {
 	HANDLE mhandle;
+protected:
 	void closeimpl()
 	{
 		if(mhandle)
 			CloseHandle(mhandle);
 	}
+	HANDLE& protected_native_handle()	{return mhandle;}
 public:
 	using char_type = char;
 	using native_handle_type = HANDLE;
-	template<typename ...Args>
-	win32_file(fast_io::native_interface_t,Args&& ...args):mhandle(CreateFileW(std::forward<Args>(args)...))
-	{
-		if(mhandle==INVALID_HANDLE_VALUE)
-			throw win32_error();
-	}
-
-	template<typename T>
-	void seek(seek_type_t<T>,std::integral i,seekdir s=seekdir::beg)
+	win32_io_handle(native_handle_type handle):mhandle(handle){}
+	win32_io_handle(DWORD dw):mhandle(GetStdHandle(dw)){}
+	template<typename T,std::integral U>
+	void seek(seek_type_t<T>,U i,seekdir s=seekdir::beg)
 	{
 		LONG distance_to_move_high(0);
 		if(SetFilePointer(mhandle,seek_precondition<LONG,T,char_type>(i),std::addressof(distance_to_move_high),static_cast<DWORD>(s))== INVALID_SET_FILE_POINTER)
@@ -82,47 +79,18 @@ public:
 				throw win32_error(last_error);
 		}
 	}
-	void seek(std::integral i,seekdir s=seekdir::beg)
+	template<std::integral U>
+	void seek(U i,seekdir s=seekdir::beg)
 	{
 		seek(seek_type<char_type>,i,s);
 	}
-
-	template<std::size_t om>
-	win32_file(std::string_view filename,open::interface_t<om>):win32_file(fast_io::native_interface,fast_io::utf8_to_ucs<std::wstring>(filename).c_str(),
-				details::win32_file_openmode<om>::mode.dwDesiredAccess,
-				details::win32_file_openmode<om>::mode.dwShareMode,
-				details::win32_file_openmode<om>::mode.lpSecurityAttributes,
-				details::win32_file_openmode<om>::mode.dwCreationDisposition,
-				details::win32_file_openmode<om>::mode.dwFlagsAndAttributes,nullptr)
-	{
-		if constexpr (with_ate(open::mode(om)))
-			seek(0,seekdir::end);
-	}
-	win32_file(std::string_view filename,open::mode const& m)
-	{
-		auto const mode(details::calculate_win32_open_mode(m));
-		if((mhandle=CreateFileW(fast_io::utf8_to_ucs<std::wstring>(filename).c_str(),
-					mode.dwDesiredAccess,
-					mode.dwShareMode,
-					mode.lpSecurityAttributes,
-					mode.dwCreationDisposition,
-					mode.dwFlagsAndAttributes,nullptr))==INVALID_HANDLE_VALUE)
-			throw win32_error();
-		if(with_ate(m))
-			seek(0,seekdir::end);
-	}
-	win32_file(std::string_view file,std::string_view mode):win32_file(file,fast_io::open::c_style(mode)){}
-	~win32_file()
-	{
-		closeimpl();
-	}
-	win32_file(win32_file const&)=delete;
-	win32_file& operator=(win32_file const&)=delete;
-	win32_file(win32_file&& b) noexcept:mhandle(b.mhandle)
+	win32_io_handle(win32_io_handle const&)=delete;
+	win32_io_handle& operator=(win32_io_handle const&)=delete;
+	win32_io_handle(win32_io_handle&& b) noexcept:mhandle(b.mhandle)
 	{
 		b.mhandle=nullptr;
 	}
-	win32_file& operator=(win32_file&& b) noexcept
+	win32_io_handle& operator=(win32_io_handle&& b) noexcept
 	{
 		if(std::addressof(b)!=this)
 		{
@@ -155,6 +123,49 @@ public:
 	}
 	void flush()
 	{
+	}
+};
+
+
+class win32_file:public win32_io_handle
+{
+public:
+	using char_type = char;
+	using native_handle_type = HANDLE;
+	template<typename ...Args>
+	win32_file(fast_io::native_interface_t,Args&& ...args):win32_io_handle(CreateFileW(std::forward<Args>(args)...))
+	{
+		if(native_handle()==INVALID_HANDLE_VALUE)
+			throw win32_error();
+	}
+	template<std::size_t om>
+	win32_file(std::string_view filename,open::interface_t<om>):win32_file(fast_io::native_interface,fast_io::utf8_to_ucs<std::wstring>(filename).c_str(),
+				details::win32_file_openmode<om>::mode.dwDesiredAccess,
+				details::win32_file_openmode<om>::mode.dwShareMode,
+				details::win32_file_openmode<om>::mode.lpSecurityAttributes,
+				details::win32_file_openmode<om>::mode.dwCreationDisposition,
+				details::win32_file_openmode<om>::mode.dwFlagsAndAttributes,nullptr)
+	{
+		if constexpr (with_ate(open::mode(om)))
+			seek(0,seekdir::end);
+	}
+	win32_file(std::string_view filename,open::mode const& m):win32_io_handle(nullptr)
+	{
+		auto const mode(details::calculate_win32_open_mode(m));
+		if((protected_native_handle()=CreateFileW(fast_io::utf8_to_ucs<std::wstring>(filename).c_str(),
+					mode.dwDesiredAccess,
+					mode.dwShareMode,
+					mode.lpSecurityAttributes,
+					mode.dwCreationDisposition,
+					mode.dwFlagsAndAttributes,nullptr))==INVALID_HANDLE_VALUE)
+			throw win32_error();
+		if(with_ate(m))
+			seek(0,seekdir::end);
+	}
+	win32_file(std::string_view file,std::string_view mode):win32_file(file,fast_io::open::c_style(mode)){}
+	~win32_file()
+	{
+		win32_io_handle::closeimpl();
 	}
 };
 

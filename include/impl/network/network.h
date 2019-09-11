@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef __WINNT__
+#if defined(__WINNT__) || defined(_MSC_VER)
 #include <winsock2.h>
 #else
 #include<sys/socket.h>
