@@ -3,7 +3,7 @@ project(fastio)
 find_package(Threads)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-add_definitions(-fconcepts)
+add_definitions(-fconcepts -ffast-math)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   # using Visual Studio C++
 add_definitions(/experimental:concepts)

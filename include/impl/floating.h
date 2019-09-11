@@ -44,19 +44,19 @@ inline constexpr F mpow(F const &f,U const& u)
 template<standard_output_stream output,std::floating_point T>
 inline void output_fixed_floats(output& out,T e,std::size_t precision)
 {
-	auto u(floor(e));
+	auto u(std::floor(e));
 	e-=u;
 	auto gggg(details::mpow(static_cast<T>(10),precision));
 	auto temp(e*gggg);
 	auto p(temp*10);
-	auto ptg(floor(temp));
+	auto ptg(std::floor(temp));
 	auto const mdg(p-ptg*10);
-	if(mdg<5||(mdg==5&&(fmod(ptg,2)==0||floor(p)!=p)))
+	if(mdg<5||(mdg==5&&((ptg-std::floor(ptg/2)*2)==0||std::floor(p)!=p)))
 	{
 		std::basic_string<typename output::char_type> bas;
 		do
 		{
-			temp = floor(u/10);
+			temp = std::floor(u/10);
 			bas.push_back(static_cast<typename output::char_type>(u-temp*10)+48);
 		}
 		while((u=temp));
@@ -67,7 +67,7 @@ inline void output_fixed_floats(output& out,T e,std::size_t precision)
 		bas.clear();
 		do
 		{
-			temp = floor(ptg/10);
+			temp = std::floor(ptg/10);
 			bas.push_back(static_cast<typename output::char_type>(ptg-temp*10)+48);
 		}
 		while((ptg=temp)&&bas.size()<=precision);
@@ -84,7 +84,7 @@ inline void output_fixed_floats(output& out,T e,std::size_t precision)
 		{
 			if(precision<=bas.size())
 				break;
-			temp = floor(ptg/10);
+			temp = std::floor(ptg/10);
 			auto ch(static_cast<typename output::char_type>(ptg-temp*10)+48);
 			bas.push_back(ch);
 			if(ch!=48)
@@ -100,7 +100,7 @@ inline void output_fixed_floats(output& out,T e,std::size_t precision)
 		}
 		do
 		{
-			temp = floor(u/10);
+			temp = std::floor(u/10);
 			bas2.push_back(static_cast<typename output::char_type>(u-temp*10)+48);
 		}
 		while((u=temp));
