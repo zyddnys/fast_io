@@ -14,7 +14,8 @@ private:
 		virtual char_type* read(char_type*,char_type*) = 0;
 		virtual ~base() = default;
 	};
-	template<input_stream input>
+	template<stream input>
+	requires input_stream<input>||mutex_input_stream<input>
 	struct derv:base
 	{
 		input in;
@@ -24,7 +25,8 @@ private:
 	};
 	std::unique_ptr<base> up;
 public:
-	template<input_stream P,typename ...Args>
+	template<stream P,typename ...Args>
+	requires input_stream<P>||mutex_input_stream<P>
 	basic_dynamic_input_stream(std::in_place_type_t<P>,Args&& ...args):
 		up(new derv<P>(std::in_place_type<P>,std::forward<Args>(args)...)){}
 	template<typename Contiguous_iterator>
@@ -91,7 +93,8 @@ private:
 		virtual void flush() = 0;
 		virtual ~base() = default;
 	};
-	template<output_stream output>
+	template<stream output>
+	requires output_stream<output>||mutex_output_stream<output>
 	struct derv:base
 	{
 		output out;
@@ -102,7 +105,8 @@ private:
 	};
 	std::unique_ptr<base> up;
 public:
-	template<output_stream P,typename ...Args>
+	template<stream P,typename ...Args>
+	requires output_stream<P>||mutex_output_stream<P>
 	basic_dynamic_output_stream(std::in_place_type_t<P>,Args&& ...args):
 		up(new derv<P>(std::in_place_type<P>,std::forward<Args>(args)...)){}
 	template<typename Contiguous_iterator>
@@ -169,7 +173,8 @@ private:
 		virtual char_type* read(char_type*,char_type*) = 0;
 		virtual ~base() = default;
 	};
-	template<io_stream iod>
+	template<stream iod>
+	requires io_stream<iod>||mutex_io_stream<iod>
 	struct derv:base
 	{
 		iod out;
@@ -181,7 +186,8 @@ private:
 	};
 	std::unique_ptr<base> up;
 public:
-	template<input_stream P,typename ...Args>
+	template<stream P,typename ...Args>
+	requires io_stream<P>||mutex_io_stream<P>
 	basic_dynamic_io_stream(std::in_place_type_t<P>,Args&& ...args):
 		up(new derv<P>(std::in_place_type<P>,std::forward<Args>(args)...)){}
 	template<typename Contiguous_iterator>

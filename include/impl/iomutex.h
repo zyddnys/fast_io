@@ -64,13 +64,13 @@ public:
 };
 
 
+
 template<mutex_input_stream input,typename ...Args>
 inline constexpr void scan(input &in,Args&& ...args)
 {
 	std::lock_guard lg{in.mutex()};
 	scan(in.native_handle(),std::forward<Args>(args)...);
 }
-
 template<mutex_input_stream input,typename ...Args>
 inline constexpr void read(input &in,Args&& ...args)
 {

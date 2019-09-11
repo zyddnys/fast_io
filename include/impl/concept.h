@@ -56,25 +56,22 @@ template<typename T>
 concept mutex_stream = stream<T>&&details::mutex_stream_impl<T>;
 
 template<typename T>
-concept input_stream = stream<T>&&details::input_stream_impl<T>;
+concept mutex_input_stream = mutex_stream<T>&&details::input_stream_impl<T>;
 
 template<typename T>
-concept mutex_input_stream = input_stream<T>&&mutex_stream<T>;
+concept mutex_output_stream = mutex_stream<T>&&details::output_stream_impl<T>;
 
 template<typename T>
-concept output_stream = stream<T>&&details::output_stream_impl<T>;
+concept input_stream = stream<T>&&details::input_stream_impl<T>&&!mutex_input_stream<T>;
 
 template<typename T>
-concept mutex_output_stream = output_stream<T>&&mutex_stream<T>;
+concept output_stream = stream<T>&&details::output_stream_impl<T>&&!mutex_output_stream<T>;
 
 template<typename T>
 concept random_access_stream = stream<T>&&details::random_access_stream_impl<T>;
 
 template<typename T>
 concept io_stream = input_stream<T>&&output_stream<T>;
-
-template<typename T>
-concept mutex_io_stream = mutex_input_stream<T>&&mutex_output_stream<T>;
 
 template<typename T>
 concept standard_input_stream = input_stream<T>&&details::standard_input_stream_impl<T>;
@@ -84,5 +81,7 @@ concept standard_output_stream = output_stream<T>&&details::standard_output_stre
 
 template<typename T>
 concept standard_io_stream = standard_input_stream<T>&&standard_output_stream<T>;
+template<typename T>
+concept mutex_io_stream = mutex_input_stream<T>&&mutex_output_stream<T>;
 
 }
