@@ -42,13 +42,14 @@ inline std::size_t read_size(input& in)
 template<standard_output_stream output>
 inline void write_size(output& out,std::size_t size)
 {
+	using ch_type = typename output::char_type;
 	auto constexpr bytes(sizeof(typename output::char_type)*8);
 	auto constexpr lshift(bytes-1);
 	auto constexpr limit(static_cast<std::size_t>(1)<<lshift);
 	auto constexpr limitm1(limit-1);
 	for(;limitm1<size;size>>=lshift)
-		out.put((size&limitm1)|limit);
-	out.put(size);
+		out.put(static_cast<ch_type>(size&limitm1|limit));
+	out.put(static_cast<ch_type>(size));
 }
 
 template<standard_input_stream input,Dynamic_size_container D>

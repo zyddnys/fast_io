@@ -44,6 +44,7 @@ inline void print(output& out,details::fixed<T const> a)
 		auto mdg(fmod(p,10)),ptg(floor(p/10));
 		if(mdg<5||(mdg==5&&(fmod(ptg,2)==0||floor(p)!=p)))
 		{
+//			std::cout<<"47 here: "<<mdg<<"\n";
 			std::basic_string<typename output::char_type> bas;
 			auto pu(u);
 			do
@@ -68,8 +69,9 @@ inline void print(output& out,details::fixed<T const> a)
 		}
 		else
 		{
+//			std::cout<<"72 here: \n";
 			++ptg;
-			if(pround+1==round(pow(static_cast<T>(10),-static_cast<T>(a.precision))))
+			if(pround+1==round(1/pow(static_cast<T>(10),a.precision)))
 				++u;				
 			std::basic_string<typename output::char_type> bas;
 			do

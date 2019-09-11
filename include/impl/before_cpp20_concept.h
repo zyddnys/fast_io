@@ -15,6 +15,7 @@ concept floating_point = std::is_floating_point_v<T>;
 #else
 #include"ported/concepts"		//use my migrated version of concepts
 #endif
+#include<iterator>
 
 namespace fast_io
 {
@@ -22,26 +23,40 @@ namespace fast_io
 template<typename T>
 concept Trivial_copyable=std::is_trivially_copyable_v<T>;
 
-template<typename Cont>
-concept Container = requires(Cont c)
+
+namespace details
 {
-	{begin(c)};
-	{end(c)};
+
+template<typename Cont>
+concept Container_impl = requires(Cont c)
+{
+	{c.begin};
+	{c.end};
 };
 
 template<typename Cont>
-concept Dynamic_size_container = 
-Container<Cont> && requires(Cont c)
+concept Dynamic_size_container_impl = requires(Cont c)
 {
 	{c.insert};
-	{size(c)};
+	{c.size};
 };
 
 template<typename Cont>
-concept Contiguous_container = Container<Cont> && requires(Cont c)
+concept Contiguous_container_impl = requires(Cont c)
 {
-	{data(c)};
+	{c.data};
 };
+
+}
+
+template<typename Cont>
+concept Container = details::Container_impl<Cont>;
+
+template<typename Cont>
+concept Dynamic_size_container = Container<Cont> && details::Dynamic_size_container_impl<Cont>;
+
+template<typename Cont>
+concept Contiguous_container = Container<Cont> && details::Contiguous_container_impl<Cont>;
 
 template<typename Cont>
 concept Trivial_copyable_container = Container<Cont> && Trivial_copyable<typename Cont::value_type>;

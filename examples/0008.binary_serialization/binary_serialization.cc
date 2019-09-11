@@ -8,8 +8,8 @@
 int main()
 {
 	{
-	std::vector<std::vector<std::array<std::size_t,3>>> arr{std::vector<std::array<std::size_t,3>>{std::array<std::size_t,3>{12142141,2,3},std::array<std::size_t,3>{4,5,6}}};
 	fast_io::obuf out("binary_serialization.txt");
+	std::vector<std::vector<std::array<std::size_t,3>>> arr{std::vector<std::array<std::size_t,3>>{std::array<std::size_t,3>{12142141,2,3},std::array<std::size_t,3>{4,5,6}}};
 	write(out,arr);
 	std::array<std::string,1> ar{"abcdef\n dsjfgoisdjgoisdjgdiso"};
 	write(out,ar);

@@ -37,10 +37,10 @@ add_executable(input_10M_size_t_until_eof "./examples/0021.benchmark/input_10M_s
 
 add_executable(hexa+b "./examples/0018.base/hexa+b.cc")
 add_executable(base "./examples/0018.base/base.cc")
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+
 add_executable(binary_serialization "./examples/0008.binary_serialization/binary_serialization.cc")
 add_executable(custom_binary_serialization_type "./examples/0008.binary_serialization/custom_binary_serialization_type.cc")
-endif()
+
 add_executable(random_password "./examples/0014.random_password/random_password.cc")
 add_executable(unsigned_view "./examples/0017.unsigned_view/unsigned_view.cc")
 
