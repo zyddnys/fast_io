@@ -81,7 +81,7 @@ public:
 	template<typename ContiguousIterator>
 	ContiguousIterator read(ContiguousIterator begin,ContiguousIterator end)
 	{
-		auto read_bytes(details::recv(handle,std::addressof(*begin),(end-begin)*sizeof(*begin),0));
+		auto read_bytes(details::recv(handle,std::addressof(*begin),static_cast<int>((end-begin)*sizeof(*begin)),0));
 		if(read_bytes==SOCKET_ERROR)
 			throw std::system_error(details::WSAGetLastError(),std::generic_category());
 		return begin+(read_bytes/sizeof(*begin));
@@ -89,7 +89,7 @@ public:
 	template<typename ContiguousIterator>
 	ContiguousIterator write(ContiguousIterator begin,ContiguousIterator end)
 	{
-		auto write_bytes(details::send(handle,std::addressof(*begin),(end-begin)*sizeof(*begin),0));
+		auto write_bytes(details::send(handle,std::addressof(*begin),static_cast<int>((end-begin)*sizeof(*begin)),0));
 		if(write_bytes==SOCKET_ERROR)
 			throw std::system_error(details::WSAGetLastError(),std::generic_category());
 		return begin+(write_bytes/sizeof(*begin));
@@ -117,7 +117,7 @@ public:
 	client(sock::family const & fm,address const& add,Args&& ...args):soc(fm,std::forward<Args>(args)...)
 	{
 		auto addr(fast_io::utf8_to_ucs<std::wstring>(add.addr()));
-		sockaddr_in servaddr{static_cast<std::int16_t>(fm),details::htons(add.port()),{},{}};
+		sockaddr_in servaddr{static_cast<ADDRESS_FAMILY>(fm),details::htons(add.port()),{},{}};
 		if(details::InetPtonW(static_cast<int>(fm),addr.data(),std::addressof(servaddr.sin_addr))==-1)
 			throw std::system_error(details::WSAGetLastError(),std::generic_category());
 		if(details::connect(soc.native_handle(),static_cast<sockaddr const*>(static_cast<void const*>(std::addressof(servaddr))),sizeof(servaddr))==-1)
@@ -150,7 +150,7 @@ public:
 	template<typename ...Args>
 	server(sock::family const & fm,address const& add,Args&& ...args):soc(fm,std::forward<Args>(args)...)
 	{
-		sockaddr_in servaddr{static_cast<std::int16_t>(fm),details::htons(add.port()),{},{}};
+		sockaddr_in servaddr{static_cast<ADDRESS_FAMILY>(fm),details::htons(add.port()),{},{}};
 		auto addr(fast_io::utf8_to_ucs<std::wstring>(add.addr()));
 		if(details::InetPtonW(static_cast<int>(fm),addr.data(),std::addressof(servaddr.sin_addr))==-1)
 			throw std::system_error(details::WSAGetLastError(),std::generic_category());

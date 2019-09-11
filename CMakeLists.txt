@@ -94,8 +94,8 @@ add_executable(streambuf_view "./examples/0031.iostream/streambuf_view.cc")
 
 add_executable(scan_int_until_eof "./examples/0032.eof/scan_int_until_eof.cc")
 
-#add_executable(client "./examples/0033.socket/client.cc")
-#add_executable(server "./examples/0033.socket/server.cc")
+add_executable(client "./examples/0033.socket/client.cc")
+add_executable(server "./examples/0033.socket/server.cc")
 
 
 add_executable(double_default "./examples/0009.floating point/double_default.cc")
