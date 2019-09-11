@@ -47,30 +47,30 @@ inline void output_fixed_floats(output& out,T e,std::size_t precision)
 	auto u(floor(e));
 	e-=u;
 	auto gggg(details::mpow(static_cast<T>(10),precision));
-	auto ptgtmp(e*gggg);
-	auto p(ptgtmp*10);
-	auto ptg(floor(ptgtmp));
-	auto mdg(p-ptg*10);
+	auto temp(e*gggg);
+	auto p(temp*10);
+	auto ptg(floor(temp));
+	auto const mdg(p-ptg*10);
 	if(mdg<5||(mdg==5&&(fmod(ptg,2)==0||floor(p)!=p)))
 	{
 		std::basic_string<typename output::char_type> bas;
-		auto pu(u);
 		do
 		{
-			bas.push_back(static_cast<typename output::char_type>(fmod(pu,10)+48));
+			temp = floor(u/10);
+			bas.push_back(static_cast<typename output::char_type>(u-temp*10)+48);
 		}
-		while((pu=floor(pu/10)));
+		while((u=temp));
 		for(std::size_t i(bas.size());i--;out.put(bas[i]));
 		if(!precision)
 			return;
 		out.put('.');
 		bas.clear();
-		auto pv(ptg);
 		do
 		{
-			bas.push_back(static_cast<typename output::char_type>(fmod(pv,10)+48));
+			temp = floor(ptg/10);
+			bas.push_back(static_cast<typename output::char_type>(ptg-temp*10)+48);
 		}
-		while((pv=floor(pv/10))&&bas.size()<=precision);
+		while((ptg=temp)&&bas.size()<=precision);
 		for(std::size_t i(bas.size());i<precision;++i)
 			out.put(48);
 		for(std::size_t i(bas.size());i--;out.put(bas[i]));
@@ -84,12 +84,13 @@ inline void output_fixed_floats(output& out,T e,std::size_t precision)
 		{
 			if(precision<=bas.size())
 				break;
-			auto ch(static_cast<typename output::char_type>(fmod(ptg,10))+48);
+			temp = floor(ptg/10);
+			auto ch(static_cast<typename output::char_type>(ptg-temp*10)+48);
 			bas.push_back(ch);
 			if(ch!=48)
 				hasone=true;
 		}
-		while((ptg=floor(ptg/10)));
+		while((ptg=temp));
 		std::basic_string<typename output::char_type> bas2;
 		if(!hasone)
 		{
@@ -99,9 +100,10 @@ inline void output_fixed_floats(output& out,T e,std::size_t precision)
 		}
 		do
 		{
-			bas2.push_back(static_cast<typename output::char_type>(fmod(u,10)+48));
+			temp = floor(u/10);
+			bas2.push_back(static_cast<typename output::char_type>(u-temp*10)+48);
 		}
-		while((u=floor(u/10)));
+		while((u=temp));
 		if(bas2.empty())
 			out.put('0');
 		else

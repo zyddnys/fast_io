@@ -11,7 +11,7 @@
 int main()
 try
 {
-	std::size_t constexpr N(10000000);
+	std::size_t constexpr N(1000000);
 	std::vector<double> vec;
 	vec.reserve(N);
 	std::random_device device;
