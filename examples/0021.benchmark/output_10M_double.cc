@@ -49,6 +49,12 @@ try
 	for(std::size_t i(0);i!=N;++i)
 		println(obuf,fast_io::fixed(vec[i],6));
 	}
+	{
+	cqw::timer t("obuf_mutex");
+	fast_io::obuf_mutex obuf("obuf_mutexdb.txt");
+	for(std::size_t i(0);i!=N;++i)
+		println(obuf,fast_io::fixed(vec[i],6));
+	}
 }
 catch(std::exception const& e)
 {
