@@ -36,6 +36,13 @@ public:
 };
 
 inline win32_startup const startup;
+
+using win32_address_family = 
+#ifdef _MSC_VER
+ADDRESS_FAMILY;
+#else
+std::int16_t;
+#endif
 }
 class acceptor;
 class socket
@@ -55,7 +62,7 @@ public:
 		if(handle==INVALID_SOCKET)
 			throw std::system_error(details::WSAGetLastError(),std::generic_category());
 	}
-	socket(sock::family const & family,sock::type const &type,sock::protocal const &protocal = sock::protocal::none):socket(native_interface,static_cast<ADDRESS_FAMILY>(family),static_cast<int>(type),static_cast<int>(protocal)){}
+	socket(sock::family const & family,sock::type const &type,sock::protocal const &protocal = sock::protocal::none):socket(native_interface,static_cast<details::win32_address_family>(family),static_cast<int>(type),static_cast<int>(protocal)){}
 	auto native_handle() const {return handle;}
 	socket(socket const&) = delete;
 	socket& operator=(socket const&) = delete;
@@ -117,7 +124,7 @@ public:
 	client(sock::family const & fm,address const& add,Args&& ...args):soc(fm,std::forward<Args>(args)...)
 	{
 		auto addr(fast_io::utf8_to_ucs<std::wstring>(add.addr()));
-		sockaddr_in servaddr{static_cast<ADDRESS_FAMILY>(fm),details::htons(add.port()),{},{}};
+		sockaddr_in servaddr{static_cast<details::win32_address_family>(fm),details::htons(add.port()),{},{}};
 		if(details::InetPtonW(static_cast<int>(fm),addr.data(),std::addressof(servaddr.sin_addr))==-1)
 			throw std::system_error(details::WSAGetLastError(),std::generic_category());
 		if(details::connect(soc.native_handle(),static_cast<sockaddr const*>(static_cast<void const*>(std::addressof(servaddr))),sizeof(servaddr))==-1)
@@ -150,7 +157,7 @@ public:
 	template<typename ...Args>
 	server(sock::family const & fm,address const& add,Args&& ...args):soc(fm,std::forward<Args>(args)...)
 	{
-		sockaddr_in servaddr{static_cast<ADDRESS_FAMILY>(fm),details::htons(add.port()),{},{}};
+		sockaddr_in servaddr{static_cast<details::win32_address_family>(fm),details::htons(add.port()),{},{}};
 		auto addr(fast_io::utf8_to_ucs<std::wstring>(add.addr()));
 		if(details::InetPtonW(static_cast<int>(fm),addr.data(),std::addressof(servaddr.sin_addr))==-1)
 			throw std::system_error(details::WSAGetLastError(),std::generic_category());
