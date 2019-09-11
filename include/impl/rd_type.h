@@ -42,7 +42,7 @@ template<standard_output_stream output,std::integral T>
 requires std::same_as<T,bool>
 inline constexpr void print(output& out, T const& b)
 {
-	out.put(b);
+	out.put(b+'0');
 }
 
 template<output_stream output>
