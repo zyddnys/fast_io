@@ -47,8 +47,10 @@ inline void output_fixed_floats(output& out,T e,std::size_t precision)
 	auto u(floor(e));
 	e-=u;
 	auto gggg(details::mpow(static_cast<T>(10),precision));
-	auto p(e*gggg*10);
-	auto mdg(fmod(p,10)),ptg(floor(p/10));
+	auto ptgtmp(e*gggg);
+	auto p(ptgtmp*10);
+	auto ptg(floor(ptgtmp));
+	auto mdg(p-ptg*10);
 	if(mdg<5||(mdg==5&&(fmod(ptg,2)==0||floor(p)!=p)))
 	{
 		std::basic_string<typename output::char_type> bas;
