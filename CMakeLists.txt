@@ -16,6 +16,7 @@ endif()
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(compile "./examples/0000.Hello World/compile.cc")
+
 add_executable(hello_world "./examples/0000.Hello World/hello_world.cc")
 add_executable(hello_world_format "./examples/0000.Hello World/hello_world_format.cc")
 #add_executable(hello_world1 "./examples/0000.Hello World/hello_world1.cc")
@@ -36,8 +37,10 @@ add_executable(input_10M_size_t_until_eof "./examples/0021.benchmark/input_10M_s
 
 add_executable(hexa+b "./examples/0018.base/hexa+b.cc")
 add_executable(base "./examples/0018.base/base.cc")
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 add_executable(binary_serialization "./examples/0008.binary_serialization/binary_serialization.cc")
 add_executable(custom_binary_serialization_type "./examples/0008.binary_serialization/custom_binary_serialization_type.cc")
+endif()
 add_executable(random_password "./examples/0014.random_password/random_password.cc")
 add_executable(unsigned_view "./examples/0017.unsigned_view/unsigned_view.cc")
 
@@ -91,8 +94,9 @@ add_executable(streambuf_view "./examples/0031.iostream/streambuf_view.cc")
 
 add_executable(scan_int_until_eof "./examples/0032.eof/scan_int_until_eof.cc")
 
-add_executable(client "./examples/0033.socket/client.cc")
-add_executable(server "./examples/0033.socket/server.cc")
+#add_executable(client "./examples/0033.socket/client.cc")
+#add_executable(server "./examples/0033.socket/server.cc")
+
 
 add_executable(double_default "./examples/0009.floating point/double_default.cc")
 add_executable(double_scientific "./examples/0009.floating point/double_scientific.cc")

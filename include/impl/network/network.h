@@ -58,7 +58,7 @@ public:
 };
 
 }
-#ifdef __WINNT__
+#if defined(__WINNT__) || defined(_MSC_VER)
 #include "win32_socket.h"
 #else
 #include "posix_socket.h"
