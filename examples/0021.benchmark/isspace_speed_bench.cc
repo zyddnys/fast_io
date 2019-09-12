@@ -39,19 +39,19 @@ inline constexpr bool misspace4(T const& t)
 template<typename T>
 inline constexpr bool fastisspace(T ch)
 {
-	return (9<=ch&&ch<=13)||ch==20;
+	return (9<=ch&&ch<=13)||ch==0x20;
 }
 
 template<typename T>
 inline constexpr bool fastisspacerev(T ch)
 {
-	return ch==20||(9<=ch&&ch<=13);
+	return ch==0x20||(9<=ch&&ch<=13);
 }
 
 template<typename T>
 inline constexpr bool fastisspacerev2(T ch)
 {
-	if(ch==20)
+	if(ch==0x20)
 		return true;
 	std::make_unsigned_t<T> e(ch);
 	e-=9;
@@ -76,14 +76,16 @@ int main()
 	std::array<char,4> a={'a','e','f',105};
 	std::size_t constexpr N(100000000);
 	std::size_t v(0);
-	{
+/*	{
 		cqw::timer t("std::isspace");
 		for(std::size_t i(0);i!=N;++i)
 		{
 			for(auto const& e : a)
 				v+=std::isspace(e)|std::isspace(e+1)|std::isspace(e+2)|std::isspace(e+3);
 		}
-	}
+	}*/
+	
+	static_assert(fastisspacerev2(' '),"false");
 	{
 		cqw::timer t("misspace1");
 		for(std::size_t i(0);i!=N;++i)

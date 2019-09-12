@@ -8,7 +8,7 @@ namespace details
 template<std::integral T>
 inline constexpr bool isspace(T ch)
 {
-	if(ch==20)
+	if(ch==0x20)
 		return true;
 	std::make_unsigned_t<T> e(ch);
 	e-=9;
