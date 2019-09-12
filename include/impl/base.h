@@ -63,23 +63,24 @@ inline void output_base_number(output& out,T a)
 template<std::uint8_t base,standard_input_stream input,std::unsigned_integral U>
 inline constexpr void input_base_number(input& in,U& a)
 {
-	auto constexpr baseed(48+base);
+//	auto constexpr baseed(48+base);
 	while(true)
 	{
-		auto ch(in.get());
-		if(48<=ch&&ch<=baseed)
+		std::make_unsigned_t<decltype(in.get())> ch(in.get());
+		if(ch-48<base)
 		{
 			a=ch-48;
 			break;
 		}
 		else if constexpr (10 < base)
 		{
-			if(65<=ch&&ch<65+base)
+			auto constexpr basem10(base-10);
+			if(ch-65<basem10)
 			{
 				a=ch-55;
 				break;
 			}
-			else if(97<=ch&&ch<97+base)
+			else	if(ch-97<basem10)
 			{
 				a=ch-87;
 				break;
@@ -89,14 +90,17 @@ inline constexpr void input_base_number(input& in,U& a)
 	while(true)
 	{
 		auto try_ch(in.try_get());
-		if(48<=try_ch.first&&try_ch.first<baseed)
-			a=a*base+try_ch.first-48;
+		std::make_unsigned_t<decltype(in.get())> ch(try_ch.first);
+		ch-=48;
+		if(ch<10)
+			a=a*base+ch;
 		else if constexpr (10 < base)
 		{
-			if(65<=try_ch.first&&try_ch.first<65+base)
-				a=a*base+try_ch.first-55;
-			else if(97<=try_ch.first&&try_ch.first<97+base)
-				a=a*base+try_ch.first-87;
+			auto constexpr basem10(base-10);
+			if(ch-17<basem10)
+				a=a*base+(ch-7);
+			else if(ch-49<basem10)
+				a=a*base+(ch-39);
 			else
 				return;
 		}
