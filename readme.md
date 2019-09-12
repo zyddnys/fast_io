@@ -16,7 +16,7 @@ Since C++ 20 has not been released. No standard supporting libraries for concept
   7. Unicode/UTF-8 support
   8. Compatible with C stdio/ C++ iostream
   9. Native Handle Interface
-  10. support C style io format (fprint). C++ style io format (<<,>>). Basic/Lua/Python/etc format (print, scan)
+  10. support C style io format (fprint). Basic/Lua/Python/etc format (print, scan). NO LONGER SUPPORTS C++ style io format (<<,>>) since they are bad.
   11. Compilation time open mode parse. Supports C style open mode and C++ style open mode.
   12. No internal iomanip states (since it creates security issues)
   13. Extremely easy to support custom devices
