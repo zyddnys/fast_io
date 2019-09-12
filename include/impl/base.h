@@ -60,47 +60,21 @@ inline void output_base_number(output& out,T a)
 	output_base_number<base,uppercase>(out,static_cast<std::make_unsigned_t<T>>(a));
 }
 
-template<std::uint8_t base,standard_input_stream input,std::unsigned_integral U>
-inline constexpr void input_base_number(input& in,U& a)
+template<std::uint8_t base,standard_input_stream input,std::integral U>
+inline constexpr void input_base_number_phase2(input& in,U& a)
 {
-//	auto constexpr baseed(48+base);
+	using unsigned_char_type = std::make_unsigned_t<decltype(in.get())>;
+	unsigned_char_type constexpr baseed(std::min(static_cast<unsigned_char_type>(base),static_cast<unsigned_char_type>(10)));
 	while(true)
 	{
-		std::make_unsigned_t<decltype(in.get())> ch(in.get());
-		if(ch-48<base)
-		{
-			a=ch-48;
-			break;
-		}
-		else if constexpr (10 < base)
-		{
-			auto constexpr basem10(base-10);
-			if(ch-65<basem10)
-			{
-				a=ch-55;
-				break;
-			}
-			else	if(ch-97<basem10)
-			{
-				a=ch-87;
-				break;
-			}
-		}
-	}
-	while(true)
-	{
-		auto try_ch(in.try_get());
-		std::make_unsigned_t<decltype(in.get())> ch(try_ch.first);
-		ch-=48;
-		if(ch<10)
+		unsigned_char_type ch(in.try_get().first);
+		if((ch-=48)<baseed)
 			a=a*base+ch;
 		else if constexpr (10 < base)
 		{
-			auto constexpr basem10(base-10);
-			if(ch-17<basem10)
-				a=a*base+(ch-7);
-			else if(ch-49<basem10)
-				a=a*base+(ch-39);
+			unsigned_char_type constexpr bm10(base-10);
+			if((ch-=17)<bm10||(ch-=32)<bm10)
+				a=a*base+(ch+10);
 			else
 				return;
 		}
@@ -108,56 +82,64 @@ inline constexpr void input_base_number(input& in,U& a)
 			return;
 	}
 }
+
+template<std::uint8_t base,standard_input_stream input,std::unsigned_integral U>
+inline constexpr void input_base_number(input& in,U& a)
+{
+	using unsigned_char_type = std::make_unsigned_t<decltype(in.get())>;
+	unsigned_char_type constexpr baseed(std::min(static_cast<unsigned_char_type>(base),static_cast<unsigned_char_type>(10)));
+	while(true)
+	{
+		unsigned_char_type ch(in.get());
+		if((ch-=48)<baseed)
+		{
+			a=ch;
+			break;
+		}
+		else if constexpr (10 < base)
+		{
+			unsigned_char_type constexpr bm10(base-10);
+			if((ch-=17)<bm10||(ch-=32)<bm10)
+				a=a*base+ch+10;
+			{
+				a=ch+10;
+				break;
+			}
+		}
+	}
+	input_base_number_phase2<base>(in,a);
+}
 template<std::uint8_t base,standard_input_stream input, std::signed_integral T>
 inline constexpr void input_base_number(input& in,T& a)
 {
-	auto constexpr baseed(48+base);
+	using unsigned_char_type = std::make_unsigned_t<decltype(in.get())>;
+	unsigned_char_type constexpr baseed(std::min(static_cast<unsigned_char_type>(base),static_cast<unsigned_char_type>(10)));
 	bool rev(false);
 	while(true)
 	{
-		auto ch(in.get());
-		if(48<=ch&&ch<baseed)
-		{
-			a=ch-48;
-			break;
-		}
-		else if(ch==45)
+		unsigned_char_type ch(in.get());
+		if(ch==45)
 		{
 			a=0;
 			rev=true;
 			break;
 		}
-		else if constexpr (10 < base)
+		else if((ch-=48)<baseed)
 		{
-			if(65<=ch&&ch<65+base)
-			{
-				a=ch-55;
-				break;
-			}
-			else if(97<=ch&&ch<97+base)
-			{
-				a=ch-87;
-				break;
-			}
-		}
-	}
-	while(true)
-	{
-		auto try_ch(in.try_get());
-		if(48<=try_ch.first&&try_ch.first<baseed)
-			a=a*base+try_ch.first-48;
-		else if constexpr (10 < base)
-		{
-			if(65<=try_ch.first&&try_ch.first<65+base)
-				a=a*base+try_ch.first-55;
-			else if(97<=try_ch.first&&try_ch.first<97+base)
-				a=a*base+try_ch.first-87;
-			else
-				break;
-		}
-		else
+			a=ch;
 			break;
+		}
+		else if constexpr (10 < base)
+		{
+			unsigned_char_type constexpr bm10(base-10);
+			if((ch-=17)<bm10||(ch-=32)<bm10)
+			{
+				a=ch+10;
+				break;
+			}
+		}
 	}
+	input_base_number_phase2<base>(in,a);
 	if(rev)
 		a=-a;
 }
