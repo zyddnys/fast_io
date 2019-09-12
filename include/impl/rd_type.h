@@ -4,11 +4,17 @@ namespace fast_io
 {
 namespace details
 {
+
 template<std::integral T>
 inline constexpr bool isspace(T ch)
 {
-	return ch==0x20||ch==0x0a||ch==0x0d||ch==0x09||ch==0x0b;
+	if(ch==20)
+		return true;
+	std::make_unsigned_t<T> e(ch);
+	e-=9;
+	return e<5;
 }
+
 }
 
 template<standard_input_stream input>
