@@ -5,7 +5,7 @@
 #else
 #include "posix_socket.h"
 #endif
-#include<bit>
+//#include<bit>
 
 namespace fast_io
 {
@@ -66,11 +66,11 @@ namespace sock::details
 template<std::unsigned_integral U>
 inline constexpr void in_place_big_endian(U& u)
 {
-	if constexpr (std::endian::native==std::endian::little)
-	{
+//	if constexpr (std::endian::native==std::endian::little)			//pretend the platform is little endian before c++20
+//	{
 		auto &e(reinterpret_cast<std::array<std::uint8_t,sizeof(U)>&>(u));
 		std::reverse(e.begin(),e.end());
-	}
+//	}
 }
 
 inline void set_ipv4_storage(sockaddr_storage& storage,address const& add)

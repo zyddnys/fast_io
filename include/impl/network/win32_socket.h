@@ -112,11 +112,10 @@ public:
 	win32_startup(win32_startup const&) = delete;
 	win32_startup& operator=(win32_startup const&) = delete;
 	~win32_startup()
-	try
 	{
-		get_proc_address<decltype(::WSACleanup)*>("WSACleanup")();
+		auto WSACleanup(reinterpret_cast<decltype(::WSACleanup)*>(reinterpret_cast<void(*)()>(GetProcAddress(ws2_32_dll,"WSACleanup"))));
+		WSACleanup();
 	}
-	catch(...){}
 };
 
 inline win32_startup const startup;
