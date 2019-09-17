@@ -13,6 +13,8 @@ namespace fast_io
 inline constexpr auto ipv4_address(std::string_view str)
 {
 	std::array<std::uint8_t,4> value{};
+	if(str.empty())
+		return value;
 	istring_view istrbuf(str);
 	for(auto & e : value)
 		scan(istrbuf,e);
@@ -21,6 +23,9 @@ inline constexpr auto ipv4_address(std::string_view str)
 
 inline auto ipv6_address(std::string_view str)
 {
+	std::array<std::uint16_t,8> value{};
+	if(str.empty())
+		return value;
 	ostring ostr;
 	std::size_t prefix_zero(0);
 	for(auto it(str.cbegin());it!=str.cend();++it)
@@ -53,7 +58,6 @@ inline auto ipv6_address(std::string_view str)
 		else
 			break;
 	}
-	std::array<std::uint16_t,8> value{};
 	istring_view istrbuf(ostr.str());
 	for(auto & e : value)
 		scan(istrbuf,fast_io::hex(e));
@@ -76,17 +80,21 @@ inline constexpr void in_place_big_endian(U& u)
 inline void set_ipv4_storage(sockaddr_storage& storage,address const& add)
 {
 	auto& sockaddin(reinterpret_cast<sockaddr_in&>(storage));
+//	sockaddin={};
 	sockaddin.sin_family=static_cast<address_family>(fast_io::sock::family::ipv4);
 	in_place_big_endian(sockaddin.sin_port=add.port());
-	reinterpret_cast<std::array<std::uint8_t,4>&>(sockaddin.sin_addr.s_addr)=ipv4_address(add.addr());
+	if(!add.addr().empty())
+		reinterpret_cast<std::array<std::uint8_t,4>&>(sockaddin.sin_addr)=ipv4_address(add.addr());
 }
 
 inline void set_ipv6_storage(sockaddr_storage& storage,address const& add)
 {
 	auto& sockaddin(reinterpret_cast<sockaddr_in6&>(storage));
+//	sockaddin={};
 	sockaddin.sin6_family=static_cast<address_family>(fast_io::sock::family::ipv6);
 	in_place_big_endian(sockaddin.sin6_port=add.port());
-	reinterpret_cast<std::array<std::uint16_t,8>&>(sockaddin.sin6_addr.s6_addr)=ipv6_address(add.addr());
+	if(!add.addr().empty())
+		reinterpret_cast<std::array<std::uint16_t,8>&>(sockaddin.sin6_addr)=ipv6_address(add.addr());
 }
 }
 

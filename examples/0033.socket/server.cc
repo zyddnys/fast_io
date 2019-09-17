@@ -3,11 +3,11 @@
 int main()
 try
 {
-	fast_io::server hd(fast_io::sock::family::ipv4,fast_io::address(2000),fast_io::sock::type::stream);
+	fast_io::server hd(fast_io::sock::family::ipv6,fast_io::address(2000),fast_io::sock::type::stream);
 	for(;;)
 	{
 		fast_io::acceptor_buf accept(hd);
-		println(accept,"hello world");
+		println_flush(accept,"hello world");
 		println_flush(fast_io::log,"a client connect to this server");
 	}
 }

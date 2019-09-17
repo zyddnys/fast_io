@@ -3,7 +3,7 @@
 int main()
 try
 {
-	fast_io::client_buf hd(fast_io::sock::family::ipv6,fast_io::address(2000,"2604:6000:1205:43ca:a0ee:68ea:7672:70db"),fast_io::sock::type::stream);
+	fast_io::client_buf hd(fast_io::sock::family::ipv4,fast_io::address(2000,"127.0.0.1"),fast_io::sock::type::stream);
 	std::string str;
 	getwhole(hd,str);
 	println(fast_io::out,str);

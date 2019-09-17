@@ -98,6 +98,11 @@ inline auto listen(Args&& ...args)
 	return call_win32_ws2_32<decltype(::listen)*>("listen",std::forward<Args>(args)...);
 }
 
+inline auto inet_pton(family fm,std::string_view address,void* dst)
+{
+	auto wstr(fast_io::utf8_to_ucs<std::wstring>(address));
+	return call_win32_ws2_32_minus_one<decltype(::InetPtonW)*>("InetPtonW",static_cast<int>(fm),wstr.c_str(),dst);
+}
 
 class win32_startup
 {

@@ -65,6 +65,10 @@ inline auto listen(Args&& ...args)
 	return call_posix(::listen,std::forward<Args>(args)...);
 }
 
+inline auto inet_pton(family fm,std::string_view address,void* dst)
+{
+	return call_posix(::inet_pton,static_cast<int>(fm),address.data(),dst);
+}
 
 using address_family = sa_family_t;
 using socket_type = int;
