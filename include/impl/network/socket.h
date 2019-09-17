@@ -237,10 +237,11 @@ public:
 
 class server
 {
+	sock::family fml;
 	socket soc;
 public:
 	template<typename ...Args>
-	server(sock::family const & fm,address const& add,Args&& ...args):soc(fm,std::forward<Args>(args)...)
+	server(sock::family const & fm,address const& add,Args&& ...args):fml(fm),soc(fm,std::forward<Args>(args)...)
 	{
 		sockaddr_storage storage{};
 		if(fm==sock::family::ipv6)
@@ -260,6 +261,10 @@ public:
 	auto& handle()
 	{
 		return soc;
+	}
+	auto& family()
+	{
+		return fml;
 	}
 };
 
