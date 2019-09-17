@@ -58,14 +58,12 @@ public:
 };
 
 }
-#if defined(__WINNT__) || defined(_MSC_VER)
-#include "win32_socket.h"
-#else
-#include "posix_socket.h"
-#endif
+
+#include"socket.h"
 
 namespace fast_io
 {
+
 using acceptor_buf = fast_io::self_tie<fast_io::basic_iobuf<fast_io::acceptor>>;
 using client_buf = fast_io::self_tie<fast_io::basic_iobuf<fast_io::client>>;
 using acceptor_buf_mutex = fast_io::basic_iomutex<acceptor_buf>;

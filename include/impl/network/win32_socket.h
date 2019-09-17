@@ -1,21 +1,104 @@
 #pragma once
 
-namespace fast_io
+namespace fast_io::sock::details
 {
-namespace details
+
+inline auto load_ws2_32()
 {
-inline auto const ws2_32_dll(LoadLibraryW(L"ws2_32.dll"));
-inline auto socket(reinterpret_cast<decltype(::socket)*>(reinterpret_cast<void(*)()>(GetProcAddress(ws2_32_dll,"socket"))));
-inline auto WSAGetLastError(reinterpret_cast<decltype(::WSAGetLastError)*>(reinterpret_cast<void(*)()>(GetProcAddress(ws2_32_dll,"WSAGetLastError"))));
-inline auto connect(reinterpret_cast<decltype(::connect)*>(reinterpret_cast<void(*)()>(GetProcAddress(ws2_32_dll,"connect"))));
-inline auto closesocket(reinterpret_cast<decltype(::closesocket)*>(reinterpret_cast<void(*)()>(GetProcAddress(ws2_32_dll,"closesocket"))));
-inline auto send(reinterpret_cast<decltype(::send)*>(reinterpret_cast<void(*)()>(GetProcAddress(ws2_32_dll,"send"))));
-inline auto recv(reinterpret_cast<decltype(::recv)*>(reinterpret_cast<void(*)()>(GetProcAddress(ws2_32_dll,"recv"))));
-inline auto htons(reinterpret_cast<decltype(::htons)*>(reinterpret_cast<void(*)()>(GetProcAddress(ws2_32_dll,"htons"))));
-inline auto InetPtonW(reinterpret_cast<decltype(::InetPtonW)*>(reinterpret_cast<void(*)()>(GetProcAddress(ws2_32_dll,"InetPtonW"))));
-inline auto bind(reinterpret_cast<decltype(::bind)*>(reinterpret_cast<void(*)()>(GetProcAddress(ws2_32_dll,"bind"))));
-inline auto listen(reinterpret_cast<decltype(::listen)*>(reinterpret_cast<void(*)()>(GetProcAddress(ws2_32_dll,"listen"))));
-inline auto accept(reinterpret_cast<decltype(::accept)*>(reinterpret_cast<void(*)()>(GetProcAddress(ws2_32_dll,"accept"))));
+	auto ws2_32_dll(LoadLibraryW(L"ws2_32.dll"));
+	if(ws2_32_dll==nullptr)
+		throw win32_error();
+	return ws2_32_dll;
+}
+
+inline auto const ws2_32_dll{load_ws2_32()};
+
+template<typename prototype>
+inline auto get_proc_address(char const* proc)
+{
+	auto address(GetProcAddress(ws2_32_dll,proc));
+	if(address==nullptr)
+		throw win32_error();
+	return reinterpret_cast<prototype>(reinterpret_cast<void(*)()>(address));
+}
+
+inline auto get_last_error(get_proc_address<decltype(::WSAGetLastError)*>("WSAGetLastError"));
+
+template<typename prototype,typename ...Args>
+inline auto call_win32_ws2_32(char const *name,Args&& ...args)
+{
+	auto ret(get_proc_address<prototype>(name)(std::forward<Args>(args)...));
+	if(ret==SOCKET_ERROR)
+		throw std::system_error(get_last_error(),std::system_category());
+	return ret;
+}
+
+template<typename prototype,typename ...Args>
+inline auto call_win32_ws2_32_invalid_socket(char const *name,Args&& ...args)
+{
+	auto ret(get_proc_address<prototype>(name)(std::forward<Args>(args)...));
+	if(ret==INVALID_SOCKET)
+		throw std::system_error(get_last_error(),std::system_category());
+	return ret;
+}
+
+template<typename prototype,typename ...Args>
+inline auto call_win32_ws2_32_minus_one(char const *name,Args&& ...args)
+{
+	auto ret(get_proc_address<prototype>(name)(std::forward<Args>(args)...));
+	if(ret==-1)
+		throw std::system_error(get_last_error(),std::system_category());
+	return ret;
+}
+
+template<typename ...Args>
+inline auto socket(Args&& ...args)
+{
+	return call_win32_ws2_32_invalid_socket<decltype(::socket)*>("socket",std::forward<Args>(args)...);
+}
+
+template<typename T>
+inline auto accept(SOCKET sck,T& sock_address,socklen_t& storage_size)
+{
+	return call_win32_ws2_32_invalid_socket<decltype(::accept)*>("accept",sck,static_cast<sockaddr*>(static_cast<void*>(std::addressof(sock_address))),std::addressof(storage_size));
+}
+
+template<typename sock_type,typename T>
+inline auto connect(SOCKET sck,T& sock_address)
+{
+	return call_win32_ws2_32_minus_one<decltype(::connect)*>("connect",sck,static_cast<sockaddr*>(static_cast<void*>(std::addressof(sock_address))),sizeof(T));
+}
+
+template<typename ...Args>
+inline auto send(Args&& ...args)
+{
+	return call_win32_ws2_32<decltype(::send)*>("send",std::forward<Args>(args)...);
+}
+template<typename ...Args>
+inline auto recv(Args&& ...args)
+{
+	return call_win32_ws2_32<decltype(::recv)*>("recv",std::forward<Args>(args)...);
+}
+
+template<typename ...Args>
+inline auto closesocket(Args&& ...args)
+{
+	return call_win32_ws2_32<decltype(::closesocket)*>("closesocket",std::forward<Args>(args)...);
+}
+
+template<typename sock_type,typename T>
+inline auto bind(SOCKET sck,T& sock_address)
+{
+	return call_win32_ws2_32_minus_one<decltype(::bind)*>("bind",sck,static_cast<sockaddr*>(static_cast<void*>(std::addressof(sock_address))),sizeof(sock_type));
+}
+
+template<typename ...Args>
+inline auto listen(Args&& ...args)
+{
+	return call_win32_ws2_32<decltype(::listen)*>("listen",std::forward<Args>(args)...);
+}
+
+
 class win32_startup
 {
 public:
@@ -29,186 +112,23 @@ public:
 	win32_startup(win32_startup const&) = delete;
 	win32_startup& operator=(win32_startup const&) = delete;
 	~win32_startup()
+	try
 	{
-		auto WSACleanup(reinterpret_cast<decltype(::WSACleanup)*>(reinterpret_cast<void(*)()>(GetProcAddress(ws2_32_dll,"WSACleanup"))));
-		WSACleanup();
+		get_proc_address<decltype(::WSACleanup)*>("WSACleanup")();
 	}
+	catch(...){}
 };
 
 inline win32_startup const startup;
 
-using win32_address_family = 
+using address_family =
 #ifdef _MSC_VER
 ADDRESS_FAMILY;
 #else
 std::int16_t;
 #endif
-}
-class acceptor;
-class socket
-{
-	SOCKET handle;
-	void close_impl()
-	{
-		if(handle!=INVALID_SOCKET)
-			details::closesocket(handle);
-	}
-	friend class acceptor;
-	socket()=default;
-public:
-	template<typename ...Args>
-	socket(native_interface_t,Args&& ...args):handle(details::socket(std::forward<Args>(args)...))
-	{
-		if(handle==INVALID_SOCKET)
-			throw std::system_error(details::WSAGetLastError(),std::generic_category());
-	}
-	socket(sock::family const & family,sock::type const &type,sock::protocal const &protocal = sock::protocal::none):socket(native_interface,static_cast<details::win32_address_family>(family),static_cast<int>(type),static_cast<int>(protocal)){}
-	auto native_handle() const {return handle;}
-	socket(socket const&) = delete;
-	socket& operator=(socket const&) = delete;
-	socket(socket && soc) noexcept:handle(soc.handle)
-	{
-		soc.handle = INVALID_SOCKET;
-	}
-	socket& operator=(socket && soc) noexcept
-	{
-		if(soc.handle!=handle)
-		{
-			close_impl();
-			handle = soc.handle;
-			soc.handle = INVALID_SOCKET;
-		}
-		return *this;
-	}
-	void swap(socket& b) noexcept
-	{
-		using std::swap;
-		swap(handle,b.handle);
-	}
-	template<typename ContiguousIterator>
-	ContiguousIterator read(ContiguousIterator begin,ContiguousIterator end)
-	{
-		auto read_bytes(details::recv(handle,std::addressof(*begin),static_cast<int>((end-begin)*sizeof(*begin)),0));
-		if(read_bytes==SOCKET_ERROR)
-			throw std::system_error(details::WSAGetLastError(),std::generic_category());
-		return begin+(read_bytes/sizeof(*begin));
-	}
-	template<typename ContiguousIterator>
-	ContiguousIterator write(ContiguousIterator begin,ContiguousIterator end)
-	{
-		auto write_bytes(details::send(handle,std::addressof(*begin),static_cast<int>((end-begin)*sizeof(*begin)),0));
-		if(write_bytes==SOCKET_ERROR)
-			throw std::system_error(details::WSAGetLastError(),std::generic_category());
-		return begin+(write_bytes/sizeof(*begin));
-	}
-	~socket()
-	{
-		close_impl();
-	}
-	void flush()
-	{
-	}
-};
 
-inline constexpr void swap(socket& a,socket &b) noexcept
-{
-	swap(a,b);
-}
 
-class client
-{
-	socket soc;
-public:
-	using char_type = char;
-	template<typename ...Args>
-	client(sock::family const & fm,address const& add,Args&& ...args):soc(fm,std::forward<Args>(args)...)
-	{
-		auto addr(fast_io::utf8_to_ucs<std::wstring>(add.addr()));
-		sockaddr_in servaddr{static_cast<details::win32_address_family>(fm),details::htons(add.port()),{},{}};
-		if(details::InetPtonW(static_cast<int>(fm),addr.data(),std::addressof(servaddr.sin_addr))==-1)
-			throw std::system_error(details::WSAGetLastError(),std::generic_category());
-		if(details::connect(soc.native_handle(),static_cast<sockaddr const*>(static_cast<void const*>(std::addressof(servaddr))),sizeof(servaddr))==-1)
-			throw std::system_error(details::WSAGetLastError(),std::generic_category());
-	}
-	auto& handle()
-	{
-		return soc;
-	}
-	template<typename ...Args>
-	auto read(Args&& ...args)
-	{
-		return soc.read(std::forward<Args>(args)...);
-	}
-	template<typename ...Args>
-	void write(Args&& ...args)
-	{
-		soc.write(std::forward<Args>(args)...);
-	}
-	void flush()
-	{
-		soc.flush();
-	}
-};
-
-class server
-{
-	socket soc;
-public:
-	template<typename ...Args>
-	server(sock::family const & fm,address const& add,Args&& ...args):soc(fm,std::forward<Args>(args)...)
-	{
-		sockaddr_in servaddr{static_cast<details::win32_address_family>(fm),details::htons(add.port()),{},{}};
-		auto addr(fast_io::utf8_to_ucs<std::wstring>(add.addr()));
-		if(details::InetPtonW(static_cast<int>(fm),addr.data(),std::addressof(servaddr.sin_addr))==-1)
-			throw std::system_error(details::WSAGetLastError(),std::generic_category());
-		if(details::bind(soc.native_handle(),static_cast<sockaddr const*>(static_cast<void const*>(std::addressof(servaddr))),sizeof(servaddr))==SOCKET_ERROR)
-			throw std::system_error(details::WSAGetLastError(),std::generic_category());
-		if(details::listen(soc.native_handle(),10)==SOCKET_ERROR)
-			throw std::system_error(details::WSAGetLastError(),std::generic_category());			
-	}
-	auto& handle()
-	{
-		return soc;
-	}
-};
-
-class acceptor
-{
-	socket soc;
-	sockaddr_in add;
-public:
-	using native_handle_type = SOCKET;
-	using char_type = char;
-	acceptor(server& listener_socket)
-	{
-		int size(sizeof(add));
-		auto ret(details::accept(listener_socket.handle().native_handle(),static_cast<sockaddr*>(static_cast<void*>(std::addressof(add))),std::addressof(size)));
-		if(ret==INVALID_SOCKET)
-			throw std::system_error(details::WSAGetLastError(),std::generic_category());
-		soc.handle=ret;
-	}
-	auto& handle()
-	{
-		return soc;
-	}
-	template<typename ...Args>
-	auto read(Args&& ...args)
-	{
-		return soc.read(std::forward<Args>(args)...);
-	}
-	template<typename ...Args>
-	void write(Args&& ...args)
-	{
-		soc.write(std::forward<Args>(args)...);
-	}
-	void flush()
-	{
-		soc.flush();
-	}
-	auto& native_address() const
-	{
-		return add;
-	}
-};
-
+using socket_type = SOCKET;
+auto constexpr invalid_socket(INVALID_SOCKET);
 }
