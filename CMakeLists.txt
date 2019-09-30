@@ -3,5 +3,4 @@ project(fastio)
 find_package(Threads)
 
 INSTALL (DIRECTORY ${CMAKE_SOURCE_DIR}/include/
-DESTINATION include
-FILES_MATCHING PATTERN "*.h")
+DESTINATION ${PROJECT_SOURCE_DIR}/include)
