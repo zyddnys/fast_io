@@ -12,33 +12,33 @@
 #include<string>
 #include<bitset>
 #include<algorithm>
-#include"impl/concept.h"
-#include"impl/eof.h"
-#include"impl/seek.h"
-#include"impl/precondition.h"
-#include"impl/mode.h"
-#include"impl/base.h"
-#include"impl/stringbuf.h"
-#include"impl/rd_type.h"
-#include"impl/manip.h"
-#include"impl/read_write.h"
-#include"impl/ucs.h"
-#include"impl/text.h"
+#include"fast_io_impl/concept.h"
+#include"fast_io_impl/eof.h"
+#include"fast_io_impl/seek.h"
+#include"fast_io_impl/precondition.h"
+#include"fast_io_impl/mode.h"
+#include"fast_io_impl/base.h"
+#include"fast_io_impl/stringbuf.h"
+#include"fast_io_impl/rd_type.h"
+#include"fast_io_impl/manip.h"
+#include"fast_io_impl/read_write.h"
+#include"fast_io_impl/ucs.h"
+#include"fast_io_impl/text.h"
 #if defined(__WINNT__) || defined(_MSC_VER)
-#include"impl/handlers/win32.h"
+#include"fast_io_impl/handlers/win32.h"
 #else
-#include"impl/handlers/posix.h"
+#include"fast_io_impl/handlers/posix.h"
 #endif
-#include"impl/iobuf.h"
-#include"impl/iomutex.h"
-#include"impl/wrapper.h"
-#include"impl/tie.h"
-#include"impl/flush.h"
-#include"impl/erasure.h"
-#include"impl/dynamic.h"
-#include"impl/sync.h"
-#include"impl/streambuf_view.h"
-#include"impl/stream_view.h"
+#include"fast_io_impl/iobuf.h"
+#include"fast_io_impl/iomutex.h"
+#include"fast_io_impl/wrapper.h"
+#include"fast_io_impl/tie.h"
+#include"fast_io_impl/flush.h"
+#include"fast_io_impl/erasure.h"
+#include"fast_io_impl/dynamic.h"
+#include"fast_io_impl/sync.h"
+#include"fast_io_impl/streambuf_view.h"
+#include"fast_io_impl/stream_view.h"
 
 namespace fast_io
 {
@@ -101,9 +101,9 @@ using iobuf_dynamic = basic_iobuf<dynamic_io_stream>;
 }
 
 #ifdef FAST_IO_IOSTREAM_AS_IO_HANDLE
-#include"impl/handlers/iostreams.h"
+#include"fast_io_impl/handlers/iostreams.h"
 #elif FAST_IO_CSTDIO_AS_IO_HANDLE
-#include"impl/handlers/c_style.h"
+#include"fast_io_impl/handlers/c_style.h"
 namespace fast_io
 {
 using c_style_ohandle = ierasure<c_style_io_handle>;
@@ -123,4 +123,4 @@ inline basic_obuf<system_ohandle> log(native_stderr);
 }
 #endif
 
-#include"impl/network/network.h"
+#include"fast_io_impl/network/network.h"
