@@ -57,7 +57,11 @@ inline void output_fixed_floats(output& out,T e,std::size_t precision)
 		do
 		{
 			temp = std::floor(u/10);
-			bas.push_back(static_cast<typename output::char_type>(u-temp*10)+48);
+			std::make_unsigned_t<typename output::char_type> v(u-temp*10);
+			if(v<10)
+				bas.push_back(v+48);
+			else
+				bas.push_back(48);
 		}
 		while((u=temp));
 		for(std::size_t i(bas.size());i--;out.put(bas[i]));
@@ -68,7 +72,11 @@ inline void output_fixed_floats(output& out,T e,std::size_t precision)
 		do
 		{
 			temp = std::floor(ptg/10);
-			bas.push_back(static_cast<typename output::char_type>(ptg-temp*10)+48);
+			std::make_unsigned_t<typename output::char_type> v(ptg-temp*10);
+			if(v<10)
+				bas.push_back(v+48);
+			else
+				bas.push_back(48);
 		}
 		while((ptg=temp)&&bas.size()<=precision);
 		for(std::size_t i(bas.size());i<precision;++i)
@@ -85,9 +93,12 @@ inline void output_fixed_floats(output& out,T e,std::size_t precision)
 			if(precision<=bas.size())
 				break;
 			temp = std::floor(ptg/10);
-			auto ch(static_cast<typename output::char_type>(ptg-temp*10)+48);
-			bas.push_back(ch);
-			if(ch!=48)
+			std::make_unsigned_t<typename output::char_type> v(ptg-temp*10);
+			if(v<10)
+				bas.push_back(v+48);
+			else
+				bas.push_back(48);
+			if(v)
 				hasone=true;
 		}
 		while((ptg=temp));
@@ -101,7 +112,11 @@ inline void output_fixed_floats(output& out,T e,std::size_t precision)
 		do
 		{
 			temp = std::floor(u/10);
-			bas2.push_back(static_cast<typename output::char_type>(u-temp*10)+48);
+			std::make_unsigned_t<typename output::char_type> v(u-temp*10);
+			if(v<10)
+				bas2.push_back(v+48);
+			else
+				bas2.push_back(48);
 		}
 		while((u=temp));
 		if(bas2.empty())
