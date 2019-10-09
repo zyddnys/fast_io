@@ -5,21 +5,23 @@ find_package(Threads)
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   # using Visual Studio C++
 add_definitions(/experimental:concepts)
-#if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 #if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-else()
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 add_definitions(-fconcepts -ffast-math)
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+add_definitions(-Xclang -fconcepts-ts -ffast-math -stdlib=libc++ -lc++abi)
 endif()
 
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(compile "./0000.Hello World/compile.cc")
+
 add_executable(hello_world "./0000.Hello World/hello_world.cc")
+
 add_executable(hello_world_format "./0000.Hello World/hello_world_format.cc")
 #add_executable(hello_world1 "./0000.Hello World/hello_world1.cc")
 add_executable(hello_world2 "./0000.Hello World/hello_world2.cc")
 add_executable(hello_world3 "./0000.Hello World/hello_world3.cc")
-
 add_executable(file_hello_world "./0001.file io/file_hello_world.cc")
 add_executable(mutex_file_hello_world "./0001.file io/mutex_file_hello_world.cc")
 add_executable(open_none_existing_file "./0001.file io/open_none_existing_file.cc")
@@ -107,3 +109,4 @@ add_executable(double_fixed "./0009.floating point/double_fixed.cc")
 add_executable(double_fixed_setw "./0009.floating point/double_fixed_setw.cc")
 add_executable(integer_scientific "./0009.floating point/integer_scientific.cc")
 add_executable(floating_view "./0009.floating point/floating_view.cc")
+

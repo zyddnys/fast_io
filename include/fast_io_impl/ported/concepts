@@ -5,16 +5,19 @@ Migrator: Cqwrteur
 #ifndef _GLIBCXX_EXPERIMENTAL_CONCEPTS_
 #define _GLIBCXX_EXPERIMENTAL_CONCEPTS_ 1
 
-#pragma GCC system_header
-#if __cplusplus > 201703L
 #include <functional>
 #include <type_traits>
 #include "__type_traits.h"
 
+#ifdef __GLIBCXX__
+#pragma GCC system_header
+
 namespace std _GLIBCXX_VISIBILITY(default)
 {
 _GLIBCXX_BEGIN_NAMESPACE_VERSION
-
+#else
+_LIBCPP_BEGIN_NAMESPACE_STD
+#endif
 
 // CONCEPT same_as
 template <class _Ty1, class _Ty2>
@@ -337,14 +340,16 @@ concept relation = predicate<_FTy, _Ty1, _Ty1> && predicate<_FTy, _Ty2, _Ty2> &&
 template <class _FTy, class _Ty1, class _Ty2>
 concept strict_weak_order = relation<_FTy, _Ty1, _Ty2>;
 
-
 /*
 My Additional implementations (Looks like VCs implementation has not completed yet)
 */
 template<typename T>
-concept floating_point = std::is_floating_point_v<T>;
+concept floating_point = is_floating_point_v<T>;
 
+#ifdef __GLIBCXX__
 _GLIBCXX_END_NAMESPACE_VERSION
 }
+#else
+_LIBCPP_END_NAMESPACE_STD
 #endif
 #endif

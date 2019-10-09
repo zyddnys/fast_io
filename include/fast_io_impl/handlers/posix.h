@@ -113,13 +113,14 @@ public:
 			throw std::system_error(errno,std::generic_category());
 		return begin+(write_bytes/sizeof(*begin));
 	}
-	template<typename T>
-	void seek(seek_type_t<T>,std::integral i,seekdir s=seekdir::beg)
+	template<typename T,std::integral R>
+	void seek(seek_type_t<T>,R i,seekdir s=seekdir::beg)
 	{
 		if(::lseek64(fd,seek_precondition<off64_t,T,char_type>(i),static_cast<int>(s))==-1)
 			throw std::system_error(errno,std::generic_category()); 
 	}
-	void seek(std::integral i,seekdir s=seekdir::beg)
+	template<std::integral R>
+	void seek(R i,seekdir s=seekdir::beg)
 	{
 		seek(seek_type<char_type>,i,s);
 	}

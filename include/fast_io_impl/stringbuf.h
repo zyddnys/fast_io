@@ -98,7 +98,7 @@ inline constexpr T format(std::string_view format,Args&& ...args)
 }
 
 template<typename T,typename... Args>
-inline constexpr void in_place_to(T& t,Args&& ...args)
+inline void in_place_to(T& t,Args&& ...args)
 {
 	basic_ostring<std::string> os;
 	print(os,std::forward<Args>(args)...);
@@ -107,7 +107,7 @@ inline constexpr void in_place_to(T& t,Args&& ...args)
 }
 
 template<typename... Args>
-inline constexpr void in_place_to(std::string& t,Args&& ...args)
+inline void in_place_to(std::string& t,Args&& ...args)
 {
 	basic_ostring<std::string> os(std::move(t));
 	os.clear();
@@ -116,7 +116,7 @@ inline constexpr void in_place_to(std::string& t,Args&& ...args)
 }
 
 template<typename T,typename... Args>
-inline constexpr auto to(Args&& ...args)
+inline auto to(Args&& ...args)
 {
 	T t;
 	in_place_to(t,std::forward<Args>(args)...);

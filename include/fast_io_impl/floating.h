@@ -321,7 +321,7 @@ inline constexpr void scan(input& in,T &t)
 			}
 		}
 	}
-	std::ptrdiff_t p;
+	std::ptrdiff_t p=0;
 	scan(in,p);
 	t*=std::pow(10,p);
 	if(negative)

@@ -7,7 +7,7 @@ class basic_ibuf;
 template<output_stream Ohandler,typename Buf>
 class basic_obuf;
 
-template<typename T,std::size_t alignment=4096>
+template<typename T,std::size_t alignment=16384>
 struct io_aligned_allocator
 {
 	using value_type = T;
@@ -17,15 +17,15 @@ struct io_aligned_allocator
 	using is_always_equal = std::true_type;
 	[[nodiscard]] T* allocate(std::size_t n)
 	{
-		return static_cast<T*>(std::aligned_alloc(alignment,n));
+		return static_cast<T*>(operator new(n,std::align_val_t{alignment}));
 	}
 	void deallocate(T* p, std::size_t n)
 	{
-		std::free(p);
+		operator delete(p,n,std::align_val_t{alignment});
 	}
 };
 
-template<typename CharT,typename Allocator = io_aligned_allocator<CharT>,std::size_t buffer_size = 1048576>
+template<typename CharT,typename Allocator = io_aligned_allocator<CharT>,std::size_t buffer_size = 65536>
 class basic_buf_handler
 {
 	Allocator alloc;

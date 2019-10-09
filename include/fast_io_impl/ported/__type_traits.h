@@ -5,14 +5,15 @@ Migrator: Cqwrteur
 
 #ifndef _GLIBCXX___TYPE_TRAITS_H
 #define _GLIBCXX___TYPE_TRAITS_H 1
-
+#ifdef __GLIBCXX__
 #pragma GCC system_header
-#if __cplusplus >= 201703L
-#include<type_traits>
 
 namespace std _GLIBCXX_VISIBILITY(default)
 {
 _GLIBCXX_BEGIN_NAMESPACE_VERSION
+#else
+_LIBCPP_BEGIN_NAMESPACE_STD
+#endif
 
 // STRUCT TEMPLATE basic_common_reference
 template <class, class, template <class> class, template <class> class>
@@ -159,8 +160,10 @@ struct _Fold_common_reference<void_t<common_reference_t<_Ty1, _Ty2>>, _Ty1, _Ty2
 template <class _Ty1, class _Ty2, class _Ty3, class... _Rest>
 struct common_reference<_Ty1, _Ty2, _Ty3, _Rest...> : _Fold_common_reference<void, _Ty1, _Ty2, _Ty3, _Rest...> {};
 
-
+#ifdef __GLIBCXX__
 _GLIBCXX_END_NAMESPACE_VERSION
 }
+#else
+_LIBCPP_END_NAMESPACE_STD
 #endif
 #endif
