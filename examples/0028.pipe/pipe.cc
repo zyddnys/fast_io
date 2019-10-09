@@ -2,8 +2,9 @@
 
 int main()
 {
-	fast_io::ioposix_pipe pipe;
+	fast_io::iosystem_pipe pipe;
 	println(pipe,"hello world ",4);
 	std::size_t v;
 	scan(pipe,v);
+	println(fast_io::out,v);
 }

@@ -7,7 +7,25 @@ class basic_ibuf;
 template<output_stream Ohandler,typename Buf>
 class basic_obuf;
 
-template<typename CharT,typename Allocator = std::allocator<CharT>,std::size_t buffer_size = 1048576>
+template<typename T,std::size_t alignment=4096>
+struct io_aligned_allocator
+{
+	using value_type = T;
+	using size_type = std::size_t;
+	using difference_type = std::ptrdiff_t;
+	using propagate_on_container_move_assignment = std::true_type;
+	using is_always_equal = std::true_type;
+	[[nodiscard]] T* allocate(std::size_t n)
+	{
+		return static_cast<T*>(std::aligned_alloc(alignment,n));
+	}
+	void deallocate(T* p, std::size_t n)
+	{
+		std::free(p);
+	}
+};
+
+template<typename CharT,typename Allocator = io_aligned_allocator<CharT>,std::size_t buffer_size = 1048576>
 class basic_buf_handler
 {
 	Allocator alloc;
@@ -67,6 +85,9 @@ private:
 			bh.end=ih.read(bh.beg,bh.beg+Buf::size());
 			bh.curr=bh.beg;
 			n=end-begin;
+			std::size_t const sz(bh.end-bh.beg);
+			if(sz<n)
+				n=sz;
 		}
 		begin=std::uninitialized_copy_n(bh.curr,n,begin);
 		bh.curr+=n;

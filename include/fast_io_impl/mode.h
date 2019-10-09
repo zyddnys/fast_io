@@ -24,11 +24,12 @@ struct mode
 inline static mode constexpr app{1};
 inline static mode constexpr ate{1<<1};
 inline static mode constexpr binary{1<<2};
-inline static mode constexpr in{1<<3};
-inline static mode constexpr excl{1<<4};//C++ iostream currently still does not support "x"
-inline static mode constexpr out{1<<5};
-inline static mode constexpr trunc{1<<6};
-//inline static mode constexpr sync{1<<7}; future support for sync tag after implementing ntopen
+inline static mode constexpr direct{1<<3};
+inline static mode constexpr in{1<<4};
+inline static mode constexpr excl{1<<5};//C++ iostream currently still does not support "x"
+inline static mode constexpr out{1<<6};
+inline static mode constexpr sync{1<<7};
+inline static mode constexpr trunc{1<<8};
 
 inline constexpr mode operator|(mode const& a,mode const& b)
 {
@@ -55,10 +56,40 @@ inline constexpr bool with_binary(mode const& m)
 	return m.value&binary.value;
 }
 
+inline constexpr mode remove_direct(mode const& m)
+{
+	return {m.value&~direct.value};
+}
+
+inline constexpr bool with_direct(mode const& m)
+{
+	return m.value&direct.value;
+}
+
+inline constexpr mode remove_sync(mode const& m)
+{
+	return {m.value&~sync.value};
+}
+
+inline constexpr bool with_sync(mode const& m)
+{
+	return m.value&sync.value;
+}
+
+inline constexpr mode remove_ate_direct_sync(mode const& m)
+{
+	return {m.value&~ate.value&~direct.value&~sync.value};
+}
+inline constexpr mode remove_ate_binary_direct_sync(mode const& m)
+{
+	return {m.value&~ate.value&~binary.value&~direct.value&~sync.value};
+}
+
+
 inline auto constexpr c_style(mode const& m)
 {
 	using namespace std::string_view_literals;
-	switch(remove_ate(m))
+	switch(remove_ate_direct_sync(m))
 	{
 //Action if file already exists;	Action if file does not exist;	c-style mode;	Explanation
 //Read from start;	Failure to open;	"r";	Open a file for reading

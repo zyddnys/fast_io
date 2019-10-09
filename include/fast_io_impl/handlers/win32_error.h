@@ -1,13 +1,17 @@
 #pragma once
-#include <winsock2.h>
-#include <Ws2tcpip.h>
-#include<wtypes.h>
-#ifdef interface
+#undef min
+#undef max
+#include<ws2tcpip.h>
+
 #undef interface			//what a joke. Who did this?
-#endif
+#undef min			//what a joke. Who did this?
+#undef max			//what a joke. Who did this?
 
 namespace fast_io
 {
+
+//void * __stdcall LoadLibraryW(wchar_t const*);
+
 class win32_error : public std::runtime_error
 {
 	static std::string format_get_last_error(DWORD error)
@@ -16,9 +20,7 @@ class win32_error : public std::runtime_error
 		{
 			char *lpMsgBuf;
 			auto bufLen(FormatMessage(
-			FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-			FORMAT_MESSAGE_FROM_SYSTEM |
-			FORMAT_MESSAGE_IGNORE_INSERTS,
+			0x00000100 | 0x00000200 | 0x00001000,
 			nullptr,
 			error,
 			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),

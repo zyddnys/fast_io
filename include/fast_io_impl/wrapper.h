@@ -25,6 +25,8 @@ using output_file_wrapper = basic_file_wrapper<T,fast_io::open::out|fast_io::ope
 template<io_stream T>
 using io_file_wrapper = basic_file_wrapper<T,fast_io::open::in|fast_io::open::out|fast_io::open::binary>;
 
+
+
 template<stream T,std::size_t interface_mode>
 class basic_wrapper:public T
 {

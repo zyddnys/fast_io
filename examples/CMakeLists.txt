@@ -73,6 +73,7 @@ add_executable(osync "./0025.multiprocesses/osync.cc")
 add_executable(run_mt_sync "./0025.multiprocesses/run_mt_sync.cc")
 target_link_libraries(run_mt_sync ${CMAKE_THREAD_LIBS_INIT} )
 add_executable(addressof "./0027.pointer/addressof.cc")
+add_executable(pipe "./0028.pipe/pipe.cc")
 
 add_executable(emoji "./0012.ucs/emoji.cc")
 add_executable(ucs_view "./0012.ucs/ucs_view.cc")

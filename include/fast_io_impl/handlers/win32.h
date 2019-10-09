@@ -44,6 +44,10 @@ inline constexpr win32_open_mode calculate_win32_open_mode(open::mode const &om)
 	}
 	else
 		mode.dwCreationDisposition=OPEN_ALWAYS;
+	if(value&open::direct.value)
+		mode.dwFlagsAndAttributes|=FILE_FLAG_NO_BUFFERING;
+	if(value&open::sync.value)
+		mode.dwFlagsAndAttributes|=FILE_FLAG_WRITE_THROUGH;
 	return mode;
 }
 template<std::size_t om>
@@ -57,12 +61,13 @@ class win32_io_handle
 {
 	HANDLE mhandle;
 protected:
-	void closeimpl()
+	void close_impl()
 	{
 		if(mhandle)
 			CloseHandle(mhandle);
 	}
 	HANDLE& protected_native_handle()	{return mhandle;}
+	win32_io_handle() = default;
 public:
 	using char_type = char;
 	using native_handle_type = HANDLE;
@@ -94,7 +99,7 @@ public:
 	{
 		if(std::addressof(b)!=this)
 		{
-			closeimpl();
+			close_impl();
 			mhandle = b.mhandle;
 			b.mhandle=nullptr;
 		}
@@ -165,9 +170,88 @@ public:
 	win32_file(std::string_view file,std::string_view mode):win32_file(file,fast_io::open::c_style(mode)){}
 	~win32_file()
 	{
-		win32_io_handle::closeimpl();
+		win32_io_handle::close_impl();
 	}
 };
 
+class win32_pipe_unique:public win32_io_handle
+{
+public:
+	using char_type = char;
+	using native_handle_type = HANDLE;
+	void close()
+	{
+		win32_io_handle::close_impl();
+		protected_native_handle() = nullptr;
+	}
+	~win32_pipe_unique()
+	{
+		win32_io_handle::close_impl();
+	}
+};
+
+class win32_pipe
+{
+public:
+	using char_type = char;
+	using native_handle_type = std::array<win32_pipe_unique,2>;
+private:
+	native_handle_type pipes;
+public:
+	template<typename ...Args>
+	win32_pipe(fast_io::native_interface_t, Args&& ...args)
+	{
+		if(!::CreatePipe(static_cast<void**>(static_cast<void*>(pipes.data())),static_cast<void**>(static_cast<void*>(pipes.data()+1)),std::forward<Args>(args)...))
+			throw win32_error();
+	}
+	win32_pipe():win32_pipe(fast_io::native_interface,nullptr,0)
+	{
+	}
+	template<std::size_t om>
+	win32_pipe(open::interface_t<om>):win32_pipe()
+	{
+		auto constexpr omb(om&~open::binary.value);
+		static_assert(omb==open::in.value||omb==open::out.value||omb==(open::in.value|open::out.value),"pipe open mode must be in or out");
+		if constexpr (!(om&~open::in.value)&&(om&~open::out.value))
+			pipes.front().close();
+		if constexpr ((om&~open::in.value)&&!(om&~open::out.value))
+			pipes.back().close();
+	}
+	auto& native_handle()
+	{
+		return pipes;
+	}
+	void flush()
+	{
+	}
+	void close_in()
+	{
+		pipes.front().close();
+	}
+	void close_out()
+	{
+		pipes.back().close();		
+	}
+	template<typename ContiguousIterator>
+	ContiguousIterator read(ContiguousIterator begin,ContiguousIterator end)
+	{
+		return pipes.front().read(begin,end);
+	}
+	template<typename ContiguousIterator>
+	void write(ContiguousIterator begin,ContiguousIterator end)
+	{
+		pipes.back().write(begin,end);
+	}
+};
+
+
+using system_file = win32_file;
+using system_io_handle = win32_io_handle;
+using system_pipe_unique = win32_pipe_unique;
+using system_pipe = win32_pipe;
+
+inline DWORD constexpr native_stdin = -10;
+inline DWORD constexpr native_stdout = -11;
+inline DWORD constexpr native_stderr = -12;
 
 }

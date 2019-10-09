@@ -29,6 +29,20 @@ inline constexpr int calculate_posix_open_mode(open::mode const &om)
 		mode |= O_TRUNC;
 		value &= ~trunc.value;
 	}
+	if(value&direct.value)
+	{
+#ifdef O_DIRECT
+		mode |= O_DIRECT;
+#endif
+		value &= ~direct.value;
+	}
+	if(value&sync.value)
+	{
+#ifdef O_SYNC
+		mode |= O_SYNC;
+#endif
+		value &= ~sync.value;
+	}
 	switch(value)
 	{
 //Action if file already exists;	Action if file does not exist;	c-style mode;	Explanation
@@ -67,8 +81,12 @@ class posix_io_handle
 protected:
 	void close_impl() noexcept
 	{
-		if(native_handle()!=-1)
-			close(native_handle());
+		if(fd!=-1)
+			close(fd);
+	}
+	auto& protected_native_handle()
+	{
+		return fd;
 	}
 public:
 	using char_type = char;
@@ -171,116 +189,48 @@ public:
 	}
 };
 
+class posix_pipe_unique:public posix_io_handle
+{
+public:
+	using char_type = char;
+	using native_handle_type = int;
+	void close()
+	{
+		posix_io_handle::close_impl();
+		protected_native_handle() = -1;
+	}
+	~posix_pipe_unique()
+	{
+		posix_io_handle::close_impl();
+	}
+};
+
 class posix_pipe
 {
 public:
 	using char_type = char;
-	using native_handle_type = std::array<int,2>;
+	using native_handle_type = std::array<posix_pipe_unique,2>;
 private:
 	native_handle_type pipes;
-	void close_impl()
-	{
-		for(auto const & e : pipes)
-			if(e!=-1)
-				close(e);
-	}
 public:
 	posix_pipe()
 	{
 #ifdef _WIN32_WINNT
-		if(_pipe(pipes.data(),1048576,_O_BINARY)==-1)
+		if(_pipe(static_cast<int*>(static_cast<void*>(pipes.data())),1048576,_O_BINARY)==-1)
 #else
-		if(::pipe(pipes.data())==-1)
+		if(::pipe(static_cast<int*>(static_cast<void*>(pipes.data())))==-1)
 #endif
 			throw std::system_error(errno,std::generic_category());
-	}
-	posix_pipe(posix_pipe&& other) noexcept:pipes(other.pipes)
-	{
-		other.pipes.fill(-1);
-	}
-	posix_pipe& operator=(posix_pipe && other) noexcept
-	{
-		if(pipes.data()!=other.pipes.data())
-		{
-			close_impl();
-			pipes = other.pipes;
-			other.pipes.fill(-1);
-		}
-		return *this;
 	}
 	template<std::size_t om>
 	posix_pipe(open::interface_t<om>):posix_pipe()
 	{
-		if constexpr ((!om)||(om&~(open::in.value|open::out.value)))
-			throw std::runtime_error("unknown posix pipe flags");
+		auto constexpr omb(om&~open::binary.value);
+		static_assert(omb==open::in.value||omb==open::out.value||omb==(open::in.value|open::out.value),"pipe open mode must be in or out");
 		if constexpr (!(om&~open::in.value)&&(om&~open::out.value))
-		{
-			close(pipes.front());
-			pipes.front()=-1;
-		}
+			pipes.front().close();
 		if constexpr ((om&~open::in.value)&&!(om&~open::out.value))
-		{
-			close(pipes.back());			
-			pipes.back()=-1;
-		}
-	}
-	posix_pipe(posix_pipe const& b)
-	{
-		std::size_t i(0);
-		try
-		{
-			for(;i!=b.pipes.size();++i)
-				if(b.pipes[i]==-1)
-					pipes[i]=-1;
-				else
-				{
-					auto newfd(dup(b.pipes[i]));
-					if(newfd<0)
-						throw std::system_error(errno,std::generic_category());
-					pipes[i]=newfd;
-				}
-		}
-		catch(...)
-		{
-			for(;i;--i)
-				if(pipes[i-1]!=-1)
-					close(pipes[i-1]);
-			throw;
-		}
-	}
-	posix_pipe& operator=(posix_pipe const& m)
-	{
-		std::size_t i(0);
-		native_handle_type new_hds;
-		try
-		{
-			for(;i!=m.pipes.size();++i)
-				if(m.pipes[i]==-1)
-					new_hds[i]=-1;
-				else
-				{
-					auto newfd(dup(m.pipes[i]));
-					if(newfd==-1)
-						throw std::system_error(errno,std::generic_category());
-					new_hds[i]=newfd;
-				}
-		}
-		catch(...)
-		{
-			for(;i;--i)
-				if(new_hds[i-1]!=-1)
-					close(new_hds[i-1]);
-			throw;
-		}
-		for(auto const & e : pipes)
-			if(e!=-1)
-				close(e);
-		pipes=new_hds;
-		return *this;
-	}
-	~posix_pipe()
-	{
-		close_impl();
+			pipes.back().close();
 	}
 	auto& native_handle()
 	{
@@ -291,35 +241,33 @@ public:
 	}
 	void close_in()
 	{
-		if(pipes.front()!=-1)
-		{
-			close(pipes.front());
-			pipes.front() = -1;
-		}
+		pipes.front().close();
 	}
 	void close_out()
 	{
-		if(pipes.back()!=-1)
-		{
-			close(pipes.back());
-			pipes.back() = -1;
-		}
+		pipes.back().close();
 	}
 	template<typename ContiguousIterator>
 	ContiguousIterator read(ContiguousIterator begin,ContiguousIterator end)
 	{
-		auto read_bytes(::read(pipes.front(),std::addressof(*begin),(end-begin)*sizeof(*begin)));
-		if(read_bytes==-1)
-			throw std::system_error(errno,std::generic_category());
-		return begin+(read_bytes/sizeof(*begin));
+		return pipes.front().read(begin,end);
 	}
 	template<typename ContiguousIterator>
-	ContiguousIterator write(ContiguousIterator begin,ContiguousIterator end)
+	void write(ContiguousIterator begin,ContiguousIterator end)
 	{
-		auto write_bytes(::write(pipes.back(),std::addressof(*begin),(end-begin)*sizeof(*begin)));
-		if(write_bytes==-1)
-			throw std::system_error(errno,std::generic_category());
-		return begin+(write_bytes/sizeof(*begin));
+		pipes.back().write(begin,end);
 	}
 };
+
+#ifndef __WINNT__
+using system_file = posix_file;
+using system_io_handle = posix_io_handle;
+using system_pipe_unique = posix_pipe_unique;
+using system_pipe = posix_pipe;
+inline int constexpr native_stdin = 0;
+inline int constexpr native_stdout = 1;
+inline int constexpr native_stderr = 2;
+#endif
+
+
 }

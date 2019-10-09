@@ -42,35 +42,17 @@
 
 namespace fast_io
 {
-#if defined(__WINNT__) || defined(_MSC_VER)
-using system_file = win32_file;
-using system_io_handle = win32_io_handle;
 
-inline DWORD constexpr native_stdin = -10;
-inline DWORD constexpr native_stdout = -11;
-inline DWORD constexpr native_stderr = -12;
-
-#else
-using system_file = posix_file;
-using system_io_handle = posix_io_handle;
-using iposix_pipe = nobuf_reader<input_wrapper<posix_pipe>>;
-using oposix_pipe = immediately_flush<nobuf_reader<output_wrapper<posix_pipe>>>;
-using ioposix_pipe = immediately_flush<nobuf_reader<io_wrapper<posix_pipe>>>;
-
-inline int constexpr native_stdin = 0;
-inline int constexpr native_stdout = 1;
-inline int constexpr native_stderr = 2;
-
-#endif
+using isystem_pipe = nobuf_reader<input_wrapper<system_pipe>>;
+using osystem_pipe = immediately_flush<nobuf_reader<output_wrapper<system_pipe>>>;
+using iosystem_pipe = immediately_flush<nobuf_reader<io_wrapper<system_pipe>>>;
 
 using system_ohandle = ierasure<system_io_handle>;
 using system_ihandle = oerasure<system_io_handle>;
 
-
 using isystem_file = input_file_wrapper<system_file>;
 using osystem_file = output_file_wrapper<system_file>;
 using iosystem_file = io_file_wrapper<system_file>;
-
 
 
 using sync = basic_sync<basic_file_wrapper<system_file,fast_io::open::app|fast_io::open::binary>>;
@@ -104,6 +86,7 @@ using iobuf_dynamic = basic_iobuf<dynamic_io_stream>;
 #include"fast_io_impl/handlers/iostreams.h"
 #elif FAST_IO_CSTDIO_AS_IO_HANDLE
 #include"fast_io_impl/handlers/c_style.h"
+
 namespace fast_io
 {
 using c_style_ohandle = ierasure<c_style_io_handle>;
@@ -111,11 +94,11 @@ using c_style_ihandle = oerasure<c_style_io_handle>;
 inline c_style_ohandle out(stdout);
 inline tie<c_style_ihandle,decltype(out)> in(out,stdin);
 inline tie<immediately_flush<decltype(out)>,decltype(out)> err(out,stderr);
+inline fast_io::basic_obuf<c_style_ohandle> log(stderr);
 }
 #else
 namespace fast_io
 {
-
 inline basic_obuf<system_ohandle> out(native_stdout);
 inline tie<basic_ibuf<system_io_handle>,decltype(out)> in(out,native_stdin);
 inline tie<immediately_flush<system_ohandle>,decltype(out)> err(out,native_stderr);
@@ -124,3 +107,4 @@ inline basic_obuf<system_ohandle> log(native_stderr);
 #endif
 
 #include"fast_io_impl/network/network.h"
+#include"fast_io_impl/crypto/crypto.h"
