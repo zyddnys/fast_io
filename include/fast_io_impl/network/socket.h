@@ -158,10 +158,6 @@ public:
 	}
 	
 #ifdef __linux__
-	auto zero_copy_in_handle()
-	{
-		return handle;
-	}
 	auto zero_copy_out_handle()
 	{
 		return handle;
