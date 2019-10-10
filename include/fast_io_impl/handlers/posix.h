@@ -160,7 +160,7 @@ public:
 		}
 		return *this;
 	}
-
+#ifdef __linux__
 	auto zero_copy_in_handle()
 	{
 		return fd;
@@ -169,6 +169,7 @@ public:
 	{
 		return fd;
 	}
+#endif
 };
 
 class posix_file:public posix_io_handle
