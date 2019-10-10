@@ -1,4 +1,6 @@
-This is a new Experimental library to replace iostream and cstdio based on C++ 2a feature concepts. Currently, the only compiler which supports Concepts TS is GCC.
+This is a new header-only (module only in the future) Experimental library to replace iostream and cstdio based on C++ 2a feature concepts. Currently, the only compiler which supports Concepts TS is GCC. Supports VC preview as well. It can compile on clang concepts experimental. I have tested all the compilers.
+
+It can even work on android !! 
 
 ## Documents
 ./doxygen/html/index.html
@@ -6,7 +8,7 @@ This is a new Experimental library to replace iostream and cstdio based on C++ 2
 Since C++ 20 has not been released. No standard supporting libraries for concepts, which means a lot of Concepts Definitions are ugly. It will be changed after C++ 20 is officially published.
 
 ## Design goal.
-
+  0. Custom Devices
   1. Exception Safe & Exception neutral
   2. As fast as possible. As close to system call as possible.
   3. Zero Overhead.
@@ -26,6 +28,9 @@ Since C++ 20 has not been released. No standard supporting libraries for concept
   17. All fast_io devices can be natively put in C++ containers. std::vector<fast_io::obuf> is valid
   18. Providing RAII for FILE*&POSIX file id
   19. Dynamic Type Support
+  20. Pipe line support
+  21. Zero copy IO (still in plan phase since I would like to provide a clean interface)
+  22. Cryptography (Under construction) to replace openssl
 
 ## Future Plan After C++ 20
   1. Module support
@@ -35,10 +40,11 @@ Since C++ 20 has not been released. No standard supporting libraries for concept
      http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0709r0.pdf
   4. Network handle support with coroutine. (NOT ASIO library)
      NETWORK SUPPORT IS BECOMING MORE AND MORE IMPORTANT IN MODERN WORLD
+  5. Partial Freestanding mode
 
 ## Possible Stuff in the future
-  1. Cryptography
-  2. Compression/Decompression
+  1. Compression/Decompression
+  2. Interfaces for cloud computing algorithms like MapReduce
 
 I want this to be in the C++ standard library in the future. :)
 
@@ -47,7 +53,7 @@ Please see examples in the examples folder.
 
 compile option:
     
-	g++ -o example example.cc -O2 -std=c++17 -fconcepts
+	g++ -o example example.cc -O2 -std=c++2a -fconcepts
 
 Compiler recommendation under windows:
 
@@ -84,7 +90,7 @@ ibuf:   0.08077780s
 ### Windows:
 Output:
 ```
-g++ -o output_10M_size_t output_10M_size_t.cc -O2 -std=c++17 -fconcepts
+g++ -o output_10M_size_t output_10M_size_t.cc -O2 -std=c++2a -fconcepts
 
 Process started (PID=1580) >>>
 
@@ -111,7 +117,7 @@ obuf_mutex:	0.15303500s
 
 Input:
 ```
-g++ -o input_10M_size_t input_10M_size_t.cc -O2 -std=c++17 -fconcepts
+g++ -o input_10M_size_t input_10M_size_t.cc -O2 -std=c++2a -fconcepts
 
 Process started (PID=11856) >>>
 

@@ -110,3 +110,4 @@ add_executable(double_fixed_setw "./0009.floating point/double_fixed_setw.cc")
 add_executable(integer_scientific "./0009.floating point/integer_scientific.cc")
 add_executable(floating_view "./0009.floating point/floating_view.cc")
 
+add_executable(my_copy "./0035.transmit/my_copy.cc")

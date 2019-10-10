@@ -1,7 +1,9 @@
 #pragma once
 #include<unistd.h>
 #include<fcntl.h>
-
+#ifdef __linux__
+#include<sys/sendfile.h>
+#endif
 namespace fast_io
 {
 	
@@ -158,6 +160,15 @@ public:
 		}
 		return *this;
 	}
+
+	auto zero_copy_in_handle()
+	{
+		return fd;
+	}
+	auto zero_copy_out_handle()
+	{
+		return fd;
+	}
 };
 
 class posix_file:public posix_io_handle
@@ -240,13 +251,21 @@ public:
 	void flush()
 	{
 	}
-	void close_in()
+	auto& in()
 	{
-		pipes.front().close();
+		return pipes.front();
 	}
-	void close_out()
+	auto& out()
 	{
-		pipes.back().close();
+		return pipes.back();
+	}
+	auto zero_copy_in_handle()
+	{
+		return in().native_handle();
+	}
+	auto zero_copy_out_handle()
+	{
+		return out().native_handle();
 	}
 	template<typename ContiguousIterator>
 	ContiguousIterator read(ContiguousIterator begin,ContiguousIterator end)
@@ -265,10 +284,32 @@ using system_file = posix_file;
 using system_io_handle = posix_io_handle;
 using system_pipe_unique = posix_pipe_unique;
 using system_pipe = posix_pipe;
-inline int constexpr native_stdin = 0;
-inline int constexpr native_stdout = 1;
-inline int constexpr native_stderr = 2;
+inline int constexpr native_stdin_number = 0;
+inline int constexpr native_stdout_number = 1;
+inline int constexpr native_stderr_number = 2;
 #endif
-
+#ifdef __linux__
+//zero copy IO for linux
+template<zero_copy_output_stream output,zero_copy_input_stream input>
+inline std::size_t zero_copy_transmit(output& outp,input& inp,std::size_t bytes)
+{
+	auto transmitted_bytes(::sendfile(outp.zero_copy_out_handle(),inp.zero_copy_in_handle(),nullptr,bytes));
+	if(transmitted_bytes==-1)
+		throw std::system_error(errno,std::generic_category());
+	return transmitted_bytes;
+}
+template<zero_copy_output_stream output,zero_copy_input_stream input>
+inline std::size_t zero_copy_transmit(output& outp,input& inp)
+{
+	std::size_t constexpr kernel_buffer_size(65536);
+	for(std::size_t transmitted(0);;)
+	{
+		std::size_t transferred_this_round(transmit(outp,inp,kernel_buffer_size));
+		transmitted+=transferred_this_round;
+		if(transferred_this_round!=kernel_buffer_size)
+			return transmitted;
+	}
+}
+#endif
 
 }

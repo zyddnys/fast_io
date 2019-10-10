@@ -18,17 +18,14 @@
 #include"fast_io_impl/precondition.h"
 #include"fast_io_impl/mode.h"
 #include"fast_io_impl/base.h"
+#include"fast_io_impl/transmit.h"
 #include"fast_io_impl/stringbuf.h"
 #include"fast_io_impl/rd_type.h"
 #include"fast_io_impl/manip.h"
 #include"fast_io_impl/read_write.h"
 #include"fast_io_impl/ucs.h"
 #include"fast_io_impl/text.h"
-#if defined(__WINNT__) || defined(_MSC_VER)
-#include"fast_io_impl/handlers/win32.h"
-#else
-#include"fast_io_impl/handlers/posix.h"
-#endif
+#include"fast_io_impl/handlers/native.h"
 #include"fast_io_impl/iobuf.h"
 #include"fast_io_impl/iomutex.h"
 #include"fast_io_impl/wrapper.h"
@@ -43,9 +40,7 @@
 namespace fast_io
 {
 
-using isystem_pipe = nobuf_reader<input_wrapper<system_pipe>>;
-using osystem_pipe = immediately_flush<nobuf_reader<output_wrapper<system_pipe>>>;
-using iosystem_pipe = immediately_flush<nobuf_reader<io_wrapper<system_pipe>>>;
+using pipe = immediately_flush<nobuf_reader<io_wrapper<system_pipe>>>;
 
 using system_ohandle = ierasure<system_io_handle>;
 using system_ihandle = oerasure<system_io_handle>;
@@ -99,10 +94,10 @@ inline fast_io::basic_obuf<c_style_ohandle> log(stderr);
 #else
 namespace fast_io
 {
-inline basic_obuf<system_ohandle> out(native_stdout);
-inline tie<basic_ibuf<system_io_handle>,decltype(out)> in(out,native_stdin);
-inline tie<immediately_flush<system_ohandle>,decltype(out)> err(out,native_stderr);
-inline basic_obuf<system_ohandle> log(native_stderr);
+inline basic_obuf<system_ohandle> out(native_stdout_number);
+inline tie<basic_ibuf<system_io_handle>,decltype(out)> in(out,native_stdin_number);
+inline tie<immediately_flush<system_ohandle>,decltype(out)> err(out,native_stderr_number);
+inline basic_obuf<system_ohandle> log(native_stderr_number);
 }
 #endif
 

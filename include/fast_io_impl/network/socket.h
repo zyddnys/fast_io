@@ -156,6 +156,17 @@ public:
 	void flush()
 	{
 	}
+	
+#ifdef __linux__
+	auto zero_copy_in_handle()
+	{
+		return handle;
+	}
+	auto zero_copy_out_handle()
+	{
+		return handle;
+	}
+#endif
 };
 
 inline constexpr void swap(socket& a,socket &b) noexcept
@@ -186,7 +197,6 @@ public:
 	{
 		
 	}*/
-	
 };
 
 class client
@@ -233,6 +243,13 @@ public:
 	{
 		return cinfo;
 	}
+
+#ifdef __linux__
+	auto zero_copy_out_handle()
+	{
+		return soc.zero_copy_out_handle();
+	}
+#endif
 };
 
 class server
@@ -261,6 +278,13 @@ public:
 	{
 		return soc;
 	}
+
+#ifdef __linux__
+	auto zero_copy_out_handle()
+	{
+		return soc.zero_copy_out_handle();
+	}
+#endif
 };
 
 class acceptor
@@ -296,5 +320,12 @@ public:
 	{
 		return add;
 	}
+
+#ifdef __linux__
+	auto zero_copy_out_handle()
+	{
+		return soc.zero_copy_out_handle();
+	}
+#endif
 };
 }

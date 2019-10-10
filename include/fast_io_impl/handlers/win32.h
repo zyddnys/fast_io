@@ -224,13 +224,13 @@ public:
 	void flush()
 	{
 	}
-	void close_in()
+	auto& in()
 	{
-		pipes.front().close();
+		return pipes.front();
 	}
-	void close_out()
+	auto& out()
 	{
-		pipes.back().close();		
+		return pipes.back();
 	}
 	template<typename ContiguousIterator>
 	ContiguousIterator read(ContiguousIterator begin,ContiguousIterator end)
@@ -250,8 +250,8 @@ using system_io_handle = win32_io_handle;
 using system_pipe_unique = win32_pipe_unique;
 using system_pipe = win32_pipe;
 
-inline DWORD constexpr native_stdin = -10;
-inline DWORD constexpr native_stdout = -11;
-inline DWORD constexpr native_stderr = -12;
+inline DWORD constexpr native_stdin_number = -10;
+inline DWORD constexpr native_stdout_number = -11;
+inline DWORD constexpr native_stderr_number = -12;
 
 }

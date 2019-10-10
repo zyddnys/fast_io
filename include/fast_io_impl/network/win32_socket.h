@@ -69,15 +69,15 @@ inline auto connect(SOCKET sck,T& sock_address)
 	return call_win32_ws2_32_minus_one<decltype(::connect)*>("connect",sck,static_cast<sockaddr*>(static_cast<void*>(std::addressof(sock_address))),sizeof(T));
 }
 
-template<typename ...Args>
-inline auto send(Args&& ...args)
+template<typename mem_address,typename ...Args>
+inline auto send(SOCKET sock,mem_address const* add,Args&& ...args)
 {
-	return call_win32_ws2_32<decltype(::send)*>("send",std::forward<Args>(args)...);
+	return call_win32_ws2_32<decltype(::send)*>("send",sock,static_cast<char const*>(static_cast<void const*>(add)),std::forward<Args>(args)...);
 }
-template<typename ...Args>
-inline auto recv(Args&& ...args)
+template<typename mem_address,typename ...Args>
+inline auto recv(SOCKET sock,mem_address* add,Args&& ...args)
 {
-	return call_win32_ws2_32<decltype(::recv)*>("recv",std::forward<Args>(args)...);
+	return call_win32_ws2_32<decltype(::recv)*>("recv",sock,static_cast<char*>(static_cast<void*>(add)),std::forward<Args>(args)...);
 }
 
 template<typename ...Args>
@@ -135,4 +135,6 @@ std::int16_t;
 
 using socket_type = SOCKET;
 auto constexpr invalid_socket(INVALID_SOCKET);
+
+
 }

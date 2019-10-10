@@ -47,6 +47,19 @@ concept random_access_stream_impl = requires(T t)
 	{t.seek};
 };
 
+
+template<typename T>
+concept zero_copy_input_stream_impl = requires(T in)
+{
+	{in.zero_copy_in_handle()};
+};
+
+template<typename T>
+concept zero_copy_output_stream_impl = requires(T out)
+{
+	{out.zero_copy_out_handle()};
+};
+
 }
 
 template<typename T>
@@ -83,5 +96,11 @@ template<typename T>
 concept standard_io_stream = standard_input_stream<T>&&standard_output_stream<T>;
 template<typename T>
 concept mutex_io_stream = mutex_input_stream<T>&&mutex_output_stream<T>;
+
+template<typename T>
+concept zero_copy_input_stream = input_stream<T>&&details::zero_copy_input_stream_impl<T>;
+
+template<typename T>
+concept zero_copy_output_stream = output_stream<T>&&details::zero_copy_output_stream_impl<T>;
 
 }

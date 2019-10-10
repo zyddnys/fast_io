@@ -25,8 +25,8 @@ inline static mode constexpr app{1};
 inline static mode constexpr ate{1<<1};
 inline static mode constexpr binary{1<<2};
 inline static mode constexpr direct{1<<3};
-inline static mode constexpr in{1<<4};
-inline static mode constexpr excl{1<<5};//C++ iostream currently still does not support "x"
+inline static mode constexpr excl{1<<4};//C++ iostream currently still does not support "x"
+inline static mode constexpr in{1<<5};
 inline static mode constexpr out{1<<6};
 inline static mode constexpr sync{1<<7};
 inline static mode constexpr trunc{1<<8};
