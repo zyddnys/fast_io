@@ -296,7 +296,7 @@ namespace details
 template<zero_copy_output_stream output,zero_copy_input_stream input>
 inline std::uint_least64_t zero_copy_transmit_once(output& outp,input& inp,std::uint_least64_t bytes)
 {
-	auto transmitted_bytes(::sendfile(outp.zero_copy_out_handle(),inp.zero_copy_in_handle(),nullptr,bytes));
+	auto transmitted_bytes(::sendfile64(outp.zero_copy_out_handle(),inp.zero_copy_in_handle(),nullptr,bytes));
 	if(transmitted_bytes==-1)
 		throw std::system_error(errno,std::generic_category());
 	return transmitted_bytes;
