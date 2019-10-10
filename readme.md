@@ -29,7 +29,7 @@ Since C++ 20 has not been released. No standard supporting libraries for concept
   18. Providing RAII for FILE*&POSIX file id
   19. Dynamic Type Support
   20. Pipe line support
-  21. Zero copy IO (still in plan phase since I would like to provide a clean interface)
+  21. Zero copy IO
   22. Cryptography (Under construction) to replace openssl
 
 ## Future Plan After C++ 20

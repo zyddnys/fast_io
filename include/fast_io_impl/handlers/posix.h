@@ -289,24 +289,49 @@ inline int constexpr native_stdout_number = 1;
 inline int constexpr native_stderr_number = 2;
 #endif
 #ifdef __linux__
+
 //zero copy IO for linux
+namespace details
+{
 template<zero_copy_output_stream output,zero_copy_input_stream input>
-inline std::size_t zero_copy_transmit(output& outp,input& inp,std::size_t bytes)
+inline std::uint_least64_t zero_copy_transmit_once(output& outp,input& inp,std::uint_least64_t bytes)
 {
 	auto transmitted_bytes(::sendfile(outp.zero_copy_out_handle(),inp.zero_copy_in_handle(),nullptr,bytes));
 	if(transmitted_bytes==-1)
 		throw std::system_error(errno,std::generic_category());
 	return transmitted_bytes;
 }
+}
+
+
 template<zero_copy_output_stream output,zero_copy_input_stream input>
-inline std::size_t zero_copy_transmit(output& outp,input& inp)
+inline std::uint_least64_t zero_copy_transmit(output& outp,input& inp,std::uint_least64_t bytes)
 {
-	std::size_t constexpr kernel_buffer_size(65536);
-	for(std::size_t transmitted(0);;)
+	std::uint_least64_t constexpr maximum_transmit_bytes(std::numeric_limits<std::int64_t>::max());
+	std::uint_least64_t transmitted(0);
+	for(;bytes;)
 	{
-		std::size_t transferred_this_round(transmit(outp,inp,kernel_buffer_size));
+		std::uint_least64_t should_transfer(maximum_transmit_bytes);
+		if(bytes<should_transfer)
+			should_transfer=bytes;
+		std::uint_least64_t transferred_this_round(details::zero_copy_transmit_once(outp,inp,should_transfer));
 		transmitted+=transferred_this_round;
-		if(transferred_this_round!=kernel_buffer_size)
+		if(transferred_this_round!=should_transfer)
+			return transmitted;
+		bytes-=transferred_this_round;
+	}
+	return transmitted;
+	
+}
+template<zero_copy_output_stream output,zero_copy_input_stream input>
+inline std::uint_least64_t zero_copy_transmit(output& outp,input& inp)
+{
+	std::uint_least64_t constexpr maximum_transmit_bytes(std::numeric_limits<std::int64_t>::max());
+	for(std::uint_least64_t transmitted(0);;)
+	{
+		std::uint_least64_t transferred_this_round(details::zero_copy_transmit_once(outp,inp,maximum_transmit_bytes));
+		transmitted+=transferred_this_round;
+		if(transferred_this_round!=maximum_transmit_bytes)
 			return transmitted;
 	}
 }
