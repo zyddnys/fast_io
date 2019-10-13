@@ -8,13 +8,22 @@ namespace stream_view_details
 template<typename T>
 concept istream_concept_impl = requires(T& in)
 {
-	in.operator>>;
+	{in.read};
+	{in.get};
+	{in.gcount};
+	{in.seekg};
+	{in.tellg};
+	{in.operator>>};
 };
 
 template<typename T>
 concept ostream_concept_impl = requires(T& out)
 {
-	out.operator<<;
+	{out.write};
+	{out.put};
+	{out.seekp};
+	{out.tellp};
+	{out.operator<<};
 };
 }
 	
