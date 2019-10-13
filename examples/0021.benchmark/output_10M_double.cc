@@ -33,17 +33,6 @@ try
 		fout<<vec[i]<<'\n';
 	}
 	{
-	cqw::timer t("std::ofstream with tricks");
-	std::ofstream fout("ofstream_tricksdb.txt",std::ofstream::binary);
-	fout<<std::fixed<<std::setprecision(6);
-	auto &rdbuf(*fout.rdbuf());
-	for(std::size_t i(0);i!=N;++i)
-	{
-		fout<<vec[i];
-		rdbuf.sputc('\n');
-	}
-	}
-	{
 	cqw::timer t("obuf");
 	fast_io::obuf obuf("obufdb.txt");
 	for(std::size_t i(0);i!=N;++i)
@@ -54,6 +43,14 @@ try
 	fast_io::obuf_mutex obuf("obuf_mutexdb.txt");
 	for(std::size_t i(0);i!=N;++i)
 		println(obuf,fast_io::fixed(vec[i],6));
+	}
+	{
+	cqw::timer t("speck128/128");
+	fast_io::crypto::basic_octr<fast_io::obuf, fast_io::crypto::speck::speck_enc_128_128> enc_stream(
+		std::array<uint8_t, 16>{'8','3','3','4',';','2','3','4','a','2','c','4',']','0','3','4'},
+		std::array<uint8_t, 8>{'1','2','3','4','1','2','3','4'},"speckdb.txt");
+	for(std::size_t i(0);i!=N;++i)
+		println(enc_stream,fast_io::fixed(vec[i],6));
 	}
 }
 catch(std::exception const& e)

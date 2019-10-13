@@ -1,124 +1,112 @@
 #pragma once
 
 #include <cstdint>
+#include <array>
+#include <iostream>
 #include "../concept.h"
 
-namespace fast_io::crypto
+namespace fast_io::crypto::speck
 {
 
-namespace details::speck
+namespace details
 {
 
-inline std::uint64_t ROR(std::uint64_t x, std::uint64_t r) {return ((x >> r) | (x << (64 - r)));}
-inline std::uint64_t ROL(std::uint64_t x,std::uint64_t  r) {return (x << r) | (x >> (64 - r));}
-inline std::uint64_t R(std::uint64_t& x, std::uint64_t& y, std::uint64_t& k)
-{
-    x = ROR(x, 8);
+template<std::size_t alpha = 8, std::size_t beta = 3>
+inline constexpr std::pair<uint64_t, uint64_t> speck_round(uint64_t x, uint64_t y, uint64_t k) {
+    x = (x >> alpha) | (x << (8 * sizeof(x) - alpha));  // x = ROTR(x, 8)
     x += y;
     x ^= k;
-    y = ROL(y, 3);
+    y = (y << beta) | (y >> (8 * sizeof(y) - beta));  // y = ROTL(y, 3)
     y ^= x;
+    return {x, y};
 }
+
+template<std::size_t alpha = 8, std::size_t beta = 3>
+inline constexpr std::pair<uint64_t, uint64_t> speck_back(uint64_t x, uint64_t y, uint64_t k) {
+    y ^= x;
+    y = (y >> beta) | (y << (8 * sizeof(y) - beta));  // y = ROTR(y, 3)
+    x ^= k;
+    x -= y;
+    x = (x << alpha) | (x >> (8 * sizeof(x) - alpha));  // x = ROTL(x, 8)
+    return {x, y};
 }
-/*
-template<output_stream output, std::size_t key_size = 128, std::size_t round = 32>
-class basic_ospeck
+
+}
+
+template<bool encrypt, std::size_t blocksize, std::size_t keysize, std::size_t rounds>
+struct speck
 {
-    std::array<uint64_t, key_size / 64> key;
-    output& out;
-public:
-    using native_interface_t = output;
-	using char_type = typename native_interface_t::char_type;
-
-
-    basic_ospeck(std::array<uint64_t, key_size / 64> const& init_key, output& o) : key(init_key), out(o)
+    static std::size_t constexpr block_size = blocksize;
+    static std::size_t constexpr key_size = keysize;
+    std::array<uint64_t, rounds + 1> key_schedule{};
+    constexpr speck(uint8_t const *key)
     {
+        std::array<uint64_t, key_size / sizeof(uint64_t)> subkeys{};
+        memcpy(subkeys.data(), key, key_size);
 
+        key_schedule[0] = subkeys[0];
+        for (uint64_t i = 0; i != rounds - 1; ++i) {
+            auto [a, b] = details::speck_round(subkeys[1], subkeys[0], i);
+            if constexpr (key_size == 32)
+            {
+                subkeys[0] = b;
+                subkeys[1] = subkeys[2];
+                subkeys[2] = subkeys[3];
+                subkeys[3] = a;
+            } else if constexpr (key_size == 24) {
+                subkeys[0] = b;
+                subkeys[1] = subkeys[2];
+                subkeys[2] = a;
+            } else {
+                subkeys[0] = b;
+                subkeys[1] = a;
+            }
+            key_schedule[i + 1] = subkeys[0];
+        }
     }
+    constexpr auto operator()(uint8_t const *plaintext_or_ciphertext)
+    {
+        if constexpr (encrypt) {
+            std::array<uint8_t, block_size> ciphertext{};
+            auto cipher_as_uint64_t = static_cast<uint64_t*>(static_cast<void*>(ciphertext.data()));
+            auto plain_as_uint64_t = static_cast<uint64_t const*>(static_cast<void const*>(plaintext_or_ciphertext));
 
-    template<typename ContiguousIterator>
-	ContiguousIterator write(ContiguousIterator b, ContiguousIterator e)
-	{
-		write_precondition<char_type>(b, e);
-        auto pb(static_cast<char_type const*>(static_cast<void const*>(std::addressof(*b))));
-		auto last(pb);
-		auto pi(pb), pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));
-        if ((e-b)%128==0)
-        {
-            uint64_t y = pt[0], x = pt[1], b = key[0], a = key[1];
-
-            details::speck::R(x, y, b);
-            for (std::size_t i = 0; i < round - 1; ++i) {
-                details::speck::R(a, b, i);
-                details::speck::R(x, y, b);
+            cipher_as_uint64_t[0] = plain_as_uint64_t[0];
+            cipher_as_uint64_t[1] = plain_as_uint64_t[1];
+            for (std::size_t i = 0; i != rounds; ++i) {
+                auto [a, b] = details::speck_round(cipher_as_uint64_t[1], cipher_as_uint64_t[0], key_schedule[i]);
+                cipher_as_uint64_t[1] = a;
+                cipher_as_uint64_t[0] = b;
             }
 
-            ct[0] = y;
-            ct[1] = x;
-        }
-        else
-        {
-            /* code */
-        }
-        
-	}
+            return ciphertext;
+        } else {
+            std::array<uint8_t, block_size> plaintext{};
 
-    void flush()
-	{
-		// no need fsync. OS can deal with it
-//		if(::fsync(fd)==-1)
-//			throw std::system_error(errno,std::generic_category());
-	}
-};
-*/
-template<output_stream output, std::size_t key_size = 128, std::size_t round = 32>
-class basic_ospeck
-{
-    std::array<uint64_t, key_size / 64> key;
-    output& out;
-public:
-    using native_interface_t = output;
-	using char_type = typename native_interface_t::char_type;
+            auto plain_as_uint64_t = static_cast<uint64_t*>(static_cast<void*>(plaintext.data()));
+            auto cipher_as_uint64_t = static_cast<uint64_t const*>(static_cast<void const*>(plaintext_or_ciphertext));
 
-
-    basic_ospeck(std::array<uint64_t, key_size / 64> const& init_key, output& o) : key(init_key), out(o)
-    {
-
-    }
-
-    template<typename ContiguousIterator>
-	ContiguousIterator write(ContiguousIterator b, ContiguousIterator e)
-	{
-		write_precondition<char_type>(b, e);
-        auto pb(static_cast<char_type const*>(static_cast<void const*>(std::addressof(*b))));
-		auto last(pb);
-		auto pi(pb), pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));
-        if ((e-b)%128==0)
-        {
-            uint64_t y = pt[0], x = pt[1], b = key[0], a = key[1];
-
-            details::speck::R(x, y, b);
-            for (std::size_t i = 0; i < round - 1; ++i) {
-                details::speck::R(a, b, i);
-                details::speck::R(x, y, b);
+            plain_as_uint64_t[0] = cipher_as_uint64_t[0];
+            plain_as_uint64_t[1] = cipher_as_uint64_t[1];
+            for (std::size_t i(rounds); i--;) {
+                auto [a, b] = details::speck_back(plain_as_uint64_t[1], plain_as_uint64_t[0], key_schedule[i]);
+                plain_as_uint64_t[1] = a;
+                plain_as_uint64_t[0] = b;
             }
 
-            ct[0] = y;
-            ct[1] = x;
+            return plaintext;
         }
-        else
-        {
-            /* code */
-        }
-        
-	}
-
-    void flush()
-	{
-		// no need fsync. OS can deal with it
-//		if(::fsync(fd)==-1)
-//			throw std::system_error(errno,std::generic_category());
-	}
+    }
 };
 
+using speck_enc_128_128 = speck<true, 16, 16, 32>;
+using speck_dec_128_128 = speck<false, 16, 16, 32>;
+
+using speck_enc_128_192 = speck<true, 16, 24, 33>;
+using speck_dec_128_192 = speck<false, 16, 24, 33>;
+
+using speck_enc_128_256 = speck<true, 16, 32, 34>;
+using speck_dec_128_256 = speck<false, 16, 32, 34>;
+
 }
+

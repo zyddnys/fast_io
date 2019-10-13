@@ -4,8 +4,7 @@
 int main()
 try
 {
-	std::stringstream sst("2353256");
-	fast_io::stream_view sst_view(sst);
+	fast_io::stream_view<std::stringstream> sst_view("2353256");
 	std::size_t v(0);
 	scan(sst_view,v);
 	println(fast_io::out,v);

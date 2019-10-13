@@ -13,6 +13,7 @@ public:
 	using native_handle_type = T;
 	using char_type = typename native_handle_type::char_type;
 	template<typename ...Args>
+	requires std::constructible_from<T,Args...>
 	basic_iomutex(Args&& ...args):mtx(std::make_unique<std::mutex>()),handler(std::forward<Args>(args)...){}
 	native_handle_type& native_handle()
 	{
@@ -22,11 +23,11 @@ public:
 	{
 		return *mtx;
 	}
-	template<typename ...Args>
-	void write(Args&& ...args) requires output_stream<native_handle_type>
+	template<std::contiguous_iterator Iter>
+	void write(Iter b,Iter e) requires output_stream<native_handle_type>
 	{
 		std::lock_guard lg(mutex());
-		handler.write(std::forward<Args>(args)...);
+		handler.write(b,e);
 	}
 	void put(char_type ch) requires standard_output_stream<native_handle_type>
 	{
@@ -38,8 +39,8 @@ public:
 		std::lock_guard lg(mutex());
 		handler.flush();
 	}
-	template<typename Contiguous_iterator>
-	Contiguous_iterator read(Contiguous_iterator begin,Contiguous_iterator end)
+	template<std::contiguous_iterator Iter>
+	Iter read(Iter begin,Iter end)
 		requires input_stream<native_handle_type>
 	{
 		std::lock_guard<std::mutex> lg(mutex());
@@ -56,14 +57,23 @@ public:
 		return handler.try_get();
 	}
 	template<typename... Args>
-	void seek(Args&& ...args) requires random_access_stream<native_handle_type>
+	auto seek(Args&& ...args) requires random_access_stream<native_handle_type>
 	{
 		std::lock_guard<std::mutex> lg(mutex());
-		handler.seek(std::forward<Args>(args)...);
+		return handler.seek(std::forward<Args>(args)...);
+	}
+	void swap(basic_iomutex& o) noexcept
+	{
+		using std::swap;
+		swap(mtx,o.mtx);
+		swap(handler,o.handler);
 	}
 };
-
-
+template<stream T>
+inline void swap(basic_iomutex<T>& a,basic_iomutex<T>& b) noexcept
+{
+	a.swap(b);
+}
 
 template<mutex_input_stream input,typename ...Args>
 inline constexpr void scan(input &in,Args&& ...args)

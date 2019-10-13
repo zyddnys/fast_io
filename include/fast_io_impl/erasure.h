@@ -8,9 +8,10 @@ class ierasure:public io
 public:
 	using char_type = typename io::char_type;
 	template<typename ...Args>
+	requires std::constructible_from<io,Args...>
 	ierasure(Args&& ...args):io(std::forward<Args>(args)...){}
-	template<typename Contiguous_iterator>
-	Contiguous_iterator read(Contiguous_iterator begin,Contiguous_iterator end) = delete;
+	template<std::contiguous_iterator Iter>
+	Iter read(Iter,Iter) = delete;
 	auto get() requires standard_input_stream<io> = delete;
 	auto try_get() requires standard_input_stream<io> = delete;
 };
@@ -21,9 +22,10 @@ class oerasure:public io
 public:
 	using char_type = typename io::char_type;
 	template<typename ...Args>
+	requires std::constructible_from<io,Args...>
 	oerasure(Args&& ...args):io(std::forward<Args>(args)...){}
-	template<typename Contiguous_iterator>
-	void write(Contiguous_iterator begin,Contiguous_iterator end) = delete;
+	template<std::contiguous_iterator Iter>
+	void write(Iter,Iter) = delete;
 	auto put() requires standard_output_stream<io> = delete;
 	auto flush() requires standard_output_stream<io> = delete;
 };
@@ -34,10 +36,11 @@ class seekerasure:public io
 public:
 	using char_type = typename io::char_type;
 	template<typename ...Args>
+	requires std::constructible_from<io,Args...>
 	seekerasure(Args&& ...args):io(std::forward<Args>(args)...){}
 	template<std::integral U>
-	void seek(U,seekdir)=delete;
-	template<typename T,std::integral U> void seek(seek_type_t<T>,U,seekdir) = delete;
+	auto seek(U,seekdir)=delete;
+	template<typename T,std::integral U> auto seek(seek_type_t<T>,U,seekdir) = delete;
 };
 
 

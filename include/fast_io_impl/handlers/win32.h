@@ -74,20 +74,23 @@ public:
 	win32_io_handle(native_handle_type handle):mhandle(handle){}
 	win32_io_handle(DWORD dw):mhandle(GetStdHandle(dw)){}
 	template<typename T,std::integral U>
-	void seek(seek_type_t<T>,U i,seekdir s=seekdir::beg)
+	std::common_type_t<long long, std::size_t> seek(seek_type_t<T>,U i=0,seekdir s=seekdir::cur)
 	{
-		LONG distance_to_move_high(0);
-		if(SetFilePointer(mhandle,seek_precondition<LONG,T,char_type>(i),std::addressof(distance_to_move_high),static_cast<DWORD>(s))== INVALID_SET_FILE_POINTER)
+		LARGE_INTEGER distance_to_move_high{};
+		LARGE_INTEGER seekposition;
+		seekposition.QuadPart=seek_precondition<long long,T,char_type>(i);
+		if(!SetFilePointerEx(mhandle,seekposition,std::addressof(distance_to_move_high),static_cast<DWORD>(s)))
 		{
 			auto const last_error(GetLastError());
 			if(last_error)
 				throw win32_error(last_error);
 		}
+		return distance_to_move_high.QuadPart;
 	}
 	template<std::integral U>
-	void seek(U i,seekdir s=seekdir::beg)
+	auto seek(U i=0,seekdir s=seekdir::cur)
 	{
-		seek(seek_type<char_type>,i,s);
+		return seek(seek_type<char_type>,i,s);
 	}
 	win32_io_handle(win32_io_handle const&)=delete;
 	win32_io_handle& operator=(win32_io_handle const&)=delete;
@@ -109,28 +112,36 @@ public:
 	{
 		return mhandle;
 	}
-	template<typename Contiguous_iterator>
-	Contiguous_iterator read(Contiguous_iterator begin,Contiguous_iterator end)
+	template<std::contiguous_iterator Iter>
+	Iter read(Iter begin,Iter end)
 	{
 		DWORD numberOfBytesRead;
-		if(!ReadFile(mhandle,std::addressof(*begin),static_cast<DWORD>((end-begin)*sizeof(*begin)),&numberOfBytesRead,nullptr))
+		if(!ReadFile(mhandle,std::to_address(begin),static_cast<DWORD>((end-begin)*sizeof(*begin)),&numberOfBytesRead,nullptr))
 			throw win32_error();
 		return begin+numberOfBytesRead;
 	}
-	template<typename Contiguous_iterator>
-	void write(Contiguous_iterator cbegin,Contiguous_iterator cend)
+	template<std::contiguous_iterator Iter>
+	void write(Iter cbegin,Iter cend)
 	{
 		auto nNumberOfBytesToWrite(static_cast<DWORD>((cend-cbegin)*sizeof(*cbegin)));
 		DWORD numberOfBytesWritten;
-		if(!WriteFile(mhandle,std::addressof(*cbegin),nNumberOfBytesToWrite,std::addressof(numberOfBytesWritten),nullptr)||
+		if(!WriteFile(mhandle,std::to_address(cbegin),nNumberOfBytesToWrite,std::addressof(numberOfBytesWritten),nullptr)||
 							nNumberOfBytesToWrite!=numberOfBytesWritten)
 			throw win32_error();
 	}
 	void flush()
 	{
 	}
+	void swap(win32_io_handle& o) noexcept
+	{
+		using std::swap;
+		swap(mhandle,o.mhandle);
+	}
 };
-
+inline void swap(win32_io_handle& a,win32_io_handle& b) noexcept
+{
+	a.swap(b);
+}
 
 class win32_file:public win32_io_handle
 {
@@ -168,6 +179,23 @@ public:
 			seek(0,seekdir::end);
 	}
 	win32_file(std::string_view file,std::string_view mode):win32_file(file,fast_io::open::c_style(mode)){}
+
+	win32_file(win32_file const&)=delete;
+	win32_file& operator=(win32_file const&)=delete;
+	win32_file(win32_file&& b) noexcept:win32_io_handle(b.protected_native_handle())
+	{
+		b.protected_native_handle()=nullptr;
+	}
+	win32_file& operator=(win32_file&& b) noexcept
+	{
+		if(std::addressof(b)!=this)
+		{
+			close_impl();
+			protected_native_handle() = b.protected_native_handle();
+			b.protected_native_handle()=nullptr;
+		}
+		return *this;
+	}
 	~win32_file()
 	{
 		win32_io_handle::close_impl();
@@ -183,6 +211,23 @@ public:
 	{
 		win32_io_handle::close_impl();
 		protected_native_handle() = nullptr;
+	}
+	win32_pipe_unique()=default;
+	win32_pipe_unique(win32_pipe_unique const&)=delete;
+	win32_pipe_unique& operator=(win32_pipe_unique const&)=delete;
+	win32_pipe_unique(win32_pipe_unique&& b) noexcept:win32_io_handle(b.protected_native_handle())
+	{
+		b.protected_native_handle()=nullptr;
+	}
+	win32_pipe_unique& operator=(win32_pipe_unique&& b) noexcept
+	{
+		if(std::addressof(b)!=this)
+		{
+			close_impl();
+			protected_native_handle() = b.protected_native_handle();
+			b.protected_native_handle()=nullptr;
+		}
+		return *this;
 	}
 	~win32_pipe_unique()
 	{
@@ -232,18 +277,27 @@ public:
 	{
 		return pipes.back();
 	}
-	template<typename ContiguousIterator>
-	ContiguousIterator read(ContiguousIterator begin,ContiguousIterator end)
+	template<std::contiguous_iterator Iter>
+	Iter read(Iter begin,Iter end)
 	{
 		return pipes.front().read(begin,end);
 	}
-	template<typename ContiguousIterator>
-	void write(ContiguousIterator begin,ContiguousIterator end)
+	template<std::contiguous_iterator Iter>
+	void write(Iter begin,Iter end)
 	{
 		pipes.back().write(begin,end);
 	}
+	void swap(win32_pipe& o) noexcept
+	{
+		using std::swap;
+		swap(pipes,o.pipes);
+	}
 };
 
+inline void swap(win32_pipe& a,win32_pipe& b) noexcept
+{
+	a.swap(b);
+}
 
 using system_file = win32_file;
 using system_io_handle = win32_io_handle;

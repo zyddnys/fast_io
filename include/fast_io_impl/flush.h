@@ -7,6 +7,9 @@ template<input_stream Ihandler>
 class nobuf_reader:public Ihandler
 {
 public:
+	template<typename... Args>
+	requires std::constructible_from<Ihandler,Args...>
+	constexpr nobuf_reader(Args&&... args) :Ihandler(std::forward<Args>(args)...) {}
 	using char_type = typename Ihandler::char_type;
 	char_type get()
 	{
@@ -27,14 +30,39 @@ public:
 };
 
 template<stream Ohandler>
+class nobuf_writer :public Ohandler
+{
+public:
+	using char_type = typename Ohandler::char_type;
+	template<typename... Args>
+	requires std::constructible_from<Ohandler,Args...>
+	constexpr nobuf_writer(Args&&... args) :Ohandler(std::forward<Args>(args)...) {}
+	template<std::contiguous_iterator Iter>
+	constexpr void write(Iter cbegin, Iter cend) requires output_stream<Ohandler>
+	{
+		Ohandler::write(cbegin, cend);
+	}
+	constexpr void put(char_type ch) requires standard_output_stream<Ohandler>
+	{
+		Ohandler::put(ch);
+	}
+	constexpr void put(char_type ch) requires output_stream<Ohandler>
+	{
+		auto address(std::addressof(ch));
+		Ohandler::write(address, address + 1);
+	}
+};
+
+template<stream Ohandler>
 class immediately_flush:public Ohandler
 {
 public:
 	using char_type = typename Ohandler::char_type;
 	template<typename... Args>
+	requires std::constructible_from<Ohandler,Args...>
 	constexpr immediately_flush(Args&&... args):Ohandler(std::forward<Args>(args)...){}
-	template<typename Contiguous_Iterator>
-	constexpr void write(Contiguous_Iterator cbegin,Contiguous_Iterator cend) requires output_stream<Ohandler>
+	template<std::contiguous_iterator Iter>
+	constexpr void write(Iter cbegin,Iter cend) requires output_stream<Ohandler>
 	{
 		Ohandler::write(cbegin,cend);
 		Ohandler::flush();
@@ -58,12 +86,13 @@ class char_flush:public Ohandler
 public:
 	using char_type = typename Ohandler::char_type;
 	template<typename... Args>
+	requires std::constructible_from<Ohandler,Args...>
 	constexpr char_flush(Args&&... args):Ohandler(std::forward<Args>(args)...){}
-	template<typename Contiguous_Iterator>
-	constexpr void write(Contiguous_Iterator b,Contiguous_Iterator e)
+	template<std::contiguous_iterator Iter>
+	constexpr void write(Iter b,Iter e)
 	{
 		write_precondition<char_type>(b,e);
-		auto pb(std::addressof(*b)),pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));
+		auto pb(std::to_address(b)),pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));
 		for(auto pi(pb);pi!=pe;++pi)
 			if(*pi==flush_character)
 			{
@@ -91,7 +120,6 @@ public:
 		return Ohandler::native_handle();
 	}
 };
-
 
 template<typename T>
 using line_flush = char_flush<T,'\n'>;

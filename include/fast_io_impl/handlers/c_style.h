@@ -24,21 +24,21 @@ public:
 	{
 		return std::feof(fp);
 	}
-	template<typename ContiguousIterator>
-	ContiguousIterator read(ContiguousIterator begin,ContiguousIterator end)
+	template<std::contiguous_iterator Iter>
+	Iter read(Iter begin,Iter end)
 	{
 		std::size_t const count(end-begin);
-		std::size_t const r(std::fread(std::addressof(*begin),sizeof(*begin),count,fp));
+		std::size_t const r(std::fread(std::to_address(begin),sizeof(*begin),count,fp));
 		if(r==count||std::feof(fp))
 			return begin+r;
 		throw std::system_error(errno,std::generic_category());
 	}
 
-	template<typename ContiguousIterator>
-	void write(ContiguousIterator begin,ContiguousIterator end)
+	template<std::contiguous_iterator Iter>
+	void write(Iter begin,Iter end)
 	{
 		std::size_t const count(end-begin);
-		if(std::fwrite(std::addressof(*begin),sizeof(*begin),count,fp)<count)
+		if(std::fwrite(std::to_address(begin),sizeof(*begin),count,fp)<count)
 			throw std::system_error(errno,std::generic_category());
 	}
 	std::pair<char_type,bool> try_get()

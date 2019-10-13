@@ -4,8 +4,7 @@
 int main()
 try
 {
-	std::ifstream fin("ifstream.txt",std::ofstream::binary);
-	fast_io::stream_view in(fin);
+	fast_io::stream_view<std::ifstream> in("ifstream.txt",std::ofstream::binary);
 	std::size_t v(0);
 	scan(in,v);
 	println(fast_io::out,v);

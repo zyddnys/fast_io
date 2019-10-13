@@ -3,8 +3,10 @@
 int main()
 {
 	using namespace fast_io;
-	fast_io::obuf ob("emoji.txt");
-	fast_io::ucs_view<decltype(ob),char32_t> view(ob);
+	
+	fast_io::ucs<fast_io::obuf,char32_t> view("emoji.txt");
+	auto &ob(view.native_handle());
+
 	std::string_view const emoji("☭🚄😀我wubi😄😊😉😍😘😚😜😝😳😁😣😢😂😭😪😥😰😩㍿🀀🀁🀂🀃🀄🀅🀆🀇🀈🀉🀊🀋🀌🀍🀎🀏");
 	println(ob,"original emoji string:\n",emoji);
 	for(auto const & e : emoji)
@@ -12,6 +14,7 @@ int main()
 	print(ob,"\n\n");
 	auto u32emoji(utf8_to_ucs<std::u32string>(emoji));
 	println(ob,"u32string size is ",u32emoji.size(),"\nucs string:");
+
 	print(view,u32emoji);
 	print(ob,"\n\n");
 	for(auto const & e : u32emoji)

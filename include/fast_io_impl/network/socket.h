@@ -139,15 +139,15 @@ public:
 		using std::swap;
 		swap(handle,b.handle);
 	}
-	template<typename ContiguousIterator>
-	ContiguousIterator read(ContiguousIterator begin,ContiguousIterator end)
+	template<std::contiguous_iterator Iter>
+	Iter read(Iter begin,Iter end)
 	{
-		return begin+((sock::details::recv(handle,std::addressof(*begin),static_cast<int>((end-begin)*sizeof(*begin)),0))/sizeof(*begin));
+		return begin+((sock::details::recv(handle,std::to_address(begin),static_cast<int>((end-begin)*sizeof(*begin)),0))/sizeof(*begin));
 	}
-	template<typename ContiguousIterator>
-	ContiguousIterator write(ContiguousIterator begin,ContiguousIterator end)
+	template<std::contiguous_iterator Iter>
+	Iter write(Iter begin,Iter end)
 	{
-		return begin+(sock::details::send(handle,std::addressof(*begin),static_cast<int>((end-begin)*sizeof(*begin)),0)/sizeof(*begin));
+		return begin+(sock::details::send(handle,std::to_address(begin),static_cast<int>((end-begin)*sizeof(*begin)),0)/sizeof(*begin));
 	}
 	~socket()
 	{
@@ -165,9 +165,9 @@ public:
 #endif
 };
 
-inline constexpr void swap(socket& a,socket &b) noexcept
+inline void swap(socket& a,socket &b) noexcept
 {
-	swap(a,b);
+	a.swap(b);
 }
 
 class address_info
@@ -193,7 +193,18 @@ public:
 	{
 		
 	}*/
+	inline void swap(address_info& o) noexcept
+	{
+		using std::swap;
+		swap(storage,o.storage);
+		swap(size,o.size);
+	}
 };
+
+inline void swap(address_info& a,address_info &b) noexcept
+{
+	a.swap(b);
+}
 
 class client
 {
@@ -246,7 +257,18 @@ public:
 		return soc.zero_copy_out_handle();
 	}
 #endif
+	inline void swap(client& o) noexcept
+	{
+		using std::swap;
+		swap(soc,o.soc);
+		swap(cinfo,o.cinfo);
+	}
 };
+
+inline void swap(client& a,client &b) noexcept
+{
+	a.swap(b);
+}
 
 class server
 {
@@ -274,7 +296,11 @@ public:
 	{
 		return soc;
 	}
-
+	inline void swap(server& o) noexcept
+	{
+		using std::swap;
+		swap(soc,o.soc);
+	}
 #ifdef __linux__
 	auto zero_copy_out_handle()
 	{
@@ -282,6 +308,11 @@ public:
 	}
 #endif
 };
+
+inline void swap(server& a,server &b) noexcept
+{
+	a.swap(b);
+}
 
 class acceptor
 {
@@ -316,7 +347,12 @@ public:
 	{
 		return add;
 	}
-
+	inline void swap(acceptor& o) noexcept
+	{
+		using std::swap;
+		swap(soc,o.soc);
+		swap(add,o.add);
+	}
 #ifdef __linux__
 	auto zero_copy_out_handle()
 	{
@@ -324,4 +360,10 @@ public:
 	}
 #endif
 };
+
+inline void swap(acceptor& a,acceptor &b) noexcept
+{
+	a.swap(b);
+}
+
 }

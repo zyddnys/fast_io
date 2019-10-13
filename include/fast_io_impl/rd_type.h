@@ -54,7 +54,7 @@ inline constexpr void print(output& out, T const& b)
 template<output_stream output>
 inline void print(output& out,std::basic_string_view<typename output::char_type> str)
 {
-	out.write(str.cbegin(),str.cend());
+	out.write(str.data(),str.data()+str.size());
 }
 
 template<output_stream output>

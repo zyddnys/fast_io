@@ -27,8 +27,7 @@ try
 	}
 	{
 	cqw::timer t("stream_view for std::ifstream");
-	std::ifstream fin("cfilestardb.txt",std::ifstream::binary);
-	fast_io::stream_view view(fin);
+	fast_io::stream_view<std::ifstream> view("cfilestardb.txt",std::ifstream::binary);
 	for(std::size_t i(0);i!=N;++i)
 		scan(view,v[i]);
 	}
@@ -53,8 +52,7 @@ try
 	}
 	{
 	cqw::timer t("ibuf text");
-	fast_io::ibuf ibuf("cfilestardb.txt");
-	fast_io::text_view view(ibuf);
+	fast_io::text_view<fast_io::ibuf> view("cfilestardb.txt");
 	for(std::size_t i(0);i!=N;++i)
 		scan(view,v[i]);
 	}
@@ -69,6 +67,14 @@ try
 	fast_io::ibuf_dynamic ibuf(std::in_place_type<fast_io::isystem_file>,"cfilestardb.txt");
 	for(std::size_t i(0);i!=N;++i)
 		scan(ibuf,v[i]);
+	}
+	{
+	cqw::timer t("speck128/128");
+	fast_io::crypto::basic_ictr<fast_io::ibuf, fast_io::crypto::speck::speck_dec_128_128> enc_stream(
+		std::array<uint8_t, 16>{'8','3','3','4',';','2','3','4','a','2','c','4',']','0','3','4'},
+		std::array<uint8_t, 8>{'1','2','3','4','1','2','3','4'},"speckdb.txt");
+	for(auto & e : v)
+		scan(enc_stream,e);
 	}
 }
 catch(std::exception const& e)

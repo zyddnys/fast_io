@@ -17,9 +17,9 @@ struct ucs_char_size_max_cal
 
 template<stream T,typename CharT>
 requires details::ucs_char_size_max_cal<T,CharT>::value
-class ucs_view
+class ucs
 {
-	T& ib;
+	T ib;
 public:
 	using native_interface_t = T;
 	using char_type = CharT;
@@ -59,7 +59,9 @@ private:
 		return converted_ch;
 	}
 public:
-	constexpr ucs_view(T& ibv):ib(ibv){}
+	template<typename ...Args>
+	requires std::constructible_from<T,Args...>
+	constexpr ucs(Args&& ...args):ib(std::forward<Args>(args)...){}
 	constexpr auto& native_handle()
 	{
 		return ib;
@@ -79,11 +81,11 @@ public:
 			return {0,true};
 		return {get_impl(ch.first),false};
 	}
-	template<typename Contiguous_iterator>
-	constexpr Contiguous_iterator read(Contiguous_iterator b,Contiguous_iterator e)
+	template<std::contiguous_iterator Iter>
+	constexpr Iter read(Iter b,Iter e)
 		requires standard_input_stream<T>
 	{
-		auto pb(static_cast<char_type*>(static_cast<void*>(std::addressof(*b))));
+		auto pb(static_cast<char_type*>(static_cast<void*>(std::to_address(b))));
 		auto pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));
 		auto pi(pb);
 		for(;pi!=pe;++pi)
@@ -118,12 +120,12 @@ public:
 		*ed |= max_native_char_type>>(native_char_bits-v_elements-1)<<(native_char_bits-v_elements);
 		ib.write(ed,v.data()+v.size());
 	}
-	template<typename Contiguous_iterator>
-	constexpr void write(Contiguous_iterator b,Contiguous_iterator e)
+	template<std::contiguous_iterator Iter>
+	constexpr void write(Iter b,Iter e)
 		requires standard_output_stream<T>
 	{
 		write_precondition<char_type>(b,e);
-		auto pb(static_cast<char_type const*>(static_cast<void const*>(std::addressof(*b))));
+		auto pb(static_cast<char_type const*>(static_cast<void const*>(std::to_address(b))));
 		for(auto pi(pb),pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));pi!=pe;++pi)
 			put(*pi);
 	}
@@ -138,7 +140,7 @@ template<typename T>
 inline constexpr void in_place_utf8_to_ucs(T& t,std::string_view view)
 {
 	basic_istring_view<std::string_view> ibsv(view);
-	ucs_view<decltype(ibsv),typename T::value_type> uv(ibsv);
+	ucs<decltype(ibsv),typename T::value_type> uv(ibsv);
 	getwhole(uv,t);
 }
 
@@ -155,19 +157,18 @@ namespace details
 template<typename T>
 inline void in_place_ucs_to_utf8(std::string& v,std::basic_string_view<T> view)
 {
-	basic_ostring<std::string> obsv(std::move(v));
-	ucs_view<decltype(obsv),T> uv(obsv);
+	v.clear();
+	ucs<basic_ostring<std::string>,T> uv(std::move(v));
 	uv.write(view.cbegin(),view.cend());
-	v=std::move(obsv.str());
+	v=std::move(uv.native_handle().str());
 }
 
 template<typename T>
 inline std::string ucs_to_utf8(std::basic_string_view<T> view)
 {
-	basic_ostring<std::string> obsv;
-	ucs_view<decltype(obsv),T> uv(obsv);
+	ucs<basic_ostring<std::string>,T> uv;
 	uv.write(view.cbegin(),view.cend());
-	return std::move(obsv.str());
+	return std::move(uv.native_handle().str());
 }
 }
 

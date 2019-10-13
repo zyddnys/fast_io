@@ -2,7 +2,7 @@
 
 int main()
 {
-	fast_io::ucs_view<decltype(fast_io::out),wchar_t> view(fast_io::out);
+	fast_io::ucs<decltype(fast_io::out),wchar_t> view(fast_io::out);
 	print(view,L"Hello ucs World! I am print! My number is ",0,fast_io::char_view('\n'));
 	println(view,L"Hello ucs World! I am println! My number is ",1);
 	fprint(view,L"Hello ucs World! I am fprint! My number is %\n",2);

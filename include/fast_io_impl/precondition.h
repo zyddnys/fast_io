@@ -2,8 +2,8 @@
 
 namespace fast_io
 {
-template<typename char_type,typename Contiguous_iterator>
-inline constexpr void write_precondition(Contiguous_iterator b,Contiguous_iterator e)
+template<typename char_type,std::contiguous_iterator Iter>
+inline constexpr void write_precondition(Iter b,Iter e)
 {
 	if constexpr(sizeof(*b)%sizeof(char_type)||sizeof(*e)%sizeof(char_type))
 		if((e-b)*sizeof(*b)%sizeof(char_type))

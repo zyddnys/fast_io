@@ -11,16 +11,17 @@ public:
 	using value_type = T;
 	using char_type = std::make_unsigned_t<typename T::value_type>;
 	template<typename ...Args>
+	requires std::constructible_from<T,Args...>
 	constexpr basic_istring_view(Args&& ...args):s(std::forward<Args>(args)...){}
 	constexpr auto& str()
 	{
 		return s;
 	}
-	template<typename contiguous_iterator>
-	constexpr contiguous_iterator read(contiguous_iterator begin,contiguous_iterator end)
+	template<std::contiguous_iterator Iter>
+	constexpr Iter read(Iter begin,Iter end)
 	{
-		auto pb(static_cast<char_type*>(static_cast<void*>(std::addressof(*begin))));
-		auto pe(static_cast<char_type*>(static_cast<void*>(std::addressof(*end))));
+		auto pb(static_cast<char_type*>(static_cast<void*>(std::to_address(begin))));
+		auto pe(static_cast<char_type*>(static_cast<void*>(std::to_address(end))));
 		std::size_t const cped(s.copy(pb,pe-pb));
 		s.remove_prefix(cped);
 		return begin+cped*sizeof(*begin)/sizeof(char_type);
@@ -50,17 +51,18 @@ class basic_ostring
 public:
 	using value_type = T;
 	using char_type = typename T::value_type;
-	template<typename... Args>
+	template<typename ...Args>
+	requires std::constructible_from<T,Args...>
 	constexpr basic_ostring(Args&& ...args):s(std::forward<Args>(args)...){}
 	constexpr auto& str()
 	{
 		return s;
 	}
-	template<typename contiguous_iterator>
-	constexpr void write(contiguous_iterator cbegin,contiguous_iterator cend)
+	template<std::contiguous_iterator Iter>
+	constexpr void write(Iter cbegin,Iter cend)
 	{
 		write_precondition<char_type>(cbegin,cend);
-		s.append(static_cast<char_type const*>(static_cast<void const*>(std::addressof(*cbegin))),static_cast<char_type const*>(static_cast<void const*>(std::addressof(*cend))));
+		s.append(static_cast<char_type const*>(static_cast<void const*>(std::to_address(cbegin))),static_cast<char_type const*>(static_cast<void const*>(std::to_address(cend))));
 	}
 	constexpr void put(char_type ch)
 	{

@@ -7,177 +7,224 @@
 namespace fast_io::crypto
 {
 
-template<input_stream T, typename Dec, size_t key_size, size_t block_size>
+template <input_stream T, typename Dec>
 class basic_iecb
 {
 public:
-	using native_interface_t = T;
-	using char_type = typename native_interface_t::char_type;
+    using native_interface_t = T;
+    using char_type = typename native_interface_t::char_type;
+    using cipher_type = Dec;
+
 private:
     using unsigned_char_type = std::make_unsigned_t<char_type>;
+
 public:
-    using key_type = std::array<unsigned_char_type, key_size>;
+    using key_type = std::array<unsigned_char_type, cipher_type::key_size>;
+    using block_type = std::array<unsigned_char_type, cipher_type::block_size>;
+
 private:
-    std::array<unsigned_char_type, block_size> buf={};
-    std::array<unsigned_char_type, block_size>::iterator pos = buf.begin();
-    std::array<unsigned_char_type, block_size> buf_out={};
-    std::array<unsigned_char_type, block_size>::iterator pos_out = buf_out.begin();
+	using block_iterator = typename block_type::iterator;
+    block_type cipher_buf = {};
+	block_iterator cipher_buf_pos = cipher_buf.begin();
+    block_type plaintext_buf = {};
+	block_iterator plaintext_buf_pos = plaintext_buf.begin();
     key_type key;
-    T& ib;
+    T ib;
     Dec dec;
 
-    unsigned_char_type* mread(unsigned_char_type* pb,unsigned_char_type* pe)
+    unsigned_char_type *mread(unsigned_char_type *pb, unsigned_char_type *pe)
     {
-		auto pi(pb);
-        
+        auto pi(pb);
+
         std::size_t const input_length(pe - pi);
 
-        if (pos_out!=buf_out.begin())
+        if (plaintext_buf_pos != plaintext_buf.begin())
         {
-            std::size_t bg(pos_out-buf_out.begin());
-            std::size_t min_length = input_length;
-            if(bg < min_length)
-                min_length = bg;
-            pi = std::uninitialized_copy(buf_out.begin(), buf_out.begin()+min_length, pi);
-            std::size_t plaintext_remain_length = pos_out-buf_out.begin()-min_length;
+            std::size_t buffer_length(plaintext_buf_pos - plaintext_buf.begin());
+            std::size_t min_length(input_length);
+            if (buffer_length < min_length)
+                min_length = buffer_length;
+			auto const buf_it(plaintext_buf.begin() + min_length);
+            pi = std::uninitialized_copy(plaintext_buf.begin(), plaintext_buf.begin() + min_length, pi);
+            std::size_t plaintext_remain_length(plaintext_buf_pos - plaintext_buf.begin() - min_length);
             if (plaintext_remain_length)
             {
-                std::uninitialized_copy(pos_out, pos_out+plaintext_remain_length, buf_out.begin());
-                pos_out = buf_out.begin()+plaintext_remain_length;
+                std::uninitialized_copy(buf_it, buf_it + plaintext_remain_length, plaintext_buf.begin());
+                plaintext_buf_pos = plaintext_buf.begin() + plaintext_remain_length;
                 return pi;
             }
-            pos_out = buf_out.begin();
-            return pi;
+            plaintext_buf_pos = plaintext_buf.begin();
         }
 
-        for(;pi!=pe;)
+        for (; pi != pe;)
         {
-            //println(fast_io::err, "for(;pi!=pe;)");
-            //println(fast_io::err, "buf size ",buf.end()-buf.begin());
-            //println(fast_io::err, "pos before ",pos-buf.begin());
-            pos = ib.read(pos, buf.end());
-            //println(fast_io::err, "pos after ",pos-buf.begin());
-            if (pos!=buf.end())
+            cipher_buf_pos = ib.read(cipher_buf_pos, cipher_buf.end());
+            if (cipher_buf_pos != cipher_buf.end())
                 return pi;
-            //println(fast_io::err, "done reading");
 
-            auto plain = dec(buf.begin(), key);
-            pos = buf.begin();
+            auto plain(dec(cipher_buf.data()));
+            cipher_buf_pos = cipher_buf.begin();
 
-            std::size_t available_out_space = pe - pi;
-            if (available_out_space < block_size)
+            std::size_t available_out_space(pe - pi);
+            if (available_out_space < cipher_type::block_size)
             {
-                //println(fast_io::err, "if (available_out_space < block_size)");
-                pi = std::uninitialized_copy(plain.begin(), plain.begin()+available_out_space, pi);
-                pos_out = std::uninitialized_copy(plain.begin()+available_out_space, plain.end(), buf_out.begin());
+                pi = std::uninitialized_copy(plain.begin(), plain.begin() + available_out_space, pi);
+                plaintext_buf_pos = std::uninitialized_copy(plain.begin() + available_out_space, plain.end(), plaintext_buf.begin());
                 break;
             }
             else
             {
-                //println(fast_io::err, "if (available_out_space < block_size) else");
                 pi = std::uninitialized_copy(plain.begin(), plain.end(), pi);
             }
+
         }
         return pi;
     }
 
 public:
-    basic_iecb(key_type const& init_key, T& i) : key(init_key), ib(i)
+
+    template<typename T1, typename ...Args>
+	requires std::constructible_from<key_type, T1>  && std::constructible_from<T,Args...>
+    basic_iecb(T1 &&init_key, Args&& ...args) : key(std::forward<T1>(init_key)), ib(std::forward<Args>(args)...), dec(key.data()){}
+
+
+    template<std::contiguous_iterator Iter>
+	Iter read(Iter begin, Iter end)
     {
-
+        auto bgchadd(static_cast<unsigned_char_type *>(static_cast<void *>(std::to_address(begin))));
+        return begin + (mread(bgchadd, static_cast<unsigned_char_type *>(static_cast<void *>(std::to_address(end)))) - bgchadd) / sizeof(*begin);
     }
+    char_type get()
+	{
+        if (plaintext_buf_pos == plaintext_buf.begin())
+        {
+            block_type tmp;
+            auto next_ch(tmp.begin() + 1);
+            auto ret(read(tmp.begin(), next_ch));
+            if (ret != next_ch)
+                throw eof();
+            return static_cast<char_type>(*tmp.begin());
+        }
+        auto ch(*plaintext_buf_pos);
+        if (plaintext_buf_pos == plaintext_buf.end())
+            plaintext_buf_pos = plaintext_buf.begin();
+        else
+            ++plaintext_buf_pos;
+        return static_cast<char_type>(ch);
+	}
 
-
-
-    template<typename ContiguousIterator>
-	ContiguousIterator read(ContiguousIterator begin, ContiguousIterator end)
-    {
-        auto bgchadd(static_cast<unsigned_char_type*>(static_cast<void*>(std::addressof(*begin))));
-		return begin+(mread(bgchadd,static_cast<unsigned_char_type*>(static_cast<void*>(std::addressof(*end))))-bgchadd)/sizeof(*begin);
-    }
+    std::pair<char_type, bool> try_get()
+	{
+        if (plaintext_buf_pos == plaintext_buf.begin())
+        {
+            block_type tmp;
+            auto next_ch(tmp.begin() + 1);
+            auto ret(read(tmp.begin(), next_ch));
+            if (ret != next_ch)
+                return {0, true};
+            return {static_cast<char_type>(*tmp.begin()), false};
+        }
+        auto ch(*plaintext_buf_pos);
+        if (plaintext_buf_pos == plaintext_buf.end())
+            plaintext_buf_pos = plaintext_buf.begin();
+        else
+            ++plaintext_buf_pos;
+        return {static_cast<char_type>(ch), false};
+	}
 };
 
-template<output_stream T, typename Enc, size_t key_size, size_t block_size>
+template <output_stream T, typename Enc>
 class basic_oecb
 {
 public:
-	using native_interface_t = T;
-	using char_type = typename native_interface_t::char_type;
+    using native_interface_t = T;
+    using char_type = typename native_interface_t::char_type;
+    using cipher_type = Enc;
+
 private:
     using unsigned_char_type = std::make_unsigned_t<char_type>;
-public:
-    using key_type = std::array<unsigned_char_type, key_size>;
 
-    std::array<unsigned_char_type, block_size> buf={};
-    std::size_t buf_pos=0;
+public:
+    using key_type = std::array<unsigned_char_type, cipher_type::key_size>;
+    using block_type = std::array<unsigned_char_type, cipher_type::block_size>;
+	using block_iterator = typename block_type::iterator;
+
+    block_type plaintext_buf = {};
+    block_iterator plaintext_buf_pos = plaintext_buf.begin();
     key_type key;
-    T& ob;
+    T ob;
     Enc enc;
-public:
-    basic_oecb(key_type const& init_key, T& o) : key(init_key), ob(o)
-    {
 
-    }
+public:
+
+    template<typename T1, typename ...Args>
+	requires std::constructible_from<key_type, T1>  && std::constructible_from<T, Args...>
+    basic_oecb(T1 &&init_key, Args&& ...args) : key(std::forward<T1>(init_key)), ob(std::forward<Args>(args)...), enc(key.data()){}
 
     void flush()
-	{
-        if (buf_pos)
+    {
+        if (plaintext_buf_pos)
         {
-            //println(fast_io::err, "inside flush() ", "if (buf_pos)");
-            //println(fast_io::err, "buf_pos ", buf_pos);
-            std::uninitialized_fill(buf.begin() + buf_pos, buf.end(), 0);
-            auto cipher = enc(buf.begin(), key);
+            std::uninitialized_fill(plaintext_buf_pos, plaintext_buf.end(), 0);
+            
+            auto cipher(enc(plaintext_buf.data()));
             ob.write(cipher.cbegin(), cipher.cend());
-            buf_pos = 0;
+            plaintext_buf_pos = plaintext_buf.begin();
         }
-	}
-
-
-    basic_oecb(basic_oecb const&) = delete;
-    basic_oecb& operator=(basic_oecb const& o) = delete;
-
-    basic_oecb(basic_oecb&& o) noexcept = delete;
-    basic_oecb& operator=(basic_oecb&& o) noexcept = delete;
-
-    template<typename ContiguousIterator>
-	void write(ContiguousIterator b, ContiguousIterator e)
-	{
-		write_precondition<unsigned_char_type>(b, e);
-        auto pb(static_cast<unsigned_char_type const*>(static_cast<void const*>(std::addressof(*b))));
-		auto pi(pb), pe(pb+(e-b)*sizeof(*b)/sizeof(unsigned_char_type));
-//        std::size_t const range_size(pe - pi);
-        std::size_t const input_length(pe - pi + buf_pos);
-        //println(fast_io::err, "input_length: ", input_length);
-        if (input_length < block_size)
-        {
-            buf_pos=std::uninitialized_copy(pi, pe, buf.data() + buf_pos)-buf.data();
-            return;
-        }
-        if (buf_pos)
-        {
-            //println(fast_io::err, "inside ", "if (buf_pos)");
-            auto bg(buf.data()-buf_pos);
-            pi += std::uninitialized_copy(pi, pi+ (block_size-buf_pos), bg)-bg;
-            auto cipher = enc(buf.begin(), key);
-            ob.write(cipher.cbegin(), cipher.cend());
-        }
-        for(; pi + block_size <= pe; pi += block_size)
-        {
-            //println(fast_io::err, "inside ", "for(; pi < pe; pi += block_size)");
-            auto cipher = enc(pi, key);
-            ob.write(cipher.cbegin(), cipher.cend());
-            //println(fast_io::err, "after ", "for(; pi < pe; pi += block_size)");
-        }
-        buf_pos=std::uninitialized_copy(pi, pe, buf.data())-buf.data();
-	}
-
-    ~basic_oecb()
-    try{
-        flush();
-    }catch(...){
-
     }
 
+
+    template<std::contiguous_iterator Iter>
+    void write(Iter b, Iter e)
+    {
+        write_precondition<unsigned_char_type>(b, e);
+        auto pb(static_cast<unsigned_char_type const *>(static_cast<void const *>(std::addressof(*b))));
+        auto pi(pb), pe(pb + (e - b) * sizeof(*b) / sizeof(unsigned_char_type));
+        std::size_t const input_length(pe - pi);
+
+        if (plaintext_buf_pos != plaintext_buf.begin())
+        {
+            std::size_t min_length(plaintext_buf.end() - plaintext_buf_pos);
+            if (input_length < min_length)
+                min_length = input_length;
+            plaintext_buf_pos = std::uninitialized_copy(pi, pi + min_length, plaintext_buf_pos);
+            pi += min_length;
+
+            if (plaintext_buf_pos != plaintext_buf.end())
+                return;
+
+            auto cipher(enc(plaintext_buf.data()));
+            ob.write(cipher.cbegin(), cipher.cend());
+
+            plaintext_buf_pos = plaintext_buf.begin();
+        }
+
+        for (auto const last_length(pe - cipher_type::block_size); pi <= last_length; pi += cipher_type::block_size)
+        {
+            auto cipher(enc(pi));
+            ob.write(cipher.cbegin(), cipher.cend());
+        }
+        plaintext_buf_pos = std::uninitialized_copy(pi, pe, plaintext_buf.begin());
+    }
+
+    void put(char_type ch) {
+        if (plaintext_buf_pos == plaintext_buf.end())
+        {
+            auto cipher(enc(plaintext_buf.data()));
+            ob.write(cipher.cbegin(), cipher.cend());
+            plaintext_buf_pos = plaintext_buf.begin();
+        }
+        *plaintext_buf_pos = static_cast<unsigned_char_type>(ch);
+        ++plaintext_buf_pos;
+    }
+
+    ~basic_oecb() try
+    {
+        flush();
+    }
+    catch (...)
+    {
+    }
 };
 
-}
+} // namespace fast_io::crypto

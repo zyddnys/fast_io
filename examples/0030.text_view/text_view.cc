@@ -8,8 +8,7 @@ try
 	println(file,"hello world\nmmd\n");
 	}
 	{
-	fast_io::obuf file("text.txt");
-	fast_io::text_view view(file);
+	fast_io::text_view<fast_io::obuf> view("text.txt");
 	println(view,"hello world\nmmd\n");
 	}
 }

@@ -12,6 +12,7 @@
 #include<string>
 #include<bitset>
 #include<algorithm>
+#include<cstring>
 #include"fast_io_impl/concept.h"
 #include"fast_io_impl/eof.h"
 #include"fast_io_impl/seek.h"

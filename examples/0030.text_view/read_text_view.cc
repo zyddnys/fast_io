@@ -6,8 +6,7 @@ try
 	fast_io::ibuf binary_file("binary.txt");
 	std::string binary_file_content;
 	getwhole(binary_file,binary_file_content);
-	fast_io::ibuf text_file("text.txt");
-	fast_io::text_view view(text_file);
+	fast_io::text_view<fast_io::ibuf> text_file("text.txt");
 	std::string text_file_content;
 	getwhole(text_file,text_file_content);
 	println(fast_io::out,"same? ",binary_file_content==text_file_content);

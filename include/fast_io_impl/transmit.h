@@ -4,13 +4,13 @@ namespace fast_io
 {
 
 template<output_stream output,input_stream input>
-inline std::uint_least64_t bufferred_transmit(output& outp,input& inp)
+inline std::size_t bufferred_transmit(output& outp,input& inp)
 {
-	std::uint_least64_t transmitted_bytes(0);
+	std::size_t transmitted_bytes(0);
 	for(std::array<unsigned char,65536> array;;)
 	{
 		auto p(inp.read(array.data(),array.data()+array.size()));
-		std::uint_least64_t transmitted_this_round(p-array.data());
+		std::size_t transmitted_this_round(p-array.data());
 		transmitted_bytes+=transmitted_this_round;
 		outp.write(array.data(),p);
 		if(transmitted_this_round!=array.size())
@@ -19,16 +19,16 @@ inline std::uint_least64_t bufferred_transmit(output& outp,input& inp)
 }
 
 template<output_stream output,input_stream input>
-inline std::uint_least64_t bufferred_transmit(output& outp,input& inp,std::uint_least64_t bytes)
+inline std::size_t bufferred_transmit(output& outp,input& inp,std::size_t bytes)
 {
-	std::uint_least64_t transmitted_bytes(0);
+	std::size_t transmitted_bytes(0);
 	for(std::array<unsigned char,65536> array;bytes;)
 	{
-		std::uint_least64_t b(array.size());
+		std::size_t b(array.size());
 		if(bytes<b)
 			b=bytes;
 		auto p(inp.read(array.data(),array.data()+b));
-		std::uint_least64_t read_bytes(p-array.data());
+		std::size_t read_bytes(p-array.data());
 		outp.write(array.data(),p);
 		transmitted_bytes+=read_bytes;
 		if(read_bytes!=b)

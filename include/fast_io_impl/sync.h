@@ -16,6 +16,7 @@ public:
 	auto& buffer(){return mostr;}
 	auto& native_handle() {return handle;}
 	template<typename ...Args>
+	requires std::constructible_from<output,Args...>
 	basic_sync(Args&& ...args):handle(std::forward<Args>(args)...){}
 	void flush()
 	{
@@ -32,13 +33,13 @@ public:
 		mostr.put(ch);
 	}
 	template<typename... Args>
-	void seek(Args&& ...args) requires random_access_stream<native_handle_type>
+	auto seek(Args&& ...args) requires random_access_stream<native_handle_type>
 	{
 		flush();
-		handle.seek(std::forward<Args>(args)...);
+		return handle.seek(std::forward<Args>(args)...);
 	}
-	template<typename Contiguous_iterator>
-	Contiguous_iterator read(Contiguous_iterator begin,Contiguous_iterator end)
+	template<std::contiguous_iterator Iter>
+	Iter read(Iter begin,Iter end)
 		requires input_stream<native_handle_type>
 	{
 		flush();
@@ -72,7 +73,8 @@ public:
 	using native_handle_type = output;
 	using char_type = typename native_handle_type::char_type;
 	using buffer_type = ostr;
-	template<typename... Args>
+	template<typename ...Args>
+	requires std::constructible_from<output,Args...>
 	constexpr basic_fsync(Args&& ...args):basic_sync<output,ostr>(std::forward<Args>(args)...) {}
 	basic_fsync(basic_fsync const&) = delete;
 	basic_fsync& operator=(basic_fsync const&) = delete;

@@ -5,27 +5,34 @@
 namespace fast_io::crypto
 {
 
-template<standard_output_stream T,typename strT = std::basic_string<typename T::char_type>>
+template<standard_output_stream T,typename strT = std::basic_string_view<typename T::char_type>>
 class oone_time_pad
 {
-	std::random_device device;
-	T& t;
 public:
 	using char_type = typename T::char_type;
 	using key_type = strT;
 private:
-	std::uniform_int_distribution<char_type> dis;
-	key_type string;
+	key_type strvw;
+	T t;
+	typename key_type::iterator iter;
+	void write_remain()
+	{
+		if(iter!=strvw.cend())
+			t.write(iter,strvw.cend());
+	}
 public:
-	oone_time_pad(T& t):t(t),dis(std::numeric_limits<char_type>::min(),std::numeric_limits<char_type>::max()){}
+    template<typename T1, typename ...Args>
+	requires std::constructible_from<key_type, strT>&&std::constructible_from<T, Args...>
+	oone_time_pad(T1&& t1,Args&& ...args):strvw(std::forward<T1>(t1)),t(std::forward<Args>(args)...),iter(strvw.cbegin()){}
 	void put(char_type ch)
 	{
-		char_type c = dis(device);
-		string.push_back(c);
-		t.put(c^ch);
+		if(iter==strvw.cend())
+			throw std::runtime_error("key is too short for one time pad");
+		t.put(*iter^ch);
+		++iter;
 	}
-	template<typename ContiguousIterator>
-	void write(ContiguousIterator b,ContiguousIterator e)
+	template<std::contiguous_iterator Iter>
+	void write(Iter b,Iter e)
 	{
 		write_precondition<char_type>(b, e);
         auto pb(static_cast<char_type const*>(static_cast<void const*>(std::addressof(*b))));
@@ -33,23 +40,53 @@ public:
 		for(;pi!=pe;++pi)
 			put(*pi);
 	}
-	void flush(){t.flush();}
-	auto& key()  const {return string;}
-	auto& key() {return string;}
+	void flush()
+	{
+		write_remain();
+		iter=strvw.cend();
+		t.flush();
+	}
+	auto& key()  const {return strvw;}
+	auto& key() {return strvw;}
+	oone_time_pad(oone_time_pad const&) = delete;
+	oone_time_pad& operator=(oone_time_pad const&) = delete;
+	oone_time_pad(oone_time_pad&& o) noexcept:strvw(std::move(strvw)),t(std::move(o.t)),iter(std::move(o.iter)){}
+	oone_time_pad& operator=(oone_time_pad&& o) noexcept
+	{
+		if(std::addressof(o)!=this)
+		{
+			try
+			{
+				write_remain();
+			}
+			catch(...){}
+			strvw=std::move(o.strvw);
+			t=std::move(o.t);
+			iter=std::move(o.iter);
+		}
+		return *this;
+	}
+	~oone_time_pad()
+	try
+	{
+		write_remain();
+	}
+	catch(...)
+	{
+	}
 };
 
 template<standard_input_stream T,typename strv = std::basic_string_view<typename T::char_type>>
 class ione_time_pad
 {
-	T& t;
+	fast_io::basic_istring_view<strv> istr;
+	T t;
 public:
 	using char_type = typename T::char_type;
 	using key_type = strv;
-private:
-	fast_io::basic_istring_view<key_type> istr;
-public:
-	template<typename ...Args>
-	ione_time_pad(T& t,Args&& ...args):t(t),istr(std::forward<Args>(args)...){}
+	template<typename T1,typename ...Args>
+	requires std::constructible_from<key_type, T1>&&std::constructible_from<T, Args...>
+	ione_time_pad(T1&& t1,Args&& ...args):istr(std::forward<T1>(t1)),t(std::forward<Args>(args)...){}
 	char_type get()
 	{
 		return t.get()^istr.get();
@@ -61,8 +98,8 @@ public:
 			return {0,true};
 		return {ch.first^istr.get(),false};
 	}
-	template<typename Contiguous_iterator>
-	Contiguous_iterator read(Contiguous_iterator b,Contiguous_iterator e)
+	template<std::contiguous_iterator Iter>
+	Iter read(Iter b,Iter e)
 		requires standard_input_stream<T>
 	{
 		auto pb(static_cast<char_type*>(static_cast<void*>(std::addressof(*b))));
@@ -77,6 +114,7 @@ public:
 		}
 		return b+(pi-pb)*sizeof(char_type)/sizeof(*b);
 	}
+	auto& key_istrview() {return istr;}
 };
 
 }

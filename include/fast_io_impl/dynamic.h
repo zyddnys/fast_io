@@ -29,11 +29,11 @@ public:
 	requires input_stream<P>||mutex_input_stream<P>
 	basic_dynamic_input_stream(std::in_place_type_t<P>,Args&& ...args):
 		up(new derv<P>(std::in_place_type<P>,std::forward<Args>(args)...)){}
-	template<typename Contiguous_iterator>
-	Contiguous_iterator read(Contiguous_iterator b,Contiguous_iterator e)
+	template<std::contiguous_iterator Iter>
+	Iter read(Iter b,Iter e)
 	{
-		char_type *pb(static_cast<char_type*>(static_cast<void*>(std::addressof(*b))));
-		char_type *pe(static_cast<char_type*>(static_cast<void*>(std::addressof(*e))));
+		char_type *pb(static_cast<char_type*>(static_cast<void*>(std::to_address(b))));
+		char_type *pe(static_cast<char_type*>(static_cast<void*>(std::to_address(e))));
 		return b+(up->read(pb,pe)-pb)*sizeof(*b)/sizeof(char_type);
 	}
 };
@@ -68,11 +68,11 @@ public:
 	template<standard_input_stream P,typename ...Args>
 	basic_dynamic_standard_input_stream(std::in_place_type_t<P>,Args&& ...args):
 		up(new derv<P>(std::in_place_type<P>,std::forward<Args>(args)...)){}
-	template<typename Contiguous_iterator>
-	Contiguous_iterator read(Contiguous_iterator b,Contiguous_iterator e)
+	template<std::contiguous_iterator Iter>
+	Iter read(Iter b,Iter e)
 	{
-		char_type *pb(static_cast<char_type*>(static_cast<void*>(std::addressof(*b))));
-		char_type *pe(static_cast<char_type*>(static_cast<void*>(std::addressof(*e))));
+		char_type *pb(static_cast<char_type*>(static_cast<void*>(std::to_address(b))));
+		char_type *pe(static_cast<char_type*>(static_cast<void*>(std::to_address(e))));
 		return b+(up->read(pb,pe)-pb)*sizeof(*b)/sizeof(char_type);
 	}
 	char_type get() {return up->get();}
@@ -109,11 +109,11 @@ public:
 	requires output_stream<P>||mutex_output_stream<P>
 	basic_dynamic_output_stream(std::in_place_type_t<P>,Args&& ...args):
 		up(new derv<P>(std::in_place_type<P>,std::forward<Args>(args)...)){}
-	template<typename Contiguous_iterator>
-	void write(Contiguous_iterator b,Contiguous_iterator e)
+	template<std::contiguous_iterator Iter>
+	void write(Iter b,Iter e)
 	{
-		up->write(static_cast<char_type const*>(static_cast<void const*>(std::addressof(*b))),
-							static_cast<char_type const*>(static_cast<void const*>(std::addressof(*e))));
+		up->write(static_cast<char_type const*>(static_cast<void const*>(std::to_address(b))),
+							static_cast<char_type const*>(static_cast<void const*>(std::to_address(e))));
 	}
 	void flush() { return up->flush();}
 };
@@ -148,11 +148,11 @@ public:
 	template<standard_output_stream P,typename ...Args>
 	basic_dynamic_standard_output_stream(std::in_place_type_t<P>,Args&& ...args):
 		up(new derv<P>(std::in_place_type<P>,std::forward<Args>(args)...)){}
-	template<typename Contiguous_iterator>
-	void write(Contiguous_iterator b,Contiguous_iterator e)
+	template<std::contiguous_iterator Iter>
+	void write(Iter b,Iter e)
 	{
-		up->write(static_cast<char_type const*>(static_cast<void const*>(std::addressof(*b))),
-							static_cast<char_type const*>(static_cast<void const*>(std::addressof(*e))));
+		up->write(static_cast<char_type const*>(static_cast<void const*>(std::to_address(b))),
+							static_cast<char_type const*>(static_cast<void const*>(std::to_address(e))));
 	}
 	void flush() { return up->flush();}
 	void put(char_type ch){up->put(ch);}
@@ -190,18 +190,18 @@ public:
 	requires io_stream<P>||mutex_io_stream<P>
 	basic_dynamic_io_stream(std::in_place_type_t<P>,Args&& ...args):
 		up(new derv<P>(std::in_place_type<P>,std::forward<Args>(args)...)){}
-	template<typename Contiguous_iterator>
-	void write(Contiguous_iterator b,Contiguous_iterator e)
+	template<std::contiguous_iterator Iter>
+	void write(Iter b,Iter e)
 	{
-		up->write(static_cast<char_type const*>(static_cast<void const*>(std::addressof(*b))),
-							static_cast<char_type const*>(static_cast<void const*>(std::addressof(*e))));
+		up->write(static_cast<char_type const*>(static_cast<void const*>(std::to_address(b))),
+							static_cast<char_type const*>(static_cast<void const*>(std::to_address(e))));
 	}
 	void flush() { return up->flush();}
-	template<typename Contiguous_iterator>
-	Contiguous_iterator read(Contiguous_iterator b,Contiguous_iterator e)
+	template<std::contiguous_iterator Iter>
+	Iter read(Iter b,Iter e)
 	{
-		char_type *pb(static_cast<char_type*>(static_cast<void*>(std::addressof(*b))));
-		char_type *pe(static_cast<char_type*>(static_cast<void*>(std::addressof(*e))));
+		char_type *pb(static_cast<char_type*>(static_cast<void*>(std::to_address(b))));
+		char_type *pe(static_cast<char_type*>(static_cast<void*>(std::to_address(e))));
 		return b+(up->read(pb,pe)-pb)*sizeof(*b)/sizeof(char_type);
 	}
 };
@@ -241,18 +241,22 @@ public:
 	template<standard_io_stream P,typename ...Args>
 	basic_dynamic_standard_io_stream(std::in_place_type_t<P>,Args&& ...args):
 		up(new derv<P>(std::in_place_type<P>,std::forward<Args>(args)...)){}
-	template<typename Contiguous_iterator>
-	void write(Contiguous_iterator b,Contiguous_iterator e)
+	template<standard_io_stream P>
+	requires (!std::same_as<std::decay_t<P>,basic_dynamic_standard_io_stream<T>>)
+	basic_dynamic_standard_io_stream(P&& p):basic_dynamic_standard_io_stream(std::in_place_type<std::decay_t<P>>,std::forward<P>(p)){}
+
+	template<std::contiguous_iterator Iter>
+	void write(Iter b,Iter e)
 	{
-		up->write(static_cast<char_type const*>(static_cast<void const*>(std::addressof(*b))),
-							static_cast<char_type const*>(static_cast<void const*>(std::addressof(*e))));
+		up->write(static_cast<char_type const*>(static_cast<void const*>(std::to_address(b))),
+							static_cast<char_type const*>(static_cast<void const*>(std::to_address(e))));
 	}
 	void flush() { return up->flush();}
-	template<typename Contiguous_iterator>
-	Contiguous_iterator read(Contiguous_iterator b,Contiguous_iterator e)
+	template<std::contiguous_iterator Iter>
+	Iter read(Iter b,Iter e)
 	{
-		char_type *pb(static_cast<char_type*>(static_cast<void*>(std::addressof(*b))));
-		char_type *pe(static_cast<char_type*>(static_cast<void*>(std::addressof(*e))));
+		char_type *pb(static_cast<char_type*>(static_cast<void*>(std::to_address(b))));
+		char_type *pe(static_cast<char_type*>(static_cast<void*>(std::to_address(e))));
 		return b+(up->read(pb,pe)-pb)*sizeof(*b)/sizeof(char_type);
 	}
 	void put(char_type ch){up->put(ch);}

@@ -4,8 +4,7 @@
 int main()
 try
 {
-	std::ofstream fout("ofstream.txt");
-	fast_io::stream_view fout_view(fout);
+	fast_io::stream_view<std::ofstream> fout_view("ofstream.txt");
 	println(fout_view,"Hello World\n");
 }
 catch(std::exception const & e)

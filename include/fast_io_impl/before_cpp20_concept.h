@@ -1,28 +1,31 @@
 #pragma once
 // Since the library is written before C++20. Will use standard libraries concepts after C++ 20 being official published. PLEASE Do not use these concepts!!!
 #include<type_traits>
-#ifdef __cpp_lib_concepts
 #include<concepts>
 
+#include<iterator>
 #ifdef _MSC_VER
 namespace std
 {
 template<typename T>
 concept floating_point = std::is_floating_point_v<T>;
 }
+#else
+namespace std _GLIBCXX_VISIBILITY(default)
+{
+_GLIBCXX_BEGIN_NAMESPACE_VERSION
+template<typename T>
+concept contiguous_iterator = requires(T const &t) { {to_address(t)};};
+_GLIBCXX_END_NAMESPACE_VERSION
+}
 #endif
 
-#else
-#include"./ported/concepts"		//use my migrated version of concepts
-#endif
-#include<iterator>
 
 namespace fast_io
 {
 
 template<typename T>
 concept Trivial_copyable=std::is_trivially_copyable_v<T>;
-
 
 namespace details
 {

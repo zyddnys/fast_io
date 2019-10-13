@@ -23,26 +23,26 @@ inline void output_base_number(output& out,U a)
 	{
 		std::array<typename output::char_type,sizeof(a)*8> v;
 		auto ed(v.data()+v.size());
-		do
+		while(base<=a)
 		{
+			auto const quo(a/base);
+			auto const rem(a%base);
 			if constexpr(10 < base)
 			{
-				--ed;
-				auto temp(a%base);
-				if(temp<10)
-					*ed = static_cast<typename output::char_type>(temp+48);
+				if(rem<10)
+					*--ed = static_cast<typename output::char_type>(rem+48);
 				else
 				{
 					if constexpr (uppercase)
-						*ed = static_cast<typename output::char_type>(temp+55);	
+						*--ed = static_cast<typename output::char_type>(rem+55);	
 					else
-						*ed = static_cast<typename output::char_type>(temp+87);
+						*--ed = static_cast<typename output::char_type>(rem+87);
 				}
 			}
 			else
-				*--ed = static_cast<typename output::char_type>(a%base+48);
+				*--ed = static_cast<typename output::char_type>(rem+48);
+			a=quo;
 		}
-		while(a/=base);
 		out.write(ed,v.data()+v.size());
 	}
 	else

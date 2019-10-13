@@ -19,14 +19,14 @@ try
 	for(std::size_t i(0);i!=N;++i)
 		auto const ret(fscanf(fp.get(),"%zu",v.data()+i));
 	}
-	{
+/*	{
 	cqw::timer t("std::FILE* with 1048576 buffer size + _IOFBF (Full buffering) tag");
 	std::unique_ptr<std::FILE,decltype(fclose)*> fp(std::fopen("cfilestar.txt","rb"),fclose);
 	auto buffer(std::make_unique<char[]>(1048576));
 	setvbuf(fp.get(),buffer.get(),_IOFBF,1048576);
 	for(std::size_t i(0);i!=N;++i)
 		auto const ret(fscanf(fp.get(),"%zu",v.data()+i));
-	}
+	}*/
 	{
 	cqw::timer t("std::ifstream");
 	std::ifstream fin("cfilestar.txt",std::ifstream::binary);
@@ -35,8 +35,7 @@ try
 	}
 	{
 	cqw::timer t("stream_view for std::ifstream");
-	std::ifstream fin("cfilestar.txt",std::ifstream::binary);
-	fast_io::stream_view view(fin);
+	fast_io::stream_view<std::ifstream> view("cfilestar.txt",std::ifstream::binary);
 	for(std::size_t i(0);i!=N;++i)
 		scan(view,v[i]);
 	}
@@ -61,8 +60,7 @@ try
 	}
 	{
 	cqw::timer t("ibuf text");
-	fast_io::ibuf ibuf("obuf_text.txt");
-	fast_io::text_view view(ibuf);
+	fast_io::text_view<fast_io::ibuf> view("obuf_text.txt");
 	for(std::size_t i(0);i!=N;++i)
 		scan(view,v[i]);
 	}
@@ -77,6 +75,14 @@ try
 	fast_io::ibuf_dynamic ibuf(std::in_place_type<fast_io::isystem_file>,"cfilestar.txt");
 	for(std::size_t i(0);i!=N;++i)
 		scan(ibuf,v[i]);
+	}
+	{
+	cqw::timer t("speck128/128");
+	fast_io::crypto::basic_ictr<fast_io::ibuf, fast_io::crypto::speck::speck_dec_128_128> enc_stream(
+		std::array<uint8_t, 16>{'8','3','3','4',';','2','3','4','a','2','c','4',']','0','3','4'},
+		std::array<uint8_t, 8>{'1','2','3','4','1','2','3','4'},"speck.txt");
+	for(auto & e : v)
+		scan(enc_stream,e);
 	}
 }
 catch(std::exception const& e)

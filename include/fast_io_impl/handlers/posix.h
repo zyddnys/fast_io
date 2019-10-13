@@ -99,32 +99,34 @@ public:
 	}
 	posix_io_handle() = default;
 	posix_io_handle(int fdd):fd(fdd){}
-	template<typename ContiguousIterator>
-	ContiguousIterator read(ContiguousIterator begin,ContiguousIterator end)
+	template<std::contiguous_iterator Iter>
+	Iter read(Iter begin,Iter end)
 	{
-		auto read_bytes(::read(fd,std::addressof(*begin),(end-begin)*sizeof(*begin)));
+		auto read_bytes(::read(fd,std::to_address(begin),(end-begin)*sizeof(*begin)));
 		if(read_bytes==-1)
 			throw std::system_error(errno,std::generic_category());
 		return begin+(read_bytes/sizeof(*begin));
 	}
-	template<typename ContiguousIterator>
-	ContiguousIterator write(ContiguousIterator begin,ContiguousIterator end)
+	template<std::contiguous_iterator Iter>
+	Iter write(Iter begin,Iter end)
 	{
-		auto write_bytes(::write(fd,std::addressof(*begin),(end-begin)*sizeof(*begin)));
+		auto write_bytes(::write(fd,std::to_address(begin),(end-begin)*sizeof(*begin)));
 		if(write_bytes==-1)
 			throw std::system_error(errno,std::generic_category());
 		return begin+(write_bytes/sizeof(*begin));
 	}
 	template<typename T,std::integral R>
-	void seek(seek_type_t<T>,R i,seekdir s=seekdir::beg)
+	std::common_type_t<off64_t, std::size_t> seek(seek_type_t<T>,R i=0,seekdir s=seekdir::cur)
 	{
-		if(::lseek64(fd,seek_precondition<off64_t,T,char_type>(i),static_cast<int>(s))==-1)
-			throw std::system_error(errno,std::generic_category()); 
+		auto ret(::lseek64(fd,seek_precondition<off64_t,T,char_type>(i),static_cast<int>(s)));
+		if(ret==-1)
+			throw std::system_error(errno,std::generic_category());
+		return ret;
 	}
 	template<std::integral R>
-	void seek(R i,seekdir s=seekdir::beg)
+	auto seek(R i=0,seekdir s=seekdir::cur)
 	{
-		seek(seek_type<char_type>,i,s);
+		return seek(seek_type<char_type>,i,s);
 	}
 	void flush()
 	{
@@ -160,6 +162,11 @@ public:
 		}
 		return *this;
 	}
+	void swap(posix_io_handle& o) noexcept
+	{
+		using std::swap;
+		swap(fd,o.fd);
+	}
 #ifdef __linux__
 	auto zero_copy_in_handle()
 	{
@@ -171,6 +178,11 @@ public:
 	}
 #endif
 };
+
+inline void swap(posix_io_handle& a,posix_io_handle& b) noexcept
+{
+	a.swap(b);
+}
 
 class posix_file:public posix_io_handle
 {
@@ -260,6 +272,7 @@ public:
 	{
 		return pipes.back();
 	}
+#ifdef __linux__
 	auto zero_copy_in_handle()
 	{
 		return in().native_handle();
@@ -268,17 +281,27 @@ public:
 	{
 		return out().native_handle();
 	}
-	template<typename ContiguousIterator>
-	ContiguousIterator read(ContiguousIterator begin,ContiguousIterator end)
+#endif
+	template<std::contiguous_iterator Iter>
+	Iter read(Iter begin,Iter end)
 	{
 		return pipes.front().read(begin,end);
 	}
-	template<typename ContiguousIterator>
-	void write(ContiguousIterator begin,ContiguousIterator end)
+	template<std::contiguous_iterator Iter>
+	void write(Iter begin,Iter end)
 	{
 		pipes.back().write(begin,end);
 	}
+	void swap(posix_pipe& o) noexcept
+	{
+		using std::swap;
+		swap(pipes,o.pipes);
+	}
 };
+inline void swap(posix_pipe& a,posix_pipe& b) noexcept
+{
+	a.swap(b);
+}
 
 #ifndef __WINNT__
 using system_file = posix_file;
@@ -295,9 +318,9 @@ inline int constexpr native_stderr_number = 2;
 namespace details
 {
 template<zero_copy_output_stream output,zero_copy_input_stream input>
-inline std::uint_least64_t zero_copy_transmit_once(output& outp,input& inp,std::uint_least64_t bytes)
+inline std::size_t zero_copy_transmit_once(output& outp,input& inp,std::size_t bytes)
 {
-	auto transmitted_bytes(::sendfile64(outp.zero_copy_out_handle(),inp.zero_copy_in_handle(),nullptr,bytes));
+	auto transmitted_bytes(::sendfile(outp.zero_copy_out_handle(),inp.zero_copy_in_handle(),nullptr,bytes));
 	if(transmitted_bytes==-1)
 		throw std::system_error(errno,std::generic_category());
 	return transmitted_bytes;
@@ -306,16 +329,16 @@ inline std::uint_least64_t zero_copy_transmit_once(output& outp,input& inp,std::
 
 
 template<zero_copy_output_stream output,zero_copy_input_stream input>
-inline std::uint_least64_t zero_copy_transmit(output& outp,input& inp,std::uint_least64_t bytes)
+inline std::size_t zero_copy_transmit(output& outp,input& inp,std::size_t bytes)
 {
-	std::uint_least64_t constexpr maximum_transmit_bytes(std::numeric_limits<std::int64_t>::max());
-	std::uint_least64_t transmitted(0);
+	std::size_t constexpr maximum_transmit_bytes(2147479552);
+	std::size_t transmitted(0);
 	for(;bytes;)
 	{
-		std::uint_least64_t should_transfer(maximum_transmit_bytes);
+		std::size_t should_transfer(maximum_transmit_bytes);
 		if(bytes<should_transfer)
 			should_transfer=bytes;
-		std::uint_least64_t transferred_this_round(details::zero_copy_transmit_once(outp,inp,should_transfer));
+		std::size_t transferred_this_round(details::zero_copy_transmit_once(outp,inp,should_transfer));
 		transmitted+=transferred_this_round;
 		if(transferred_this_round!=should_transfer)
 			return transmitted;
@@ -325,12 +348,12 @@ inline std::uint_least64_t zero_copy_transmit(output& outp,input& inp,std::uint_
 	
 }
 template<zero_copy_output_stream output,zero_copy_input_stream input>
-inline std::uint_least64_t zero_copy_transmit(output& outp,input& inp)
+inline std::size_t zero_copy_transmit(output& outp,input& inp)
 {
-	std::uint_least64_t constexpr maximum_transmit_bytes(std::numeric_limits<std::int64_t>::max());
-	for(std::uint_least64_t transmitted(0);;)
+	std::size_t constexpr maximum_transmit_bytes(2147479552);
+	for(std::size_t transmitted(0);;)
 	{
-		std::uint_least64_t transferred_this_round(details::zero_copy_transmit_once(outp,inp,maximum_transmit_bytes));
+		std::size_t transferred_this_round(details::zero_copy_transmit_once(outp,inp,maximum_transmit_bytes));
 		transmitted+=transferred_this_round;
 		if(transferred_this_round!=maximum_transmit_bytes)
 			return transmitted;

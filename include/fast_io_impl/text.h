@@ -22,13 +22,15 @@ template<typename T>
 requires standard_input_stream<T>||standard_output_stream<T>
 class text_view
 {
-	T& ib;
+	T ib;
 	details::text_view_interal_variable<T> state;
 public:
 	using native_interface_t = T;
 	using char_type = typename native_interface_t::char_type;
 public:
-	constexpr text_view(T& ibv):ib(ibv){}
+	template<typename ...Args>
+	requires std::constructible_from<T,Args...>
+	constexpr text_view(Args&& ...args):ib(std::forward<Args>(args)...){}
 	constexpr auto& native_handle()
 	{
 		return ib;
@@ -79,11 +81,11 @@ public:
 		else
 			return ch;
 	}
-	template<typename Contiguous_iterator>
-	constexpr Contiguous_iterator read(Contiguous_iterator b,Contiguous_iterator e)
+	template<std::contiguous_iterator Iter>
+	constexpr Iter read(Iter b,Iter e)
 		requires standard_input_stream<T>
 	{
-		auto pb(static_cast<char_type*>(static_cast<void*>(std::addressof(*b))));
+		auto pb(static_cast<char_type*>(static_cast<void*>(std::to_address(b))));
 		auto pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));
 		auto pi(pb);
 		for(;pi!=pe;++pi)
@@ -98,13 +100,13 @@ public:
 #endif
 		ib.put(ch);
 	}
-	template<typename Contiguous_iterator>
-	constexpr void write(Contiguous_iterator b,Contiguous_iterator e)
+	template<std::contiguous_iterator Iter>
+	constexpr void write(Iter b,Iter e)
 		requires standard_output_stream<T>
 	{
 #if defined(__WINNT__) || defined(_MSC_VER)
 		write_precondition<char_type>(b,e);
-		auto pb(static_cast<char_type const*>(static_cast<void const*>(std::addressof(*b))));
+		auto pb(static_cast<char_type const*>(static_cast<void const*>(std::to_address(b))));
 		auto last(pb);
 		auto pi(pb),pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));
 		for(;pi!=pe;++pi)
@@ -128,6 +130,6 @@ public:
 };
 
 template<stream srm>
-text_view(srm&) -> text_view<srm>;
+text_view(srm&&) -> text_view<srm>;
 
 }

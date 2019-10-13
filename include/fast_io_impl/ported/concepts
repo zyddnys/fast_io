@@ -346,6 +346,9 @@ My Additional implementations (Looks like VCs implementation has not completed y
 template<typename T>
 concept floating_point = is_floating_point_v<T>;
 
+template<typename T>
+concept contiguous_iterator = requires(T const &t) { {to_address(t)};};
+
 #ifdef __GLIBCXX__
 _GLIBCXX_END_NAMESPACE_VERSION
 }

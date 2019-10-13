@@ -31,8 +31,8 @@ concept mutex_stream_impl = requires(T t)
 template<typename T>
 concept standard_input_stream_impl = requires(T in)
 {
-	{in.get()}->typename T::char_type;
-	{in.try_get()}->std::pair<typename T::char_type,bool>;
+	{in.get()};
+	{in.try_get()};
 };
 
 template<typename T>
@@ -63,7 +63,7 @@ concept zero_copy_output_stream_impl = requires(T out)
 }
 
 template<typename T>
-concept stream = details::input_stream_impl<T>||details::output_stream_impl<T>;
+concept stream = std::movable<T>&&(details::input_stream_impl<T>||details::output_stream_impl<T>);
 
 template<typename T>
 concept mutex_stream = stream<T>&&details::mutex_stream_impl<T>;

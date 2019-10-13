@@ -25,6 +25,7 @@ struct io_aligned_allocator
 	}
 };
 
+
 template<typename CharT,typename Allocator = io_aligned_allocator<CharT>,std::size_t buffer_size = 65536>
 class basic_buf_handler
 {
@@ -56,7 +57,21 @@ public:
 		alloc.deallocate(beg,buffer_size);
 	}
 	Allocator get_allocator() const{	return alloc;}
+	void swap(basic_buf_handler& o) noexcept
+	{
+		using std::swap;
+		swap(alloc,o.alloc);
+		swap(beg,o.beg);
+		swap(curr,o.curr);
+		swap(end,o.end);
+	}
 };
+
+template<typename CharT,typename Allocator,std::size_t buffer_size>
+inline void swap(basic_buf_handler<CharT,Allocator,buffer_size>& a,basic_buf_handler<CharT,Allocator,buffer_size>& b) noexcept
+{
+	a.swap(b);
+}
 
 template<input_stream Ihandler,typename Buf=basic_buf_handler<typename Ihandler::char_type>>
 class basic_ibuf
@@ -95,12 +110,13 @@ private:
 	}
 public:
 	template<typename... Args>
+	requires std::constructible_from<Ihandler,Args...>
 	basic_ibuf(Args&&... args):ih(std::forward<Args>(args)...){bh.curr=bh.end;}
-	template<typename Contiguous_Iterator>
-	auto read(Contiguous_Iterator begin,Contiguous_Iterator end)
+	template<std::contiguous_iterator Iter>
+	Iter read(Iter begin,Iter end)
 	{
-		auto bgchadd(static_cast<char_type*>(static_cast<void*>(std::addressof(*begin))));
-		return begin+(mread(bgchadd,static_cast<char_type*>(static_cast<void*>(std::addressof(*end))))-bgchadd)/sizeof(*begin);
+		auto bgchadd(static_cast<char_type*>(static_cast<void*>(std::to_address(begin))));
+		return begin+(mread(bgchadd,static_cast<char_type*>(static_cast<void*>(std::to_address(end))))-bgchadd)/sizeof(*begin);
 	}
 	std::pair<char_type,bool> try_get()
 	{
@@ -133,12 +149,25 @@ public:
 		return ih;
 	}
 	template<typename... Args>
-	void seek(Args&& ...args) requires(random_access_stream<Ihandler>)
+	auto seek(Args&& ...args) requires(random_access_stream<Ihandler>)
 	{
 		bh.curr=bh.end;
-		ih.seek(std::forward<Args>(args)...);
+		return ih.seek(std::forward<Args>(args)...);
+	}
+	inline void swap(basic_ibuf& o) noexcept
+	{
+		using std::swap;
+		swap(ih,o.ih);
+		swap(bh,o.bh);
 	}
 };
+
+template<input_stream Ihandler,typename Buf>
+inline void swap(basic_ibuf<Ihandler,Buf>& a,basic_ibuf<Ihandler,Buf>&b) noexcept
+{
+	a.swap(b);
+}
+
 template<output_stream Ohandler,typename Buf=basic_buf_handler<typename Ohandler::char_type>>
 class basic_obuf
 {
@@ -176,6 +205,7 @@ private:
 	}
 public:
 	template<typename... Args>
+	requires std::constructible_from<Ohandler,Args...>
 	basic_obuf(Args&&... args):oh(std::forward<Args>(args)...){bh.curr=bh.beg;}
 	void flush()
 	{
@@ -189,7 +219,7 @@ public:
 	}
 	basic_obuf& operator=(basic_obuf const&)=delete;
 	basic_obuf(basic_obuf const&)=delete;
-	basic_obuf(basic_obuf&& bmv) noexcept = default;
+	basic_obuf(basic_obuf&& bmv) noexcept:oh(std::move(bmv.oh)),bh(std::move(bmv.bh)){}
 	basic_obuf& operator=(basic_obuf&& b) noexcept
 	{
 		if(std::addressof(b)!=this)
@@ -200,11 +230,12 @@ public:
 		}
 		return *this;
 	}
-	template<typename Contiguous_Iterator>
-	void write(Contiguous_Iterator cbegin,Contiguous_Iterator cend)
+	template<std::contiguous_iterator Iter>
+	void write(Iter cbegin,Iter cend)
 	{
 		write_precondition<char_type>(cbegin,cend);
-		mwrite(static_cast<char_type const*>(static_cast<void const*>(std::addressof(*cbegin))),static_cast<char_type const*>(static_cast<void const*>(std::addressof(*cend))));
+		mwrite(static_cast<char_type const*>(static_cast<void const*>(std::to_address(cbegin))),
+						static_cast<char_type const*>(static_cast<void const*>(std::to_address(cend))));
 	}
 	void put(char_type ch)
 	{
@@ -220,20 +251,32 @@ public:
 		return oh;
 	}
 	template<typename... Args>
-	void seek(Args&& ...args) requires(random_access_stream<Ohandler>)
+	auto seek(Args&& ...args) requires(random_access_stream<Ohandler>)
 	{
 		oh.write(bh.beg,bh.curr);
 		bh.curr=bh.beg;
-		oh.seek(std::forward<Args>(args)...);
+		return oh.seek(std::forward<Args>(args)...);
+	}
+	inline void swap(basic_obuf& o) noexcept
+	{
+		using std::swap;
+		swap(oh,o.ih);
+		swap(bh,o.bh);
 	}
 };
+template<output_stream Ohandler,typename Buf>
+inline void swap(basic_obuf<Ohandler,Buf>& a,basic_obuf<Ohandler,Buf>&b) noexcept
+{
+	a.swap(b);
+}
 
 namespace details
 {
 template<io_stream io_handler,typename Buf>
 struct fake_basic_ihandler:basic_obuf<io_handler,Buf>
 {
-template<typename ...Args>
+template<typename... Args>
+requires std::constructible_from<io_handler,Args...>
 fake_basic_ihandler(Args&& ...args):basic_obuf<io_handler,Buf>(std::forward<Args>(args)...){}
 template<typename ...Args>
 auto read(Args&& ...args)
@@ -241,6 +284,7 @@ auto read(Args&& ...args)
 	return this->native_handle().read(std::forward<Args>(args)...);
 }
 };
+
 }
 
 template<io_stream io_handler,typename Buf=basic_buf_handler<typename io_handler::char_type>>
@@ -252,7 +296,8 @@ public:
 private:
 	basic_ibuf<details::fake_basic_ihandler<native_handle_type,Buf>> ibf;
 public:
-	template<typename ...Args>
+	template<typename... Args>
+	requires std::constructible_from<io_handler,Args...>
 	basic_iobuf(Args&& ...args):ibf(std::forward<Args>(args)...){}
 	auto& native_handle()
 	{
@@ -285,11 +330,22 @@ public:
 		return ibf.try_get();
 	}
 	template<typename... Args>
-	void seek(Args&& ...args) requires(random_access_stream<io_handler>)
+	auto seek(Args&& ...args) requires(random_access_stream<io_handler>)
 	{
 		ibf.native_handle().flush();
-		ibf.seek(std::forward<Args>(args)...);
+		return ibf.seek(std::forward<Args>(args)...);
+	}
+	inline void swap(basic_iobuf& o) noexcept
+	{
+		using std::swap;
+		swap(ibf,o.ibf);
 	}
 };
+
+template<io_stream io_handler,typename Buf>
+inline void swap(basic_iobuf<io_handler,Buf>& a,basic_iobuf<io_handler,Buf>&b) noexcept
+{
+	a.swap(b);
+}
 
 }

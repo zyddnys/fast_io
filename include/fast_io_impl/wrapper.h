@@ -10,6 +10,7 @@ public:
 	using char_type = typename T::char_type;
 	using native_handle_type = typename T::native_handle_type;
 	template<typename ...Args>
+	requires std::constructible_from<T,Args...>
 	constexpr basic_file_wrapper(native_interface_t,Args&& ...args):T(std::forward<Args>(args)...){}
 	template<std::size_t om>
 	constexpr basic_file_wrapper(std::string_view file,open::interface_t<om>):T(file,open::interface<fast_io::open::mode(om|interface_mode)>){}

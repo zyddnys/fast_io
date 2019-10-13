@@ -30,15 +30,15 @@ inline auto connect(int sck,T& sock_address)
 	return call_posix(::connect,sck,static_cast<sockaddr*>(static_cast<void*>(std::addressof(sock_address))),sizeof(sock_type));
 }
 
-template<typename mem_address,typename ...Args>
-inline auto send(mem_address m,Args&& ...args)
+template<typename ...Args>
+inline auto send(Args&& ...args)
 {
 	return call_posix(::send,std::forward<Args>(args)...);
 }
-template<typename mem_address,typename ...Args>
-inline auto recv(mem_address m,Args&& ...args)
+template<typename ...Args>
+inline auto recv(Args&& ...args)
 {
-	return call_posix(::recv,static_cast<void*>(m),std::forward<Args>(args)...);
+	return call_posix(::recv,std::forward<Args>(args)...);
 }
 
 template<typename ...Args>

@@ -5,21 +5,23 @@ namespace fast_io
 template<typename T>
 class stream_view
 {
-	T& strm;
+	T strm;
 public:
 	using char_type = typename T::char_type;
 	using traits_type = typename T::traits_type;
-	stream_view(T& ref):strm(ref){}
-	template<typename Contiguous_iterator>
-	Contiguous_iterator read(Contiguous_iterator begin,Contiguous_iterator end) requires fast_io::details::input_stream_impl<T>
+	template<typename ...Args>
+	requires std::constructible_from<T,Args...>
+	stream_view(Args&& ...args):strm(std::forward<Args>(args)...){}
+	template<std::contiguous_iterator Iter>
+	Iter read(Iter begin,Iter end) requires fast_io::details::input_stream_impl<T>
 	{
-		return begin+(strm.sgetn(static_cast<char_type*>(static_cast<void*>(std::addressof(*begin))),(end-begin)*sizeof(*begin)/sizeof(char_type))*sizeof(char_type)/sizeof(*begin));
+		return begin+(strm.sgetn(static_cast<char_type*>(static_cast<void*>(std::to_address(begin))),(end-begin)*sizeof(*begin)/sizeof(char_type))*sizeof(char_type)/sizeof(*begin));
 	}
-	template<typename Contiguous_iterator>
-	void write(Contiguous_iterator begin,Contiguous_iterator end) requires fast_io::details::output_stream_impl<T>
+	template<std::contiguous_iterator Iter>
+	void write(Iter begin,Iter end) requires fast_io::details::output_stream_impl<T>
 	{
 		write_precondition<char_type>(begin,end);
-		if(!strm.write(static_cast<char_type const*>(static_cast<void const*>(std::addressof(*begin))),(end-begin)*sizeof(*begin)/sizeof(char_type)))
+		if(!strm.write(static_cast<char_type const*>(static_cast<void const*>(std::to_address(begin))),(end-begin)*sizeof(*begin)/sizeof(char_type)))
 			throw std::runtime_error("write failed for stream view");
 	}
 	char_type get() requires fast_io::details::input_stream_impl<T>
@@ -41,6 +43,7 @@ public:
 		if(!strm.put(ch))
 			throw std::runtime_error("put() failed for streambuf view");
 	}
+	auto& native_handle() { return strm;}
 	void flush() requires fast_io::details::output_stream_impl<T>
 	{
 		strm.flush();
@@ -48,6 +51,6 @@ public:
 };
 
 template<typename stream>
-stream_view(stream&) -> stream_view<stream>;
+stream_view(stream&&) noexcept -> stream_view<stream>;
 
 }
