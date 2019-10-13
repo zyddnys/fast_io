@@ -19,34 +19,44 @@ inline void output_base_number(output& out,U a)
 //number: 0:48 9:57
 //upper: 65 :A 70: F
 //lower: 97 :a 102 :f
-	if(a)
+
+	std::array<typename output::char_type,sizeof(a)*8> v;
+	auto iter(v.data()+v.size()-1);
+	for(;base<=a;--iter)
 	{
-		std::array<typename output::char_type,sizeof(a)*8> v;
-		auto iter(v.data()+v.size());
-		while(a)
+		auto const quo(a/base);
+		auto const rem(a%base);
+		if constexpr(10 < base)
 		{
-			auto const quo(a/base);
-			auto const rem(a%base);
-			if constexpr(10 < base)
-			{
-				if(rem<10)
-					*--iter = static_cast<typename output::char_type>(rem+48);
-				else
-				{
-					if constexpr (uppercase)
-						*--iter = static_cast<typename output::char_type>(rem+55);	
-					else
-						*--iter = static_cast<typename output::char_type>(rem+87);
-				}
-			}
+			if(rem<10)
+				*iter = static_cast<typename output::char_type>(rem+48);
 			else
-				*--iter = static_cast<typename output::char_type>(rem+48);
-			a=quo;
+			{
+				if constexpr (uppercase)
+					*iter = static_cast<typename output::char_type>(rem+55);	
+				else
+					*iter = static_cast<typename output::char_type>(rem+87);
+			}
 		}
-		out.writes(iter,v.data()+v.size());
+		else
+			*iter = static_cast<typename output::char_type>(rem+48);
+		a=quo;
+	}
+	if constexpr(10 < base)
+	{
+		if(a<10)
+			*iter = static_cast<typename output::char_type>(a+48);
+		else
+		{
+			if constexpr (uppercase)
+				*iter = static_cast<typename output::char_type>(a+55);	
+			else
+				*iter = static_cast<typename output::char_type>(a+87);
+		}
 	}
 	else
-		out.put(48);
+		*iter=static_cast<typename output::char_type>(a+48);
+	out.writes(iter,v.data()+v.size());
 }
 
 template<std::uint8_t base,bool uppercase,standard_output_stream output,std::signed_integral T>
