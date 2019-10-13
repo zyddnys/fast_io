@@ -100,7 +100,7 @@ public:
 	posix_io_handle() = default;
 	posix_io_handle(int fdd):fd(fdd){}
 	template<std::contiguous_iterator Iter>
-	Iter read(Iter begin,Iter end)
+	Iter reads(Iter begin,Iter end)
 	{
 		auto read_bytes(::read(fd,std::to_address(begin),(end-begin)*sizeof(*begin)));
 		if(read_bytes==-1)
@@ -108,7 +108,7 @@ public:
 		return begin+(read_bytes/sizeof(*begin));
 	}
 	template<std::contiguous_iterator Iter>
-	Iter write(Iter begin,Iter end)
+	Iter writes(Iter begin,Iter end)
 	{
 		auto write_bytes(::write(fd,std::to_address(begin),(end-begin)*sizeof(*begin)));
 		if(write_bytes==-1)
@@ -283,14 +283,14 @@ public:
 	}
 #endif
 	template<std::contiguous_iterator Iter>
-	Iter read(Iter begin,Iter end)
+	Iter reads(Iter begin,Iter end)
 	{
-		return pipes.front().read(begin,end);
+		return pipes.front().reads(begin,end);
 	}
 	template<std::contiguous_iterator Iter>
-	void write(Iter begin,Iter end)
+	Iter writes(Iter begin,Iter end)
 	{
-		pipes.back().write(begin,end);
+		return pipes.back().writes(begin,end);
 	}
 	void swap(posix_pipe& o) noexcept
 	{

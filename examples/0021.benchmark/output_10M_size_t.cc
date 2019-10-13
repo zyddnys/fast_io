@@ -52,7 +52,7 @@ try
 	for(std::size_t i(0);i!=N;++i)
 	{
 		auto [p,ec] = std::to_chars(buffer.data(), buffer.data() + buffer.size(),i);
-		obuf.write(buffer.data(),p);
+		obuf.writes(buffer.data(),p);
 		obuf.put('\n');
 	}
 	}

@@ -113,7 +113,7 @@ public:
 		return mhandle;
 	}
 	template<std::contiguous_iterator Iter>
-	Iter read(Iter begin,Iter end)
+	Iter reads(Iter begin,Iter end)
 	{
 		DWORD numberOfBytesRead;
 		if(!ReadFile(mhandle,std::to_address(begin),static_cast<DWORD>((end-begin)*sizeof(*begin)),&numberOfBytesRead,nullptr))
@@ -121,13 +121,14 @@ public:
 		return begin+numberOfBytesRead;
 	}
 	template<std::contiguous_iterator Iter>
-	void write(Iter cbegin,Iter cend)
+	Iter writes(Iter cbegin,Iter cend)
 	{
 		auto nNumberOfBytesToWrite(static_cast<DWORD>((cend-cbegin)*sizeof(*cbegin)));
 		DWORD numberOfBytesWritten;
 		if(!WriteFile(mhandle,std::to_address(cbegin),nNumberOfBytesToWrite,std::addressof(numberOfBytesWritten),nullptr)||
 							nNumberOfBytesToWrite!=numberOfBytesWritten)
 			throw win32_error();
+		return cbegin+numberOfBytesWritten/sizeof(*cbegin);
 	}
 	void flush()
 	{
@@ -278,14 +279,14 @@ public:
 		return pipes.back();
 	}
 	template<std::contiguous_iterator Iter>
-	Iter read(Iter begin,Iter end)
+	Iter reads(Iter begin,Iter end)
 	{
-		return pipes.front().read(begin,end);
+		return pipes.front().reads(begin,end);
 	}
 	template<std::contiguous_iterator Iter>
-	void write(Iter begin,Iter end)
+	Iter writes(Iter begin,Iter end)
 	{
-		pipes.back().write(begin,end);
+		return pipes.back().writes(begin,end);
 	}
 	void swap(win32_pipe& o) noexcept
 	{

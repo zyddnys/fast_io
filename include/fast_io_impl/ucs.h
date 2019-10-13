@@ -82,7 +82,7 @@ public:
 		return {get_impl(ch.first),false};
 	}
 	template<std::contiguous_iterator Iter>
-	constexpr Iter read(Iter b,Iter e)
+	constexpr Iter reads(Iter b,Iter e)
 		requires standard_input_stream<T>
 	{
 		auto pb(static_cast<char_type*>(static_cast<void*>(std::to_address(b))));
@@ -118,13 +118,13 @@ public:
 		}
 		unsigned_native_char_type constexpr max_native_char_type(-1);
 		*ed |= max_native_char_type>>(native_char_bits-v_elements-1)<<(native_char_bits-v_elements);
-		ib.write(ed,v.data()+v.size());
+		ib.writes(ed,v.data()+v.size());
 	}
 	template<std::contiguous_iterator Iter>
-	constexpr void write(Iter b,Iter e)
+	constexpr void writes(Iter b,Iter e)
 		requires standard_output_stream<T>
 	{
-		write_precondition<char_type>(b,e);
+		writes_precondition<char_type>(b,e);
 		auto pb(static_cast<char_type const*>(static_cast<void const*>(std::to_address(b))));
 		for(auto pi(pb),pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));pi!=pe;++pi)
 			put(*pi);
@@ -159,7 +159,7 @@ inline void in_place_ucs_to_utf8(std::string& v,std::basic_string_view<T> view)
 {
 	v.clear();
 	ucs<basic_ostring<std::string>,T> uv(std::move(v));
-	uv.write(view.cbegin(),view.cend());
+	uv.writes(view.cbegin(),view.cend());
 	v=std::move(uv.native_handle().str());
 }
 
@@ -167,7 +167,7 @@ template<typename T>
 inline std::string ucs_to_utf8(std::basic_string_view<T> view)
 {
 	ucs<basic_ostring<std::string>,T> uv;
-	uv.write(view.cbegin(),view.cend());
+	uv.writes(view.cbegin(),view.cend());
 	return std::move(uv.native_handle().str());
 }
 }

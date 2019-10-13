@@ -18,7 +18,7 @@ public:
 		return s;
 	}
 	template<std::contiguous_iterator Iter>
-	constexpr Iter read(Iter begin,Iter end)
+	constexpr Iter reads(Iter begin,Iter end)
 	{
 		auto pb(static_cast<char_type*>(static_cast<void*>(std::to_address(begin))));
 		auto pe(static_cast<char_type*>(static_cast<void*>(std::to_address(end))));
@@ -59,9 +59,9 @@ public:
 		return s;
 	}
 	template<std::contiguous_iterator Iter>
-	constexpr void write(Iter cbegin,Iter cend)
+	constexpr void writes(Iter cbegin,Iter cend)
 	{
-		write_precondition<char_type>(cbegin,cend);
+		writes_precondition<char_type>(cbegin,cend);
 		s.append(static_cast<char_type const*>(static_cast<void const*>(std::to_address(cbegin))),static_cast<char_type const*>(static_cast<void const*>(std::to_address(cend))));
 	}
 	constexpr void put(char_type ch)

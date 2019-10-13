@@ -25,7 +25,7 @@ public:
 		return std::feof(fp);
 	}
 	template<std::contiguous_iterator Iter>
-	Iter read(Iter begin,Iter end)
+	Iter reads(Iter begin,Iter end)
 	{
 		std::size_t const count(end-begin);
 		std::size_t const r(std::fread(std::to_address(begin),sizeof(*begin),count,fp));
@@ -35,7 +35,7 @@ public:
 	}
 
 	template<std::contiguous_iterator Iter>
-	void write(Iter begin,Iter end)
+	void writes(Iter begin,Iter end)
 	{
 		std::size_t const count(end-begin);
 		if(std::fwrite(std::to_address(begin),sizeof(*begin),count,fp)<count)

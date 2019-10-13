@@ -18,7 +18,7 @@ private:
 	void write_remain()
 	{
 		if(iter!=strvw.cend())
-			t.write(iter,strvw.cend());
+			t.writes(iter,strvw.cend());
 	}
 public:
     template<typename T1, typename ...Args>
@@ -32,9 +32,9 @@ public:
 		++iter;
 	}
 	template<std::contiguous_iterator Iter>
-	void write(Iter b,Iter e)
+	void writes(Iter b,Iter e)
 	{
-		write_precondition<char_type>(b, e);
+		writes_precondition<char_type>(b, e);
         auto pb(static_cast<char_type const*>(static_cast<void const*>(std::addressof(*b))));
 		auto pi(pb), pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));
 		for(;pi!=pe;++pi)
@@ -99,7 +99,7 @@ public:
 		return {ch.first^istr.get(),false};
 	}
 	template<std::contiguous_iterator Iter>
-	Iter read(Iter b,Iter e)
+	Iter reads(Iter b,Iter e)
 		requires standard_input_stream<T>
 	{
 		auto pb(static_cast<char_type*>(static_cast<void*>(std::addressof(*b))));

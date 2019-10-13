@@ -20,13 +20,13 @@ public:
 	basic_sync(Args&& ...args):handle(std::forward<Args>(args)...){}
 	void flush()
 	{
-		handle.write(mostr.str().cbegin(),mostr.str().cend());
+		handle.writes(mostr.str().cbegin(),mostr.str().cend());
 		mostr.clear();
 	}
 	template<typename ...Args>
-	void write(Args&& ...args)
+	void writes(Args&& ...args)
 	{
-		mostr.write(std::forward<Args>(args)...);
+		mostr.writes(std::forward<Args>(args)...);
 	}
 	void put(char_type ch)
 	{
@@ -39,11 +39,11 @@ public:
 		return handle.seek(std::forward<Args>(args)...);
 	}
 	template<std::contiguous_iterator Iter>
-	Iter read(Iter begin,Iter end)
+	Iter reads(Iter begin,Iter end)
 		requires input_stream<native_handle_type>
 	{
 		flush();
-		return handle.read(begin,end);
+		return handle.reads(begin,end);
 	}
 	auto get() requires standard_input_stream<native_handle_type>
 	{

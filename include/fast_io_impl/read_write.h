@@ -11,7 +11,7 @@ template<input_stream input,Trivial_copyable T>
 inline void read(input& in,T& v)
 {
 	auto address(std::addressof(v));
-	if(in.read(address,address+1)!=(address+1))
+	if(in.reads(address,address+1)!=(address+1))
 		throw std::runtime_error("cannot read data from input_stream&");
 }
 
@@ -19,7 +19,7 @@ template<output_stream output,Trivial_copyable T>
 inline void write(output& out,T const& v)
 {
 	auto address(std::addressof(v));
-	out.write(address,address+1);
+	out.writes(address,address+1);
 }
 
 template<standard_input_stream input>
@@ -64,7 +64,7 @@ template<standard_input_stream input,Contiguous_trivial_dynamic_size_container D
 inline void read(input& in,D& v)
 {
 	v.resize(read_size(in));
-	if(in.read(v.begin(),v.end())!=v.end())
+	if(in.reads(v.begin(),v.end())!=v.end())
 		throw std::runtime_error("read contiguous trivial containers error");
 }
 
@@ -72,7 +72,7 @@ template<standard_output_stream output,Contiguous_trivial_dynamic_size_container
 inline void write(output& out,D const& v)
 {
 	write_size(out,v.size());
-	out.write(v.begin(),v.end());
+	out.writes(v.begin(),v.end());
 }
 
 template<standard_output_stream output,Dynamic_size_container D>

@@ -11,14 +11,14 @@ template<typename T>
 concept input_stream_impl = requires(T in)
 {
 	typename T::char_type;
-	{in.read};
+	{in.reads};
 };
 
 template<typename T>
 concept output_stream_impl = requires(T out)
 {
 	typename T::char_type;
-	{out.write};
+	{out.writes};
 	{out.flush()};
 };
 

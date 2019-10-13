@@ -54,7 +54,7 @@ inline constexpr void print(output& out, T const& b)
 template<output_stream output>
 inline void print(output& out,std::basic_string_view<typename output::char_type> str)
 {
-	out.write(str.data(),str.data()+str.size());
+	out.writes(str.data(),str.data()+str.size());
 }
 
 template<output_stream output>
@@ -99,10 +99,10 @@ inline void fprint(os &out,std::basic_string_view<typename os::char_type> format
 {
 	std::size_t percent_pos;
 	for(;(percent_pos=format.find('%'))!=std::string_view::npos&&percent_pos+1!=format.size()&&format[percent_pos+1]=='%';format.remove_prefix(percent_pos+2))
-		out.write(format.cbegin(),format.cbegin()+percent_pos+1);
+		out.writes(format.cbegin(),format.cbegin()+percent_pos+1);
 	if(percent_pos!=std::string_view::npos)
 		throw std::runtime_error("fprint() format error");
-	out.write(format.cbegin(),format.cend());
+	out.writes(format.cbegin(),format.cend());
 }
 
 template<output_stream os,typename T,typename ...Args>
@@ -110,15 +110,15 @@ inline void fprint(os &out,std::basic_string_view<typename os::char_type> format
 {
 	std::size_t percent_pos;
 	for(;(percent_pos=format.find('%'))!=std::string_view::npos&&percent_pos+1!=format.size()&&format[percent_pos+1]=='%';format.remove_prefix(percent_pos+2))
-		out.write(format.cbegin(),format.cbegin()+percent_pos+1);
+		out.writes(format.cbegin(),format.cbegin()+percent_pos+1);
 	if(percent_pos==std::string_view::npos)
 	{
-		out.write(format.cbegin(),format.cend());
+		out.writes(format.cbegin(),format.cend());
 		return;
 	}
 	else
 	{
-		out.write(format.cbegin(),format.cbegin()+percent_pos);
+		out.writes(format.cbegin(),format.cbegin()+percent_pos);
 		format.remove_prefix(percent_pos+1);
 	}
 	print(out,std::forward<T>(cr));
@@ -185,7 +185,7 @@ inline constexpr void fprint_flush(output &out,Args&& ...args)
 template<output_stream output,typename ...Args>
 inline constexpr void write_flush(output& out,Args&& ...args)
 {
-	write(out,std::forward<Args>(args)...);
+	writes(out,std::forward<Args>(args)...);
 	out.flush();
 }
 

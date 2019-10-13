@@ -40,16 +40,16 @@ public:
 		t.flush();
 	}
 	template<std::contiguous_iterator Iter>
-	constexpr Iter read(Iter begin,Iter end) 	requires input_stream<T>
+	constexpr Iter reads(Iter begin,Iter end) 	requires input_stream<T>
 	{
 		o->flush();
-		return t.read(begin,end);
+		return t.reads(begin,end);
 	}
 	template<std::contiguous_iterator Iter>
-	constexpr void write(Iter begin,Iter end) requires output_stream<T>
+	constexpr void writes(Iter begin,Iter end) requires output_stream<T>
 	{
 		o->flush();
-		return t.write(begin,end);
+		return t.writes(begin,end);
 	}
 };
 
@@ -85,15 +85,15 @@ public:
 		t.flush();
 	}
 	template<std::contiguous_iterator Iter>
-	constexpr Iter read(Iter begin,Iter end) 	requires input_stream<T>
+	constexpr Iter reads(Iter begin,Iter end) 	requires input_stream<T>
 	{
 		t.flush();
-		return t.read(begin,end);
+		return t.reads(begin,end);
 	}
 	template<std::contiguous_iterator Iter>
-	constexpr void write(Iter begin,Iter end) requires output_stream<T>
+	constexpr void writes(Iter begin,Iter end) requires output_stream<T>
 	{
-		return t.write(begin,end);
+		return t.writes(begin,end);
 	}
 	template<typename... Args>
 	auto seek(Args&& ...args) requires random_access_stream<native_handle_type>

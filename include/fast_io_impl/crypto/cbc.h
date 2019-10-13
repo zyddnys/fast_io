@@ -59,7 +59,7 @@ private:
 
         for (; pi != pe;)
         {
-            cipher_buf_pos = ib.read(cipher_buf_pos, cipher_buf.end());
+            cipher_buf_pos = ib.reads(cipher_buf_pos, cipher_buf.end());
             if (cipher_buf_pos != cipher_buf.end())
                 return pi;
 
@@ -95,7 +95,7 @@ public:
     {
     }
     template<std::contiguous_iterator Iter>
-	Iter read(Iter begin, Iter end)
+	Iter reads(Iter begin, Iter end)
     {
         auto bgchadd(static_cast<unsigned_char_type *>(static_cast<void *>(std::to_address(begin))));
         return begin + (mread(bgchadd, static_cast<unsigned_char_type *>(static_cast<void *>(std::to_address(end)))) - bgchadd) / sizeof(*begin);
@@ -106,7 +106,7 @@ public:
         {
             block_type tmp;
             auto next_ch(tmp.begin() + 1);
-            auto ret(read(tmp.begin(), next_ch));
+            auto ret(reads(tmp.begin(), next_ch));
             if (ret != next_ch)
                 throw eof();
             return static_cast<char_type>(*tmp.begin());
@@ -125,7 +125,7 @@ public:
         {
             block_type tmp;
             auto next_ch(tmp.begin() + 1);
-            auto ret(read(tmp.begin(), next_ch));
+            auto ret(reads(tmp.begin(), next_ch));
             if (ret != next_ch)
                 return {0, true};
             return {static_cast<char_type>(*tmp.begin()), false};
@@ -178,16 +178,16 @@ public:
                 xored_text[i] ^= plaintext_buf[i];
             
             auto cipher(enc(xored_text.data()));
-            ob.write(cipher.cbegin(), cipher.cend());
+            ob.writes(cipher.cbegin(), cipher.cend());
             iv = cipher;
             plaintext_buf_pos = plaintext_buf.begin();
         }
     }
 
     template<std::contiguous_iterator Iter>
-    void write(Iter b, Iter e)
+    void writes(Iter b, Iter e)
     {
-        write_precondition<unsigned_char_type>(b, e);
+        writes_precondition<unsigned_char_type>(b, e);
         auto pb(static_cast<unsigned_char_type const *>(static_cast<void const *>(std::addressof(*b))));
         auto pi(pb), pe(pb + (e - b) * sizeof(*b) / sizeof(unsigned_char_type));
         std::size_t const input_length(pe - pi);
@@ -208,7 +208,7 @@ public:
                 xored_text[i] ^= plaintext_buf[i];
             
             auto cipher(enc(xored_text.data()));
-            ob.write(cipher.cbegin(), cipher.cend());
+            ob.writes(cipher.cbegin(), cipher.cend());
             iv = cipher;
 
             plaintext_buf_pos = plaintext_buf.begin();
@@ -220,7 +220,7 @@ public:
             for (std::size_t i(0); i != iv.size(); ++i)
                 xored_text[i] ^= pi[i];
             auto cipher(enc(xored_text.data()));
-            ob.write(cipher.cbegin(), cipher.cend());
+            ob.writes(cipher.cbegin(), cipher.cend());
             iv = cipher;
         }
         plaintext_buf_pos = std::uninitialized_copy(pi, pe, plaintext_buf.begin());
@@ -234,7 +234,7 @@ public:
                 xored_text[i] ^= plaintext_buf[i];
             
             auto cipher(enc(xored_text.data()));
-            ob.write(cipher.cbegin(), cipher.cend());
+            ob.writes(cipher.cbegin(), cipher.cend());
             iv = cipher;
             plaintext_buf_pos = plaintext_buf.begin();
         }

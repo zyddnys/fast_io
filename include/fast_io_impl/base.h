@@ -43,7 +43,7 @@ inline void output_base_number(output& out,U a)
 				*--ed = static_cast<typename output::char_type>(rem+48);
 			a=quo;
 		}
-		out.write(ed,v.data()+v.size());
+		out.writes(ed,v.data()+v.size());
 	}
 	else
 		out.put(48);

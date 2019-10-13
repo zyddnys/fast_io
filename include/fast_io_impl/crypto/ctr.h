@@ -60,7 +60,7 @@ private:
         for (; pi != pe;)
         {
             auto old_pos = cipher_buf_pos;
-            cipher_buf_pos = ib.read(cipher_buf_pos, cipher_buf.end());
+            cipher_buf_pos = ib.reads(cipher_buf_pos, cipher_buf.end());
             char_counter += cipher_buf_pos - old_pos;
             if (cipher_buf_pos != cipher_buf.end())
                 return pi;
@@ -99,7 +99,7 @@ public:
     {
     }
     template<std::contiguous_iterator Iter>
-	Iter read(Iter begin, Iter end)
+	Iter reads(Iter begin, Iter end)
     {
         auto bgchadd(static_cast<unsigned_char_type *>(static_cast<void *>(std::to_address(begin))));
         return begin + (mread(bgchadd, static_cast<unsigned_char_type *>(static_cast<void *>(std::to_address(end)))) - bgchadd) / sizeof(*begin);
@@ -111,7 +111,7 @@ public:
         {
             block_type tmp;
             auto next_ch(tmp.begin() + 1);
-            auto ret(read(tmp.begin(), next_ch));
+            auto ret(reads(tmp.begin(), next_ch));
             if (ret != next_ch)
                 throw eof();
             return static_cast<char_type>(*tmp.begin());
@@ -130,7 +130,7 @@ public:
         {
             block_type tmp;
             auto next_ch(tmp.begin() + 1);
-            auto ret(read(tmp.begin(), next_ch));
+            auto ret(reads(tmp.begin(), next_ch));
             if (ret != next_ch)
                 return {0, true};
             return {static_cast<char_type>(*tmp.begin()), false};
@@ -161,7 +161,7 @@ public:
         std::size_t read_length(pos_rel_to_begin - char_pos_block_aligned);
 		auto const needreed = tmp.data() + read_length;
 		ib.seek(char_pos_block_aligned, seekdir::beg);
-        auto tmp_pos(ib.read(tmp.data(), needreed));
+        auto tmp_pos(ib.reads(tmp.data(), needreed));
         if (tmp_pos != needreed)
             throw eof();
         cipher_buf = tmp;
@@ -169,7 +169,7 @@ public:
         plaintext_buf_pos = plaintext_buf.begin();
 		char_counter = pos_rel_to_begin;
 		block_type tmp2;
-		read(tmp2.data(), tmp2.data() + read_length);
+		reads(tmp2.data(), tmp2.data() + read_length);
         return ret;
 	}
 };
@@ -208,7 +208,7 @@ private:
         auto cipher(enc(block.data()));
         for (std::size_t i(0); i != cipher.size(); ++i)
             cipher[i] ^= v[i];
-        ob.write(cipher.cbegin(), cipher.cend());
+        ob.writes(cipher.cbegin(), cipher.cend());
         return block_counter;
     }
 
@@ -238,9 +238,9 @@ public:
 		ob.flush();
     }
     template<std::contiguous_iterator Iter>
-    void write(Iter b, Iter e)
+    void writes(Iter b, Iter e)
     {
-        write_precondition<unsigned_char_type>(b, e);
+        writes_precondition<unsigned_char_type>(b, e);
         auto pb(static_cast<unsigned_char_type const *>(static_cast<void const *>(std::to_address(b))));
         auto pi(pb), pe(pb + (e - b) * sizeof(*b) / sizeof(unsigned_char_type));
         std::size_t const input_length(pe - pi);

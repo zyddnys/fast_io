@@ -90,14 +90,14 @@ private:
 			begin=std::uninitialized_copy(bh.curr,bh.end,begin);
 			if(begin+Buf::size()<end)
 			{
-				begin=ih.read(begin,end);
+				begin=ih.reads(begin,end);
 				if(begin!=end)
 				{
 					bh.end=bh.curr=bh.beg;
 					return begin;
 				}
 			}
-			bh.end=ih.read(bh.beg,bh.beg+Buf::size());
+			bh.end=ih.reads(bh.beg,bh.beg+Buf::size());
 			bh.curr=bh.beg;
 			n=end-begin;
 			std::size_t const sz(bh.end-bh.beg);
@@ -113,7 +113,7 @@ public:
 	requires std::constructible_from<Ihandler,Args...>
 	basic_ibuf(Args&&... args):ih(std::forward<Args>(args)...){bh.curr=bh.end;}
 	template<std::contiguous_iterator Iter>
-	Iter read(Iter begin,Iter end)
+	Iter reads(Iter begin,Iter end)
 	{
 		auto bgchadd(static_cast<char_type*>(static_cast<void*>(std::to_address(begin))));
 		return begin+(mread(bgchadd,static_cast<char_type*>(static_cast<void*>(std::to_address(end))))-bgchadd)/sizeof(*begin);
@@ -122,7 +122,7 @@ public:
 	{
 		if(bh.end==bh.curr)		//cache miss
 		{
-			if((bh.end=ih.read(bh.beg,bh.beg+Buf::size()))==bh.beg)
+			if((bh.end=ih.reads(bh.beg,bh.beg+Buf::size()))==bh.beg)
 			{
 				bh.curr=bh.beg;
 				return {0,true};
@@ -135,7 +135,7 @@ public:
 	{
 		if(bh.end==bh.curr)		//cache miss
 		{
-			if((bh.end=ih.read(bh.beg,bh.beg+Buf::size()))==bh.beg)
+			if((bh.end=ih.reads(bh.beg,bh.beg+Buf::size()))==bh.beg)
 			{
 				bh.curr=bh.beg;
 				throw eof();
@@ -177,7 +177,7 @@ class basic_obuf
 	try
 	{
 		if(bh.beg)
-			oh.write(bh.beg,bh.curr);
+			oh.writes(bh.beg,bh.curr);
 	}
 	catch(...){}
 public:
@@ -191,10 +191,10 @@ private:
 		{
 			std::uninitialized_copy_n(cbegin,n,bh.curr);
 			cbegin+=n;
-			oh.write(bh.beg,bh.end);
+			oh.writes(bh.beg,bh.end);
 			if(cbegin+Buf::size()<cend)
 			{
-				oh.write(cbegin,cend);
+				oh.writes(cbegin,cend);
 				bh.curr=bh.beg;
 			}
 			else
@@ -209,7 +209,7 @@ public:
 	basic_obuf(Args&&... args):oh(std::forward<Args>(args)...){bh.curr=bh.beg;}
 	void flush()
 	{
-		oh.write(bh.beg,bh.curr);
+		oh.writes(bh.beg,bh.curr);
 		bh.curr=bh.beg;
 		oh.flush();
 	}
@@ -231,9 +231,9 @@ public:
 		return *this;
 	}
 	template<std::contiguous_iterator Iter>
-	void write(Iter cbegin,Iter cend)
+	void writes(Iter cbegin,Iter cend)
 	{
-		write_precondition<char_type>(cbegin,cend);
+		writes_precondition<char_type>(cbegin,cend);
 		mwrite(static_cast<char_type const*>(static_cast<void const*>(std::to_address(cbegin))),
 						static_cast<char_type const*>(static_cast<void const*>(std::to_address(cend))));
 	}
@@ -241,7 +241,7 @@ public:
 	{
 		if(bh.curr==bh.end)		//buffer full
 		{
-			oh.write(bh.beg,bh.end);
+			oh.writes(bh.beg,bh.end);
 			bh.curr=bh.beg;
 		}
 		*bh.curr++=ch;
@@ -253,7 +253,7 @@ public:
 	template<typename... Args>
 	auto seek(Args&& ...args) requires(random_access_stream<Ohandler>)
 	{
-		oh.write(bh.beg,bh.curr);
+		oh.writes(bh.beg,bh.curr);
 		bh.curr=bh.beg;
 		return oh.seek(std::forward<Args>(args)...);
 	}
@@ -279,9 +279,9 @@ template<typename... Args>
 requires std::constructible_from<io_handler,Args...>
 fake_basic_ihandler(Args&& ...args):basic_obuf<io_handler,Buf>(std::forward<Args>(args)...){}
 template<typename ...Args>
-auto read(Args&& ...args)
+auto reads(Args&& ...args)
 {
-	return this->native_handle().read(std::forward<Args>(args)...);
+	return this->native_handle().reads(std::forward<Args>(args)...);
 }
 };
 
@@ -312,14 +312,14 @@ public:
 		ibf.native_handle().put(ch);
 	}
 	template<typename ...Args>
-	void write(Args&& ...args)
+	void writes(Args&& ...args)
 	{
-		ibf.native_handle().write(std::forward<Args>(args)...);
+		ibf.native_handle().writes(std::forward<Args>(args)...);
 	}
 	template<typename ...Args>
-	auto read(Args&& ...args)
+	auto reads(Args&& ...args)
 	{
-		return ibf.read(std::forward<Args>(args)...);
+		return ibf.reads(std::forward<Args>(args)...);
 	}
 	auto get()
 	{

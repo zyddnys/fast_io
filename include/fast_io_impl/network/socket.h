@@ -140,12 +140,12 @@ public:
 		swap(handle,b.handle);
 	}
 	template<std::contiguous_iterator Iter>
-	Iter read(Iter begin,Iter end)
+	Iter reads(Iter begin,Iter end)
 	{
 		return begin+((sock::details::recv(handle,std::to_address(begin),static_cast<int>((end-begin)*sizeof(*begin)),0))/sizeof(*begin));
 	}
 	template<std::contiguous_iterator Iter>
-	Iter write(Iter begin,Iter end)
+	Iter writes(Iter begin,Iter end)
 	{
 		return begin+(sock::details::send(handle,std::to_address(begin),static_cast<int>((end-begin)*sizeof(*begin)),0)/sizeof(*begin));
 	}
@@ -233,14 +233,14 @@ public:
 		return soc;
 	}
 	template<typename ...Args>
-	auto read(Args&& ...args)
+	auto reads(Args&& ...args)
 	{
-		return soc.read(std::forward<Args>(args)...);
+		return soc.reads(std::forward<Args>(args)...);
 	}
 	template<typename ...Args>
-	void write(Args&& ...args)
+	auto writes(Args&& ...args)
 	{
-		soc.write(std::forward<Args>(args)...);
+		return soc.writes(std::forward<Args>(args)...);
 	}
 	void flush()
 	{
@@ -330,14 +330,14 @@ public:
 		return soc;
 	}
 	template<typename ...Args>
-	auto read(Args&& ...args)
+	auto reads(Args&& ...args)
 	{
-		return soc.read(std::forward<Args>(args)...);
+		return soc.reads(std::forward<Args>(args)...);
 	}
 	template<typename ...Args>
-	void write(Args&& ...args)
+	auto writes(Args&& ...args)
 	{
-		soc.write(std::forward<Args>(args)...);
+		return soc.writes(std::forward<Args>(args)...);
 	}
 	void flush()
 	{

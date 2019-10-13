@@ -11,7 +11,7 @@ public:
 private:
 	struct base
 	{
-		virtual char_type* read(char_type*,char_type*) = 0;
+		virtual char_type* reads(char_type*,char_type*) = 0;
 		virtual ~base() = default;
 	};
 	template<stream input>
@@ -21,7 +21,7 @@ private:
 		input in;
 		template<typename ...Args>
 		derv(std::in_place_type_t<input>,Args&& ...args):in(std::forward<Args>(args)...){}
-		char_type* read(char_type* b,char_type* e) {return in.read(b,e);}
+		char_type* reads(char_type* b,char_type* e) {return in.reads(b,e);}
 	};
 	std::unique_ptr<base> up;
 public:
@@ -30,11 +30,11 @@ public:
 	basic_dynamic_input_stream(std::in_place_type_t<P>,Args&& ...args):
 		up(new derv<P>(std::in_place_type<P>,std::forward<Args>(args)...)){}
 	template<std::contiguous_iterator Iter>
-	Iter read(Iter b,Iter e)
+	Iter reads(Iter b,Iter e)
 	{
 		char_type *pb(static_cast<char_type*>(static_cast<void*>(std::to_address(b))));
 		char_type *pe(static_cast<char_type*>(static_cast<void*>(std::to_address(e))));
-		return b+(up->read(pb,pe)-pb)*sizeof(*b)/sizeof(char_type);
+		return b+(up->reads(pb,pe)-pb)*sizeof(*b)/sizeof(char_type);
 	}
 };
 
@@ -48,7 +48,7 @@ public:
 private:
 	struct base
 	{
-		virtual char_type* read(char_type*,char_type*) = 0;
+		virtual char_type* reads(char_type*,char_type*) = 0;
 		virtual char_type get() = 0;
 		virtual std::pair<char_type,bool> try_get() = 0;
 		virtual ~base() = default;
@@ -59,7 +59,7 @@ private:
 		input in;
 		template<typename ...Args>
 		derv(std::in_place_type_t<input>,Args&& ...args):in(std::forward<Args>(args)...){}
-		char_type* read(char_type* b,char_type* e) {return in.read(b,e);}
+		char_type* reads(char_type* b,char_type* e) {return in.reads(b,e);}
 		char_type get() {return in.get();}
 		std::pair<char_type,bool> try_get() {return in.try_get();}
 	};
@@ -69,11 +69,11 @@ public:
 	basic_dynamic_standard_input_stream(std::in_place_type_t<P>,Args&& ...args):
 		up(new derv<P>(std::in_place_type<P>,std::forward<Args>(args)...)){}
 	template<std::contiguous_iterator Iter>
-	Iter read(Iter b,Iter e)
+	Iter reads(Iter b,Iter e)
 	{
 		char_type *pb(static_cast<char_type*>(static_cast<void*>(std::to_address(b))));
 		char_type *pe(static_cast<char_type*>(static_cast<void*>(std::to_address(e))));
-		return b+(up->read(pb,pe)-pb)*sizeof(*b)/sizeof(char_type);
+		return b+(up->reads(pb,pe)-pb)*sizeof(*b)/sizeof(char_type);
 	}
 	char_type get() {return up->get();}
 	auto try_get() {return up->try_get();}
@@ -89,7 +89,7 @@ public:
 private:
 	struct base
 	{
-		virtual void write(char_type const*,char_type const*) = 0;
+		virtual void writes(char_type const*,char_type const*) = 0;
 		virtual void flush() = 0;
 		virtual ~base() = default;
 	};
@@ -100,7 +100,7 @@ private:
 		output out;
 		template<typename ...Args>
 		derv(std::in_place_type_t<output>,Args&& ...args):out(std::forward<Args>(args)...){}
-		void write(char_type const* b,char_type const* e) {out.write(b,e);}
+		void writes(char_type const* b,char_type const* e) {out.writes(b,e);}
 		void flush() {out.flush();}
 	};
 	std::unique_ptr<base> up;
@@ -110,9 +110,9 @@ public:
 	basic_dynamic_output_stream(std::in_place_type_t<P>,Args&& ...args):
 		up(new derv<P>(std::in_place_type<P>,std::forward<Args>(args)...)){}
 	template<std::contiguous_iterator Iter>
-	void write(Iter b,Iter e)
+	void writes(Iter b,Iter e)
 	{
-		up->write(static_cast<char_type const*>(static_cast<void const*>(std::to_address(b))),
+		up->writes(static_cast<char_type const*>(static_cast<void const*>(std::to_address(b))),
 							static_cast<char_type const*>(static_cast<void const*>(std::to_address(e))));
 	}
 	void flush() { return up->flush();}
@@ -128,7 +128,7 @@ public:
 private:
 	struct base
 	{
-		virtual void write(char_type const*,char_type const*) = 0;
+		virtual void writes(char_type const*,char_type const*) = 0;
 		virtual void flush() = 0;
 		virtual void put(char_type) = 0;
 		virtual ~base() = default;
@@ -139,7 +139,7 @@ private:
 		output out;
 		template<typename ...Args>
 		derv(std::in_place_type_t<output>,Args&& ...args):out(std::forward<Args>(args)...){}
-		void write(char_type const* b,char_type const* e) {out.write(b,e);}
+		void writes(char_type const* b,char_type const* e) {out.writes(b,e);}
 		void flush() {out.flush();}
 		void put(char_type ch) {out.put(ch);};
 	};
@@ -149,9 +149,9 @@ public:
 	basic_dynamic_standard_output_stream(std::in_place_type_t<P>,Args&& ...args):
 		up(new derv<P>(std::in_place_type<P>,std::forward<Args>(args)...)){}
 	template<std::contiguous_iterator Iter>
-	void write(Iter b,Iter e)
+	void writes(Iter b,Iter e)
 	{
-		up->write(static_cast<char_type const*>(static_cast<void const*>(std::to_address(b))),
+		up->writes(static_cast<char_type const*>(static_cast<void const*>(std::to_address(b))),
 							static_cast<char_type const*>(static_cast<void const*>(std::to_address(e))));
 	}
 	void flush() { return up->flush();}
@@ -168,9 +168,9 @@ public:
 private:
 	struct base
 	{
-		virtual void write(char_type const*,char_type const*) = 0;
+		virtual void writes(char_type const*,char_type const*) = 0;
 		virtual void flush() = 0;
-		virtual char_type* read(char_type*,char_type*) = 0;
+		virtual char_type* reads(char_type*,char_type*) = 0;
 		virtual ~base() = default;
 	};
 	template<stream iod>
@@ -180,9 +180,9 @@ private:
 		iod out;
 		template<typename ...Args>
 		derv(std::in_place_type_t<iod>,Args&& ...args):out(std::forward<Args>(args)...){}
-		void write(char_type const* b,char_type const* e) {out.write(b,e);}
+		void writes(char_type const* b,char_type const* e) {out.writes(b,e);}
 		void flush() {out.flush();}
-		char_type* read(char_type* b,char_type* e) {return out.read(b,e);}
+		char_type* reads(char_type* b,char_type* e) {return out.reads(b,e);}
 	};
 	std::unique_ptr<base> up;
 public:
@@ -191,18 +191,18 @@ public:
 	basic_dynamic_io_stream(std::in_place_type_t<P>,Args&& ...args):
 		up(new derv<P>(std::in_place_type<P>,std::forward<Args>(args)...)){}
 	template<std::contiguous_iterator Iter>
-	void write(Iter b,Iter e)
+	void writes(Iter b,Iter e)
 	{
-		up->write(static_cast<char_type const*>(static_cast<void const*>(std::to_address(b))),
+		up->writes(static_cast<char_type const*>(static_cast<void const*>(std::to_address(b))),
 							static_cast<char_type const*>(static_cast<void const*>(std::to_address(e))));
 	}
 	void flush() { return up->flush();}
 	template<std::contiguous_iterator Iter>
-	Iter read(Iter b,Iter e)
+	Iter reads(Iter b,Iter e)
 	{
 		char_type *pb(static_cast<char_type*>(static_cast<void*>(std::to_address(b))));
 		char_type *pe(static_cast<char_type*>(static_cast<void*>(std::to_address(e))));
-		return b+(up->read(pb,pe)-pb)*sizeof(*b)/sizeof(char_type);
+		return b+(up->reads(pb,pe)-pb)*sizeof(*b)/sizeof(char_type);
 	}
 };
 using dynamic_io_stream = basic_dynamic_io_stream<char>;
@@ -215,9 +215,9 @@ public:
 private:
 	struct base
 	{
-		virtual void write(char_type const*,char_type const*) = 0;
+		virtual void writes(char_type const*,char_type const*) = 0;
 		virtual void flush() = 0;
-		virtual char_type* read(char_type*,char_type*) = 0;
+		virtual char_type* reads(char_type*,char_type*) = 0;
 		virtual void put(char_type) = 0;
 		virtual char_type get() = 0;
 		virtual std::pair<char_type,bool> try_get() = 0;
@@ -229,9 +229,9 @@ private:
 		iod out;
 		template<typename ...Args>
 		derv(std::in_place_type_t<iod>,Args&& ...args):out(std::forward<Args>(args)...){}
-		void write(char_type const* b,char_type const* e) {out.write(b,e);}
+		void writes(char_type const* b,char_type const* e) {out.writes(b,e);}
 		void flush() {out.flush();}
-		char_type* read(char_type* b,char_type* e) {return out.read(b,e);}
+		char_type* reads(char_type* b,char_type* e) {return out.reads(b,e);}
 		void put(char_type ch){up->put(ch);}
 		char_type get() {return out.get();}
 		std::pair<char_type,bool> try_get() {return out.try_get();}
@@ -246,18 +246,18 @@ public:
 	basic_dynamic_standard_io_stream(P&& p):basic_dynamic_standard_io_stream(std::in_place_type<std::decay_t<P>>,std::forward<P>(p)){}
 
 	template<std::contiguous_iterator Iter>
-	void write(Iter b,Iter e)
+	void writes(Iter b,Iter e)
 	{
-		up->write(static_cast<char_type const*>(static_cast<void const*>(std::to_address(b))),
+		up->writes(static_cast<char_type const*>(static_cast<void const*>(std::to_address(b))),
 							static_cast<char_type const*>(static_cast<void const*>(std::to_address(e))));
 	}
 	void flush() { return up->flush();}
 	template<std::contiguous_iterator Iter>
-	Iter read(Iter b,Iter e)
+	Iter reads(Iter b,Iter e)
 	{
 		char_type *pb(static_cast<char_type*>(static_cast<void*>(std::to_address(b))));
 		char_type *pe(static_cast<char_type*>(static_cast<void*>(std::to_address(e))));
-		return b+(up->read(pb,pe)-pb)*sizeof(*b)/sizeof(char_type);
+		return b+(up->reads(pb,pe)-pb)*sizeof(*b)/sizeof(char_type);
 	}
 	void put(char_type ch){up->put(ch);}
 	char_type get() {return up->get();}

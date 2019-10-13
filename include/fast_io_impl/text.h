@@ -82,7 +82,7 @@ public:
 			return ch;
 	}
 	template<std::contiguous_iterator Iter>
-	constexpr Iter read(Iter b,Iter e)
+	constexpr Iter reads(Iter b,Iter e)
 		requires standard_input_stream<T>
 	{
 		auto pb(static_cast<char_type*>(static_cast<void*>(std::to_address(b))));
@@ -101,11 +101,11 @@ public:
 		ib.put(ch);
 	}
 	template<std::contiguous_iterator Iter>
-	constexpr void write(Iter b,Iter e)
+	constexpr void writes(Iter b,Iter e)
 		requires standard_output_stream<T>
 	{
 #if defined(__WINNT__) || defined(_MSC_VER)
-		write_precondition<char_type>(b,e);
+		writes_precondition<char_type>(b,e);
 		auto pb(static_cast<char_type const*>(static_cast<void const*>(std::to_address(b))));
 		auto last(pb);
 		auto pi(pb),pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));
@@ -113,14 +113,14 @@ public:
 			if(*pi=='\n')
 			{
 				if(last!=pi)
-					ib.write(last,pi-1);
+					ib.writes(last,pi-1);
 				ib.put('\r');
 				ib.put('\n');
 				last=pi+1;
 			}
-		ib.write(last,pe);
+		ib.writes(last,pe);
 #else
-		ib.write(b,e);
+		ib.writes(b,e);
 #endif
 	}
 	constexpr void flush() requires standard_output_stream<T>

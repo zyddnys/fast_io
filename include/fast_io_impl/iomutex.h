@@ -24,10 +24,10 @@ public:
 		return *mtx;
 	}
 	template<std::contiguous_iterator Iter>
-	void write(Iter b,Iter e) requires output_stream<native_handle_type>
+	void writes(Iter b,Iter e) requires output_stream<native_handle_type>
 	{
 		std::lock_guard lg(mutex());
-		handler.write(b,e);
+		handler.writes(b,e);
 	}
 	void put(char_type ch) requires standard_output_stream<native_handle_type>
 	{
@@ -40,11 +40,11 @@ public:
 		handler.flush();
 	}
 	template<std::contiguous_iterator Iter>
-	Iter read(Iter begin,Iter end)
+	Iter reads(Iter begin,Iter end)
 		requires input_stream<native_handle_type>
 	{
 		std::lock_guard<std::mutex> lg(mutex());
-		return handler.read(begin,end);
+		return handler.reads(begin,end);
 	}
 	auto get() requires standard_input_stream<native_handle_type>
 	{

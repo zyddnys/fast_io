@@ -15,7 +15,7 @@ public:
 	{
 		char_type ch;
 		auto address(std::addressof(ch));
-		if(Ihandler::read(address,address+1)==address)
+		if(Ihandler::reads(address,address+1)==address)
 			throw eof();
 		return ch;
 	}
@@ -23,7 +23,7 @@ public:
 	{
 		char_type ch;
 		auto address(std::addressof(ch));
-		if(Ihandler::read(address,address+1)==address)
+		if(Ihandler::reads(address,address+1)==address)
 			return {0,true};
 		return {ch,false};
 	}
@@ -38,9 +38,9 @@ public:
 	requires std::constructible_from<Ohandler,Args...>
 	constexpr nobuf_writer(Args&&... args) :Ohandler(std::forward<Args>(args)...) {}
 	template<std::contiguous_iterator Iter>
-	constexpr void write(Iter cbegin, Iter cend) requires output_stream<Ohandler>
+	constexpr void writes(Iter cbegin, Iter cend) requires output_stream<Ohandler>
 	{
-		Ohandler::write(cbegin, cend);
+		Ohandler::writes(cbegin, cend);
 	}
 	constexpr void put(char_type ch) requires standard_output_stream<Ohandler>
 	{
@@ -49,7 +49,7 @@ public:
 	constexpr void put(char_type ch) requires output_stream<Ohandler>
 	{
 		auto address(std::addressof(ch));
-		Ohandler::write(address, address + 1);
+		Ohandler::writes(address, address + 1);
 	}
 };
 
@@ -62,9 +62,9 @@ public:
 	requires std::constructible_from<Ohandler,Args...>
 	constexpr immediately_flush(Args&&... args):Ohandler(std::forward<Args>(args)...){}
 	template<std::contiguous_iterator Iter>
-	constexpr void write(Iter cbegin,Iter cend) requires output_stream<Ohandler>
+	constexpr void writes(Iter cbegin,Iter cend) requires output_stream<Ohandler>
 	{
-		Ohandler::write(cbegin,cend);
+		Ohandler::writes(cbegin,cend);
 		Ohandler::flush();
 	}
 	constexpr void put(char_type ch) requires standard_output_stream<Ohandler>
@@ -75,7 +75,7 @@ public:
 	constexpr void put(char_type ch) requires output_stream<Ohandler>
 	{
 		auto address(std::addressof(ch));
-		Ohandler::write(address,address+1);
+		Ohandler::writes(address,address+1);
 		Ohandler::flush();
 	}
 };
@@ -89,18 +89,18 @@ public:
 	requires std::constructible_from<Ohandler,Args...>
 	constexpr char_flush(Args&&... args):Ohandler(std::forward<Args>(args)...){}
 	template<std::contiguous_iterator Iter>
-	constexpr void write(Iter b,Iter e)
+	constexpr void writes(Iter b,Iter e)
 	{
-		write_precondition<char_type>(b,e);
+		writes_precondition<char_type>(b,e);
 		auto pb(std::to_address(b)),pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));
 		for(auto pi(pb);pi!=pe;++pi)
 			if(*pi==flush_character)
 			{
-				Ohandler::write(pb,pi+1);
+				Ohandler::writes(pb,pi+1);
 				Ohandler::flush();
 				pb=pi+1;
 			}
-		Ohandler::write(pb,pe);
+		Ohandler::writes(pb,pe);
 	}
 	constexpr void put(char_type ch) requires standard_output_stream<Ohandler>
 	{
@@ -111,7 +111,7 @@ public:
 	constexpr void put(char_type ch)
 	{
 		auto address(std::addressof(ch));
-		Ohandler::write(address,address+1);
+		Ohandler::writes(address,address+1);
 		if(ch==flush_character)
 			Ohandler::flush();
 	}

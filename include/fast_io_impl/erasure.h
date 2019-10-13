@@ -11,7 +11,7 @@ public:
 	requires std::constructible_from<io,Args...>
 	ierasure(Args&& ...args):io(std::forward<Args>(args)...){}
 	template<std::contiguous_iterator Iter>
-	Iter read(Iter,Iter) = delete;
+	Iter reads(Iter,Iter) = delete;
 	auto get() requires standard_input_stream<io> = delete;
 	auto try_get() requires standard_input_stream<io> = delete;
 };
@@ -25,7 +25,7 @@ public:
 	requires std::constructible_from<io,Args...>
 	oerasure(Args&& ...args):io(std::forward<Args>(args)...){}
 	template<std::contiguous_iterator Iter>
-	void write(Iter,Iter) = delete;
+	void writes(Iter,Iter) = delete;
 	auto put() requires standard_output_stream<io> = delete;
 	auto flush() requires standard_output_stream<io> = delete;
 };

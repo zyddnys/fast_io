@@ -11,14 +11,14 @@ public:
 	using traits_type = typename T::traits_type;
 	streambuf_view(T* bufpointer):rdbuf(bufpointer){}
 	template<std::contiguous_iterator Iter>
-	Iter read(Iter begin,Iter end)
+	Iter reads(Iter begin,Iter end)
 	{
 		return begin+(rdbuf->sgetn(static_cast<char_type*>(static_cast<void*>(std::to_address(begin))),(end-begin)*sizeof(*begin)/sizeof(char_type))*sizeof(char_type)/sizeof(*begin));
 	}
 	template<std::contiguous_iterator Iter>
-	void write(Iter begin,Iter end)
+	void writes(Iter begin,Iter end)
 	{
-		write_precondition<char_type>(begin,end);
+		writes_precondition<char_type>(begin,end);
 		decltype(rdbuf->sputn(nullptr,0)) write_bytes((end-begin)*sizeof(*begin)/sizeof(char_type));
 		if(rdbuf->sputn(static_cast<char_type const*>(static_cast<void const*>(std::to_address(begin))),write_bytes)<write_bytes)
 			throw std::runtime_error("write() failed for streambuf view");
