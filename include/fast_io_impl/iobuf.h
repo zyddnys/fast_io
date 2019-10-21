@@ -263,6 +263,34 @@ public:
 		swap(oh,o.ih);
 		swap(bh,o.bh);
 	}
+	friend inline constexpr void fill_nc(basic_obuf& ob,std::size_t count,char_type const& ch)
+	{
+		std::size_t const remain_space(static_cast<std::size_t>(ob.bh.end-ob.bh.curr));
+		if(remain_space<=count)
+		{
+			std::fill(ob.bh.curr,ob.bh.end,ch);
+			ob.oh.writes(ob.bh.beg,ob.bh.end);
+			count-=remain_space;
+			constexpr auto buffer_size(Buf::size());
+			std::size_t const times(count/buffer_size),remain(count%buffer_size);
+			if(times)
+			{
+				std::fill(ob.bh.beg,ob.bh.curr,ch);
+				for(std::size_t i(0);i!=times;++i)
+					ob.oh.writes(ob.bh.beg,ob.bh.end);
+			}
+			else
+			{
+				std::size_t cb(static_cast<std::size_t>(ob.bh.curr-ob.bh.beg));
+				if(remain<cb)
+					cb=remain;
+				std::fill_n(ob.bh.beg,cb,ch);
+			}
+			ob.bh.curr=ob.bh.beg+remain;
+			return;
+		}
+		ob.bh.curr=std::fill_n(ob.bh.curr,count,ch);
+	}
 };
 template<output_stream Ohandler,typename Buf>
 inline void swap(basic_obuf<Ohandler,Buf>& a,basic_obuf<Ohandler,Buf>&b) noexcept
@@ -339,6 +367,10 @@ public:
 	{
 		using std::swap;
 		swap(ibf,o.ibf);
+	}
+	friend inline constexpr void fill_nc(basic_iobuf& ob,std::size_t count,char_type const& ch)
+	{
+		fill_nc(ob.ibf.native_handle(),count,ch);
 	}
 };
 

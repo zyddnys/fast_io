@@ -7,14 +7,14 @@ int main()
 	std::size_t constexpr N(10000000);
 	{
 	cqw::timer t("obuf");
-	fast_io::obuf obuf("obuf_cv.txt");
+	fast_io::obuf obuf("obuf.txt");
 	for(std::size_t i(0);i!=N;++i)
 		println(obuf,i);
 	}
 
 	{
 	cqw::timer t("charcv");
-	fast_io::obuf obuf("charcv.txt");
+	fast_io::obuf obuf("obuf_std_to_chars.txt");
 	std::array<char, 50> buffer;
 	for(std::size_t i(0);i!=N;++i)
 	{

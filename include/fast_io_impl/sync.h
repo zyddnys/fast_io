@@ -2,7 +2,7 @@
 
 namespace fast_io
 {
-template<output_stream output,typename ostr = basic_ostring<std::string>>			// the output device itself must be atomic
+template<output_stream output,typename ostr = basic_ostring<std::basic_string<typename output::char_type>>>			// the output device itself must be atomic
 class basic_sync
 {
 public:
@@ -57,6 +57,11 @@ public:
 	}
 };
 
+template<output_stream output,typename ostr>
+inline constexpr void fill_nc(basic_sync<output,ostr>& ob,std::size_t count,typename output::char_type const& ch)
+{
+	fill_nc(ob.buffer(),count,ch);
+}
 
 template<output_stream output,typename ostr = basic_ostring<std::string>>
 class basic_fsync:public basic_sync<output,ostr>

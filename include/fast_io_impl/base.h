@@ -13,7 +13,7 @@ struct base_number_upper_constraints
 	static constexpr bool value = 2<=bs&&bs<=36&&((bs<=10&&!uppercase)||10<bs);
 };
 
-template<std::uint8_t base,bool uppercase,standard_output_stream output,std::unsigned_integral U>
+template<std::uint8_t base,bool uppercase,output_stream output,std::unsigned_integral U>
 inline void output_base_number(output& out,U a)
 {
 //number: 0:48 9:57
@@ -110,7 +110,6 @@ inline constexpr void input_base_number(input& in,U& a)
 		{
 			unsigned_char_type constexpr bm10(base-10);
 			if((ch-=17)<bm10||(ch-=32)<bm10)
-				a=a*base+ch+10;
 			{
 				a=ch+10;
 				break;

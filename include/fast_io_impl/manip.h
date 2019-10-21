@@ -193,8 +193,9 @@ inline void print(output& out,details::setw_fill_t<T,U> a)
 {
 	basic_ostring<std::basic_string<typename output::char_type>> bas;
 	print(bas,a.reference);
-	for(std::size_t i(bas.str().size());i<a.width;++i)
-		out.put(a.ch);
+	std::size_t const size(bas.str().size());
+	if(size<a.width)
+		fill_nc(out,a.width-size,a.ch);
 	print(out,bas.str());
 }
 
@@ -203,8 +204,9 @@ inline void print(output& out,details::setw_t<T> a)
 {
 	basic_ostring<std::basic_string<typename output::char_type>> bas;
 	print(bas,a.reference);
-	for(std::size_t i(bas.str().size());i<a.width;++i)
-		out.put(' ');
+	std::size_t const size(bas.str().size());
+	if(size<a.width)
+		fill_nc(out,a.width-size,' ');
 	print(out,bas.str());
 }
 

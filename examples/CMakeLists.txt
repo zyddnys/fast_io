@@ -111,3 +111,5 @@ add_executable(my_copy "./0035.transmit/my_copy.cc")
 
 add_executable(movable "./0036.concepts_check/movable.cc")
 add_executable(iostrm "./0036.concepts_check/iostrm.cc")
+
+add_executable(fill_nc "./0039.fill_nc/fill_nc.cc")

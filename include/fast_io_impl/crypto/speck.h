@@ -2,7 +2,6 @@
 
 #include <cstdint>
 #include <array>
-#include <iostream>
 #include "../concept.h"
 
 namespace fast_io::crypto::speck

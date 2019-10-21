@@ -1,5 +1,4 @@
 #pragma once
-#include"concept.h"
 
 namespace fast_io
 {
@@ -53,6 +52,13 @@ public:
 	}
 };
 
+template<stream T,standard_output_stream out>
+inline constexpr void fill_nc(tie<T,out>& ob,std::size_t count,typename T::char_type const& ch)
+{
+	ob.to().flush();
+	fill_nc(ob.native_handle(),count,ch);
+}
+
 template<io_stream T>
 class self_tie
 {
@@ -102,5 +108,12 @@ public:
 		return t.seek(std::forward<Args>(args)...);
 	}
 };
+
+template<standard_output_stream T>
+inline constexpr void fill_nc(self_tie<T>& t,std::size_t count,typename T::char_type const& ch)
+{
+	t.native_handle().flush();
+	fill_nc(t.native_handle(),count,ch);
+}
 
 }

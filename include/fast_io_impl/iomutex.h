@@ -69,6 +69,14 @@ public:
 		swap(handler,o.handler);
 	}
 };
+
+template<standard_output_stream output>
+inline constexpr void fill_nc(basic_iomutex<output>& out,std::size_t count,typename output::char_type const& ch)
+{
+	std::lock_guard lg{out.mutex()};
+	fill_nc(out.native_handle(),count,ch);
+}
+
 template<stream T>
 inline void swap(basic_iomutex<T>& a,basic_iomutex<T>& b) noexcept
 {

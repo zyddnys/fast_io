@@ -73,6 +73,12 @@ public:
 	constexpr auto empty() const {return s.empty();}
 };
 
+template<typename T>
+inline constexpr void fill_nc(basic_ostring<T>& os,std::size_t count,typename T::value_type const& ch)
+{
+	os.str().append(count,ch);
+}
+
 //potential constexpr in the future if std::string can be constexpr
 
 template<typename T=std::string,typename... Args>

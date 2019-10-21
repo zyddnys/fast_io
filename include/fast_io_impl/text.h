@@ -132,4 +132,22 @@ public:
 template<stream srm>
 text_view(srm&&) -> text_view<srm>;
 
+template<stream T>
+inline constexpr void fill_nc(text_view<T>& view,std::size_t count,typename T::char_type const& ch)
+{
+#if defined(__WINNT__) || defined(_MSC_VER)
+	if(ch=='\n')
+	{
+		for(std::size_t i(0);i!=count;++i)
+		{
+			view.native_handle().put('\r');
+			view.native_handle().put('\n');
+		}
+		return;
+	}
+#endif
+	fill_nc(view.native_handle(),count,ch);
+}
+
+
 }

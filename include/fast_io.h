@@ -13,12 +13,14 @@
 #include<bitset>
 #include<algorithm>
 #include<cstring>
+#include<cstdint>
 #include"fast_io_impl/concept.h"
 #include"fast_io_impl/eof.h"
 #include"fast_io_impl/seek.h"
 #include"fast_io_impl/precondition.h"
 #include"fast_io_impl/mode.h"
 #include"fast_io_impl/base.h"
+#include"fast_io_impl/fill_nc.h"
 #include"fast_io_impl/transmit.h"
 #include"fast_io_impl/stringbuf.h"
 #include"fast_io_impl/rd_type.h"
@@ -104,3 +106,5 @@ inline basic_obuf<system_ohandle> log(native_stderr_number);
 
 #include"fast_io_impl/network/network.h"
 #include"fast_io_impl/crypto/crypto.h"
+#include"fast_io_impl/natural.h"
+#include"fast_io_impl/unsigned_extension.h"
