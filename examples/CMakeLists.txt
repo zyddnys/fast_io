@@ -18,6 +18,7 @@ endif()
 
 set(CMAKE_CXX_STANDARD 20)
 
+
 add_executable(compile "./0000.Hello World/compile.cc")
 
 add_executable(hello_world "./0000.Hello World/hello_world.cc")
@@ -48,7 +49,6 @@ add_executable(string_to_size_t "./0004.convert/string_to_size_t.cc")
 add_executable(compile_time_open_mode "./0006.compile_time_open_mode/compile_time_open_mode.cc")
 add_executable(compile_time_c_style_open_mode "./0006.compile_time_open_mode/compile_time_c_style_open_mode.cc")
 
-add_executable(dynamic "./0020.dynamic/dynamic.cc")
 add_executable(setw "./0010.manip/setw.cc")
 
 add_executable(manually_lockguard "./0022.mutex/manually_lockguard.cc")

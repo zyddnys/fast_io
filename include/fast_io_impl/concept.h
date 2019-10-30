@@ -6,60 +6,76 @@ namespace fast_io
 {
 	
 namespace details
-{	
+{
+
+
 template<typename T>
-concept input_stream_impl = requires(T in)
+concept stream_char_type_requirement = requires(T&)
 {
 	typename T::char_type;
-	{in.reads};
 };
 
 template<typename T>
-concept output_stream_impl = requires(T out)
+concept input_stream_impl = stream_char_type_requirement<T>&&requires(T& in,char* b,char* e)
 {
-	typename T::char_type;
-	{out.writes};
-	{out.flush()};
+	reads(in,b,e);
 };
 
 template<typename T>
-concept mutex_stream_impl = requires(T t)
+concept output_stream_impl = stream_char_type_requirement<T>&&requires(T& out,char const* b,char const* e)
 {
-	{t.mutex()};
+	{writes(out,b,e)};
+	{flush(out)};
 };
 
 template<typename T>
-concept standard_input_stream_impl = requires(T in)
+concept mutex_stream_impl = requires(T& t)
 {
-	{in.get()};
-	{in.try_get()};
+	mutex(t);
 };
 
 template<typename T>
-concept standard_output_stream_impl = requires(T out)
+concept character_input_stream_impl = requires(T& in)
 {
-	{out.put};
+	{get(in)};
+	{try_get(in)};
 };
 
 template<typename T>
-concept random_access_stream_impl = requires(T t)
+concept character_output_stream_impl = requires(T& out,typename T::char_type ch)
 {
-	{t.seek};
-};
-
-
-template<typename T>
-concept zero_copy_input_stream_impl = requires(T in)
-{
-	{in.zero_copy_in_handle()};
+	put(out,ch);
 };
 
 template<typename T>
-concept zero_copy_output_stream_impl = requires(T out)
+concept random_access_stream_impl = requires(T& t)
 {
-	{out.zero_copy_out_handle()};
+	seek(t);
 };
 
+template<typename T>
+concept buffer_input_stream_impl = requires(T& in)
+{
+	ireserve(in);
+};
+
+template<typename T>
+concept buffer_output_stream_impl = requires(T& out)
+{
+	oreserve(out);
+};
+
+template<typename T>
+concept zero_copy_input_stream_impl = requires(T& in)
+{
+	zero_copy_in_handle(in);
+};
+
+template<typename T>
+concept zero_copy_output_stream_impl = requires(T& out)
+{
+	zero_copy_out_handle(out);
+};
 }
 
 template<typename T>
@@ -87,13 +103,13 @@ template<typename T>
 concept io_stream = input_stream<T>&&output_stream<T>;
 
 template<typename T>
-concept standard_input_stream = input_stream<T>&&details::standard_input_stream_impl<T>;
+concept character_input_stream = input_stream<T>&&details::character_input_stream_impl<T>;
 
 template<typename T>
-concept standard_output_stream = output_stream<T>&&details::standard_output_stream_impl<T>;
+concept character_output_stream = output_stream<T>&&details::character_output_stream_impl<T>;
 
 template<typename T>
-concept standard_io_stream = standard_input_stream<T>&&standard_output_stream<T>;
+concept character_io_stream = character_input_stream<T>&&character_output_stream<T>;
 template<typename T>
 concept mutex_io_stream = mutex_input_stream<T>&&mutex_output_stream<T>;
 
@@ -102,5 +118,17 @@ concept zero_copy_input_stream = input_stream<T>&&details::zero_copy_input_strea
 
 template<typename T>
 concept zero_copy_output_stream = output_stream<T>&&details::zero_copy_output_stream_impl<T>;
+
+template<typename T>
+concept zero_copy_io_stream = zero_copy_input_stream<T>&&zero_copy_output_stream<T>&&io_stream<T>;
+
+template<typename T>
+concept buffer_input_stream = input_stream<T>&&details::buffer_input_stream_impl<T>;
+
+template<typename T>
+concept buffer_output_stream = output_stream<T>&&details::buffer_output_stream_impl<T>;
+
+template<typename T>
+concept buffer_io_stream = buffer_input_stream<T>&&buffer_output_stream<T>&&io_stream<T>;
 
 }

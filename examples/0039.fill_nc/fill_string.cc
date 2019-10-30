@@ -15,6 +15,6 @@ int main()
 		fast_io::ostring ob("fill_nc.txt");
 		for(std::size_t i(0);i!=N;++i)
 //			for(std::size_t j(0);j!=s;++j)
-				ob.put('0');
+				put(ob,'0');
 	}
 }

@@ -27,7 +27,7 @@ private:
 	block_type cipher_buf = {};
 	block_iterator cipher_buf_pos = cipher_buf.begin();
 	block_type plaintext_buf = {};
-	block_iterator plaintext_buf_pos = plaintext_buf.begin();
+	block_iterator plaintext_buf_pos = plaintext_buf.end();
 	key_type key;
 	T ib;
 	Dec dec;
@@ -52,7 +52,7 @@ private:
 
 		for (; pi != pe;)
 		{
-			cipher_buf_pos = ib.reads(cipher_buf_pos, cipher_buf.end());
+			cipher_buf_pos = reads(ib,cipher_buf_pos, cipher_buf.end());
 			if (cipher_buf_pos != cipher_buf.end())
 				return pi;
 
@@ -63,7 +63,7 @@ private:
 			if (available_out_space < cipher_type::block_size)
 			{
 				pi = std::uninitialized_copy(plain.begin(), plain.begin() + available_out_space, pi);
-				plaintext_buf_pos = plaintext_buf.end() - cipher_type::block_size + available_out_space;
+				plaintext_buf_pos = plaintext_buf.begin() + available_out_space;
 				std::uninitialized_copy(plain.begin() + available_out_space, plain.end(), plaintext_buf_pos);
 				break;
 			}
@@ -94,7 +94,7 @@ public:
 		{
 			block_type tmp;
 			auto next_ch(tmp.begin() + 1);
-			auto ret(reads(tmp.begin(), next_ch));
+			auto ret(mread(tmp.data(), std::to_address(next_ch)));
 			if (ret != next_ch)
 				throw eof();
 			return static_cast<char_type>(*tmp.begin());
@@ -113,7 +113,7 @@ public:
 		{
 			block_type tmp;
 			auto next_ch(tmp.begin() + 1);
-			auto ret(reads(tmp.begin(), next_ch));
+			auto ret(mread(tmp.data(), std::to_address(next_ch)));
 			if (ret != next_ch)
 				return {0, true};
 			return {static_cast<char_type>(*tmp.begin()), false};
@@ -158,7 +158,7 @@ private:
 			std::uninitialized_fill(plaintext_buf_pos, plaintext_buf.end(), 0);
 			
 			auto cipher(enc(plaintext_buf.data()));
-			ob.writes(cipher.cbegin(), cipher.cend());
+			writes(ob,cipher.cbegin(), cipher.cend());
 			plaintext_buf_pos = plaintext_buf.begin();
 		}
 	}
@@ -169,14 +169,14 @@ public:
 	requires std::constructible_from<key_type, T1>  && std::constructible_from<T, Args...>
 	basic_oecb(T1 &&init_key, Args&& ...args) : key(std::forward<T1>(init_key)), ob(std::forward<Args>(args)...), enc(key.data()){}
 	
-	void flush()
+	void mmflush()
 	{
 		write_remain();
-		ob.flush();
+		flush(ob);
 	}
 
 	template<std::contiguous_iterator Iter>
-	void writes(Iter b, Iter e)
+	void mmwrites(Iter b, Iter e)
 	{
 		writes_precondition<unsigned_char_type>(b, e);
 		auto pb(static_cast<unsigned_char_type const *>(static_cast<void const *>(std::addressof(*b))));
@@ -195,7 +195,7 @@ public:
 				return;
 
 			auto cipher(enc(plaintext_buf.data()));
-			ob.writes(cipher.cbegin(), cipher.cend());
+			writes(ob,cipher.cbegin(), cipher.cend());
 
 			plaintext_buf_pos = plaintext_buf.begin();
 		}
@@ -203,16 +203,16 @@ public:
 		for (; pi + cipher_type::block_size <= pe; pi += cipher_type::block_size)
 		{
 			auto cipher(enc(pi));
-			ob.writes(cipher.cbegin(), cipher.cend());
+			writes(ob,cipher.cbegin(), cipher.cend());
 		}
 		plaintext_buf_pos = std::uninitialized_copy(pi, pe, plaintext_buf.begin());
 	}
 
-	void put(char_type ch) {
+	void mmput(char_type ch) {
 		if (plaintext_buf_pos == plaintext_buf.end())
 		{
 			auto cipher(enc(plaintext_buf.data()));
-			ob.writes(cipher.cbegin(), cipher.cend());
+			writes(ob,cipher.cbegin(), cipher.cend());
 			plaintext_buf_pos = plaintext_buf.begin();
 		}
 		*plaintext_buf_pos = static_cast<unsigned_char_type>(ch);
@@ -235,7 +235,7 @@ public:
 		{
 			try
 			{
-				flush();
+				mmflush();
 			}
 			catch(...){}
 			plaintext_buf=std::move(oecb.plaintext_buf);
@@ -269,6 +269,43 @@ template <output_stream T, typename Enc>
 inline void swap(basic_oecb<T,Enc>& a,basic_oecb<T,Enc>& b) noexcept
 {
 	a.swap(b);
+}
+
+
+template <input_stream T, typename Enc,std::contiguous_iterator Iter>
+inline constexpr auto reads(basic_iecb<T,Enc>& ecb,Iter begin,Iter end)
+{
+	return ecb.mmreads(begin,end);
+}
+
+
+template <input_stream T, typename Enc>
+inline constexpr auto try_get(basic_iecb<T,Enc>& ecb)
+{
+	return ecb.mmtry_get();
+}
+
+template <input_stream T, typename Enc>
+inline constexpr auto get(basic_iecb<T,Enc>& ecb)
+{
+	return ecb.mmget();
+}
+
+template <output_stream T, typename Enc,std::contiguous_iterator Iter>
+inline constexpr void writes(basic_oecb<T,Enc>& ecb,Iter cbegin,Iter cend)
+{
+	ecb.mmwrites(cbegin,cend);
+}
+
+template <output_stream T, typename Enc>
+inline constexpr void flush(basic_oecb<T,Enc>& ecb)
+{
+	ecb.mmflush();
+}
+template <output_stream T, typename Enc>
+inline constexpr void put(basic_oecb<T,Enc>& ecb,typename basic_oecb<T,Enc>::char_type ch)
+{
+	ecb.mmput(ch);
 }
 
 } // namespace fast_io::crypto

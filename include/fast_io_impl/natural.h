@@ -43,7 +43,7 @@ void fft(std::vector<std::complex<long double>>& a)
 
 class natural;
 
-template<standard_input_stream input>
+template<character_input_stream input>
 inline void scan(input&,natural&);
 
 class natural
@@ -129,8 +129,6 @@ public:
 	}
 	inline natural& operator-=(natural const& other)
 	{
-		if (other > *this)
-			print_flush(fast_io::out, "???");
 		auto it(cont.begin());
 		auto carry(false);
 		for(auto const & e : other.cont)
@@ -834,7 +832,7 @@ natural mul_fft(const natural& lhs, const natural& rhs) const {
 namespace details
 {
 
-template<std::uint8_t base,bool uppercase,standard_output_stream output>
+template<std::uint8_t base,bool uppercase,character_output_stream output>
 inline void output_base_natural_number(output& out,natural a)
 {
 //number: 0:48 9:57
@@ -842,7 +840,7 @@ inline void output_base_natural_number(output& out,natural a)
 //lower: 97 :a 102 :f
 	if(!a)
 	{
-		out.put('0');
+		put(out,'0');
 		return;
 	}
 	std::vector<typename output::char_type> v(a.vec().size()*512/base+3);
@@ -865,18 +863,18 @@ inline void output_base_natural_number(output& out,natural a)
 		else
 			*--iter = static_cast<typename output::char_type>(rem+48);
 	}
-	out.writes(iter,v.data()+v.size());
+	writes(out,iter,v.data()+v.size());
 }
 
 
-template<std::uint8_t base,standard_input_stream input>
+template<std::uint8_t base,character_input_stream input>
 inline constexpr void input_base_number_phase2_natural(input& in,natural& a)
 {
-	using unsigned_char_type = std::make_unsigned_t<decltype(in.get())>;
+	using unsigned_char_type = std::make_unsigned_t<decltype(get(in))>;
 	unsigned_char_type constexpr baseed(std::min(static_cast<unsigned_char_type>(base),static_cast<unsigned_char_type>(10)));
 	while(true)
 	{
-		unsigned_char_type ch(in.try_get().first);
+		unsigned_char_type ch(try_get(in).first);
 		if((ch-=48)<baseed)
 		{
 			a*=base;
@@ -898,14 +896,14 @@ inline constexpr void input_base_number_phase2_natural(input& in,natural& a)
 	}
 }
 
-template<std::uint8_t base,standard_input_stream input>
+template<std::uint8_t base,character_input_stream input>
 inline constexpr void input_base_natural_number(input& in,natural& a)
 {
-	using unsigned_char_type = std::make_unsigned_t<decltype(in.get())>;
+	using unsigned_char_type = std::make_unsigned_t<decltype(get(in))>;
 	unsigned_char_type constexpr baseed(std::min(static_cast<unsigned_char_type>(base),static_cast<unsigned_char_type>(10)));
 	while(true)
 	{
-		unsigned_char_type ch(in.get());
+		unsigned_char_type ch(get(in));
 		if((ch-=48)<baseed)
 		{
 			a=static_cast<natural>(ch);
@@ -931,37 +929,37 @@ inline constexpr void print(output& out,natural const& a)
 	details::output_base_natural_number<10,false>(out,a);
 }
 
-template<std::size_t base,bool uppercase,standard_output_stream output>
+template<std::size_t base,bool uppercase,character_output_stream output>
 inline constexpr void print(output& out,details::base_t<base,uppercase,natural const> v)
 {
 	details::output_base_natural_number<base,uppercase>(out,v.reference);
 }
-template<std::size_t base,bool uppercase,standard_output_stream output>
+template<std::size_t base,bool uppercase,character_output_stream output>
 inline constexpr void print(output& out,details::base_t<base,uppercase,natural> v)
 {
 	details::output_base_natural_number<base,uppercase>(out,v.reference);
 }
 
 
-template<std::size_t base,bool uppercase,standard_input_stream input>
+template<std::size_t base,bool uppercase,character_input_stream input>
 inline constexpr void scan(input& in,details::base_t<base,uppercase,natural> v)
 {
 	details::input_base_natural_number<base>(in,v.reference);
 }
 
-template<standard_input_stream input>
+template<character_input_stream input>
 inline void scan(input& in,natural& a)
 {
 	details::input_base_natural_number<10>(in,a);
 }
 
-template<standard_output_stream output>
+template<character_output_stream output>
 inline void write(output& out,natural const& n)
 {
 	write(out,n.vec());
 }
 
-template<standard_input_stream input>
+template<character_input_stream input>
 inline void read(input& in,natural& n)
 {
 	read(in,n.vec());

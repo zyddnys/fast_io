@@ -28,12 +28,12 @@ private:
 	block_type cipher_buf = {};
 	block_iterator cipher_buf_pos = cipher_buf.begin();
 	block_type plaintext_buf = {};
-	block_iterator plaintext_buf_pos = plaintext_buf.begin();
+	block_iterator plaintext_buf_pos = plaintext_buf.end();
 	key_type key;
 	block_type iv;
 	Dec dec;
 	T ib;
-	unsigned_char_type *mread(unsigned_char_type *pb, unsigned_char_type *pe)
+	inline constexpr unsigned_char_type *mread(unsigned_char_type *pb, unsigned_char_type *pe)
 	{
 		auto pi(pb);
 
@@ -53,7 +53,7 @@ private:
 
 		for (; pi != pe;)
 		{
-			cipher_buf_pos = ib.reads(cipher_buf_pos, cipher_buf.end());
+			cipher_buf_pos = reads(ib,cipher_buf_pos, cipher_buf.end());
 			if (cipher_buf_pos != cipher_buf.end())
 				return pi;
 
@@ -70,7 +70,7 @@ private:
 			if (available_out_space < cipher_type::block_size)
 			{
 				pi = std::uninitialized_copy(plain.begin(), plain.begin() + available_out_space, pi);
-				plaintext_buf_pos = plaintext_buf.end() - cipher_type::block_size + available_out_space;
+				plaintext_buf_pos = plaintext_buf.begin() + available_out_space;
 				std::uninitialized_copy(plain.begin() + available_out_space, plain.end(), plaintext_buf_pos);
 				break;
 			}
@@ -85,22 +85,22 @@ private:
 public:
 	template<typename IV,typename K,typename... Args>
 	requires (std::constructible_from<key_type,K>&&std::constructible_from<block_type,IV>&&std::constructible_from<T,Args...>)
-	basic_icbc(K&& init_key, IV&& init_iv, Args&& ...args) :  key(std::forward<K>(init_key)),iv(std::forward<IV>(init_iv)), dec(key.data()), ib(std::forward<Args>(args)...)
+	inline constexpr basic_icbc(K&& init_key, IV&& init_iv, Args&& ...args) :  key(std::forward<K>(init_key)),iv(std::forward<IV>(init_iv)), dec(key.data()), ib(std::forward<Args>(args)...)
 	{
 	}
 	template<std::contiguous_iterator Iter>
-	Iter reads(Iter begin, Iter end)
+	inline constexpr Iter mmreads(Iter begin, Iter end)
 	{
 		auto bgchadd(static_cast<unsigned_char_type *>(static_cast<void *>(std::to_address(begin))));
 		return begin + (mread(bgchadd, static_cast<unsigned_char_type *>(static_cast<void *>(std::to_address(end)))) - bgchadd) / sizeof(*begin);
 	}
-	char_type get()
+	inline constexpr char_type mmget()
 	{
 		if (plaintext_buf_pos == plaintext_buf.end())
 		{
 			block_type tmp;
 			auto next_ch(tmp.begin() + 1);
-			auto ret(reads(tmp.begin(), next_ch));
+			auto ret(mread(tmp.data(), std::to_address(next_ch)));
 			if (ret != next_ch)
 			{
 				plaintext_buf_pos = plaintext_buf.begin();
@@ -111,13 +111,13 @@ public:
 		return static_cast<char_type>(*plaintext_buf_pos++);
 	}
 
-	std::pair<char_type, bool> try_get()
+	inline constexpr std::pair<char_type, bool> mmtry_get()
 	{
 		if (plaintext_buf_pos == plaintext_buf.end())
 		{
 			block_type tmp;
 			auto next_ch(tmp.begin() + 1);
-			auto ret(reads(tmp.begin(), next_ch));
+			auto ret(mread(tmp.data(), std::to_address(next_ch)));
 			if (ret != next_ch)
 			{
 				plaintext_buf_pos = plaintext_buf.begin(); // TODO: begin or end
@@ -152,7 +152,7 @@ private:
 	Enc enc;
 	T ob;
 
-	void write_remain()
+	inline constexpr void write_remain()
 	{
 		if (plaintext_buf_pos != plaintext_buf.begin())
 		{
@@ -163,7 +163,7 @@ private:
 				xored_text[i] ^= plaintext_buf[i];
 			
 			auto cipher(enc(xored_text.data()));
-			ob.writes(cipher.cbegin(), cipher.cend());
+			writes(ob,cipher.cbegin(), cipher.cend());
 			iv = cipher;
 			plaintext_buf_pos = plaintext_buf.begin();
 		}
@@ -176,14 +176,14 @@ public:
 	{
 	}
 
-	void flush()
+	inline constexpr void mmflush()
 	{
 		write_remain();
-		ob.flush();
+		flush(ob);
 	}
 
 	template<std::contiguous_iterator Iter>
-	void writes(Iter b, Iter e)
+	inline constexpr void mmwrites(Iter b, Iter e)
 	{
 		writes_precondition<unsigned_char_type>(b, e);
 		auto pb(static_cast<unsigned_char_type const *>(static_cast<void const *>(std::addressof(*b))));
@@ -206,7 +206,7 @@ public:
 				xored_text[i] ^= plaintext_buf[i];
 			
 			auto cipher(enc(xored_text.data()));
-			ob.writes(cipher.cbegin(), cipher.cend());
+			writes(ob,cipher.cbegin(), cipher.cend());
 			iv = cipher;
 
 			plaintext_buf_pos = plaintext_buf.begin();
@@ -218,13 +218,13 @@ public:
 			for (std::size_t i(0); i != iv.size(); ++i)
 				xored_text[i] ^= pi[i];
 			auto cipher(enc(xored_text.data()));
-			ob.writes(cipher.cbegin(), cipher.cend());
+			writes(ob,cipher.cbegin(), cipher.cend());
 			iv = cipher;
 		}
 		plaintext_buf_pos = std::uninitialized_copy(pi, pe, plaintext_buf.begin());
 	}
 
-	void put(char_type ch) {
+	inline constexpr void mmput(char_type ch) {
 		if (plaintext_buf_pos == plaintext_buf.end())
 		{
 			block_type xored_text(iv);
@@ -232,7 +232,7 @@ public:
 				xored_text[i] ^= plaintext_buf[i];
 			
 			auto cipher(enc(xored_text.data()));
-			ob.writes(cipher.cbegin(), cipher.cend());
+			writes(ob,cipher.cbegin(), cipher.cend());
 			iv = cipher;
 			plaintext_buf_pos = plaintext_buf.begin();
 		}
@@ -257,7 +257,7 @@ public:
 		{
 			try
 			{
-				flush();
+				mmflush();
 			}
 			catch(...){}
 			plaintext_buf=std::move(ocbc.plaintext_buf);
@@ -293,6 +293,42 @@ template <output_stream T, typename Enc>
 inline void swap(basic_ocbc<T,Enc>& a,basic_ocbc<T,Enc>& b) noexcept
 {
 	a.swap(b);
+}
+
+template <input_stream T, typename Enc,std::contiguous_iterator Iter>
+inline constexpr auto reads(basic_icbc<T,Enc>& cbc,Iter begin,Iter end)
+{
+	return cbc.mmreads(begin,end);
+}
+
+
+template <input_stream T, typename Enc>
+inline constexpr auto try_get(basic_icbc<T,Enc>& cbc)
+{
+	return cbc.mmtry_get();
+}
+
+template <input_stream T, typename Enc>
+inline constexpr auto get(basic_icbc<T,Enc>& cbc)
+{
+	return cbc.mmget();
+}
+
+template <output_stream T, typename Enc,std::contiguous_iterator Iter>
+inline constexpr void writes(basic_ocbc<T,Enc>& cbc,Iter cbegin,Iter cend)
+{
+	cbc.mmwrites(cbegin,cend);
+}
+
+template <output_stream T, typename Enc>
+inline constexpr void flush(basic_ocbc<T,Enc>& cbc)
+{
+	cbc.mmflush();
+}
+template <output_stream T, typename Enc>
+inline constexpr void put(basic_ocbc<T,Enc>& cbc,typename basic_ocbc<T,Enc>::char_type ch)
+{
+	cbc.mmput(ch);
 }
 
 } // namespace fast_io::crypto

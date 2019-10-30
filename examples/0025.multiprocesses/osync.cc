@@ -7,8 +7,5 @@ int main()
 	std::size_t process_random_number(rd());
 	fast_io::sync sync("sync_log.txt");			//sync won't call flush in its destructor
 	for(std::size_t i(0);i!=1000000;++i)
-	{
-		println(sync,"Process Random ",process_random_number," ",i);
-		sync.flush();
-	}
+		println_flush(sync,"Process Random ",process_random_number," ",i);
 }

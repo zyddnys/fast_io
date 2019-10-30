@@ -451,7 +451,7 @@ inline constexpr auto pow(basic_unsigned_extension<T> lhs, basic_unsigned_extens
 namespace details
 {
 
-template<std::uint8_t base,bool uppercase,standard_output_stream output,typename T>
+template<std::uint8_t base,bool uppercase,character_output_stream output,typename T>
 inline void output_base_extension_number(output& out,basic_unsigned_extension<T> a)
 {
 //number: 0:48 9:57
@@ -459,7 +459,7 @@ inline void output_base_extension_number(output& out,basic_unsigned_extension<T>
 //lower: 97 :a 102 :f
 	if(!a)
 	{
-		out.put('0');
+		put(out,'0');
 		return;
 	}
 	std::array<typename output::char_type,sizeof(a)*512*8/base+3> v;
@@ -482,7 +482,7 @@ inline void output_base_extension_number(output& out,basic_unsigned_extension<T>
 		else
 			*--iter = static_cast<typename output::char_type>(rem+48);
 	}
-	out.writes(iter,v.data()+v.size());
+	writes(out,iter,v.data()+v.size());
 }
 }
 
@@ -492,12 +492,12 @@ inline constexpr void print(output& out,basic_unsigned_extension<T> const& a)
 	details::output_base_extension_number<10,false>(out,a);
 }
 
-template<std::size_t base,bool uppercase,standard_output_stream output,typename T>
+template<std::size_t base,bool uppercase,character_output_stream output,typename T>
 inline constexpr void print(output& out,details::base_t<base,uppercase,basic_unsigned_extension<T> const> v)
 {
 	details::output_base_extension_number<base,uppercase>(out,v.reference);
 }
-template<std::size_t base,bool uppercase,standard_output_stream output,typename T>
+template<std::size_t base,bool uppercase,character_output_stream output,typename T>
 inline constexpr void print(output& out,details::base_t<base,uppercase,basic_unsigned_extension<T>> v)
 {
 	details::output_base_extension_number<base,uppercase>(out,v.reference);
@@ -505,14 +505,14 @@ inline constexpr void print(output& out,details::base_t<base,uppercase,basic_uns
 
 namespace details
 {
-template<std::uint8_t base,standard_input_stream input,typename T>
+template<std::uint8_t base,character_input_stream input,typename T>
 inline constexpr void input_base_number_phase2_extension(input& in,basic_unsigned_extension<T>& a)
 {
-	using unsigned_char_type = std::make_unsigned_t<decltype(in.get())>;
+	using unsigned_char_type = std::make_unsigned_t<decltype(get(in))>;
 	unsigned_char_type constexpr baseed(std::min(static_cast<unsigned_char_type>(base),static_cast<unsigned_char_type>(10)));
 	while(true)
 	{
-		unsigned_char_type ch(in.try_get().first);
+		unsigned_char_type ch(try_get(in).first);
 		if((ch-=48)<baseed)
 		{
 			a*=base;
@@ -531,14 +531,14 @@ inline constexpr void input_base_number_phase2_extension(input& in,basic_unsigne
 	}
 }
 
-template<std::uint8_t base,standard_input_stream input,typename T>
+template<std::uint8_t base,character_input_stream input,typename T>
 inline constexpr void input_base_extension_number(input& in,basic_unsigned_extension<T>& a)
 {
-	using unsigned_char_type = std::make_unsigned_t<decltype(in.get())>;
+	using unsigned_char_type = std::make_unsigned_t<decltype(get(in))>;
 	unsigned_char_type constexpr baseed(std::min(static_cast<unsigned_char_type>(base),static_cast<unsigned_char_type>(10)));
 	while(true)
 	{
-		unsigned_char_type ch(in.get());
+		unsigned_char_type ch(get(in));
 		if((ch-=48)<baseed)
 		{
 			a=static_cast<basic_unsigned_extension<T>>(ch);
@@ -558,28 +558,28 @@ inline constexpr void input_base_extension_number(input& in,basic_unsigned_exten
 }
 }
 
-template<std::size_t base,bool uppercase,standard_input_stream input,typename T>
+template<std::size_t base,bool uppercase,character_input_stream input,typename T>
 inline constexpr void scan(input& in,details::base_t<base,uppercase,basic_unsigned_extension<T>> v)
 {
 	details::input_base_extension_number<base>(in,v.reference);
 }
 
-template<standard_input_stream input,typename T>
+template<character_input_stream input,typename T>
 inline constexpr void scan(input& in,basic_unsigned_extension<T>& a)
 {
 	details::input_base_extension_number<10>(in,a);
 }
 
-template<standard_output_stream output,typename T>
+template<character_output_stream output,typename T>
 inline constexpr void write(output& out,basic_unsigned_extension<T> const& n)
 {
-	out.writes(std::addressof(n),std::addressof(n)+1);
+	writes(out,std::addressof(n),std::addressof(n)+1);
 }
 
-template<standard_input_stream input,typename T>
+template<character_input_stream input,typename T>
 inline constexpr void read(input& in,basic_unsigned_extension<T>& n)
 {
-	in.reads(std::addressof(n),std::addressof(n)+1);
+	reads(in,std::addressof(n),std::addressof(n)+1);
 }
 
 using uint128_t = basic_unsigned_extension<std::uint64_t>;

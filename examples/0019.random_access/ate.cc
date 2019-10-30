@@ -3,6 +3,6 @@
 int main()
 {
 	fast_io::ibuf ib("asfaf.txt",fast_io::open::interface<fast_io::open::ate>);
-	fast_io::out.put(ib.get());
+	put(fast_io::out,get(ib));
 	println(fast_io::out);
 }

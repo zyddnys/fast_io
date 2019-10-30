@@ -2,8 +2,5 @@
 
 int main()
 {
-	fast_io::obuf ob("generated_file.txt");
-	for(std::size_t i(0);i!=10000000000ull;++i)
-		ob.put('a');
-	ob.put('\n');
+	fill_nc(fast_io::obuf("generated_file.txt"),10000000000ull,'a');
 }

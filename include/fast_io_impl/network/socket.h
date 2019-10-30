@@ -34,27 +34,27 @@ inline auto ipv6_address(std::string_view str)
 		if(e==':')
 		{
 			if(it==str.cbegin())
-				ostr.put('0');
+				put(ostr,'0');
 			++prefix_zero;
-			ostr.put(' ');
+			put(ostr,' ');
 			if(it+1==str.cend())
-				ostr.put('0');
+				put(ostr,'0');
 			else if(it[1]==':')
 			{
-				ostr.put('0');
+				put(ostr,'0');
 				auto j(it+1);
 				for(;j!=str.cend();++j)
 					if(*j==':')
 						++prefix_zero;
 				for(;prefix_zero<7;++prefix_zero)
 				{
-					ostr.put(' ');
-					ostr.put('0');
+					put(ostr,' ');
+					put(ostr,'0');
 				}
 			}
 		}
 		else if(e-'0'<10||e-'a'<6||e-'A'<6)
-			ostr.put(e);
+			put(ostr,e);
 		else
 			break;
 	}
@@ -98,10 +98,9 @@ inline void set_ipv6_storage(sockaddr_storage& storage,address const& add)
 }
 }
 
-class acceptor;
 class socket
 {
-	sock::details::socket_type handle;
+	sock::details::socket_type handle=sock::details::invalid_socket;
 	void close_impl()
 	try
 	{
@@ -110,14 +109,16 @@ class socket
 	}
 	catch(...)
 	{}
-	friend class acceptor;
-	socket()=default;
+protected:
+	auto& protected_native_handle() {return handle;}
 public:
+	socket()=default;
+	socket(sock::details::socket_type v):handle(v){}
 	template<typename ...Args>
 	socket(native_interface_t,Args&& ...args):handle(sock::details::socket(std::forward<Args>(args)...)){}
 	socket(sock::family const & family,sock::type const &type,sock::protocal const &protocal = sock::protocal::none):
 		handle(sock::details::socket(static_cast<sock::details::address_family>(family),static_cast<int>(type),static_cast<int>(protocal))){}
-	auto native_handle() const {return handle;}
+	auto native_handle() {return handle;}
 	socket(socket const&) = delete;
 	socket& operator=(socket const&) = delete;
 	socket(socket && soc) noexcept:handle(soc.handle)
@@ -134,41 +135,34 @@ public:
 		}
 		return *this;
 	}
-	void swap(socket& b) noexcept
-	{
-		using std::swap;
-		swap(handle,b.handle);
-	}
-	template<std::contiguous_iterator Iter>
-	Iter reads(Iter begin,Iter end)
-	{
-		return begin+((sock::details::recv(handle,std::to_address(begin),static_cast<int>((end-begin)*sizeof(*begin)),0))/sizeof(*begin));
-	}
-	template<std::contiguous_iterator Iter>
-	Iter writes(Iter begin,Iter end)
-	{
-		return begin+(sock::details::send(handle,std::to_address(begin),static_cast<int>((end-begin)*sizeof(*begin)),0)/sizeof(*begin));
-	}
 	~socket()
 	{
 		close_impl();
 	}
-	void flush()
-	{
-	}
-	
-#ifdef __linux__
-	auto zero_copy_out_handle()
-	{
-		return handle;
-	}
-#endif
 };
 
-inline void swap(socket& a,socket &b) noexcept
+
+template<std::contiguous_iterator Iter>
+inline Iter reads(socket& soc,Iter begin,Iter end)
 {
-	a.swap(b);
+	return begin+((sock::details::recv(soc.native_handle(),std::to_address(begin),static_cast<int>((end-begin)*sizeof(*begin)),0))/sizeof(*begin));
 }
+template<std::contiguous_iterator Iter>
+inline Iter writes(socket& soc,Iter begin,Iter end)
+{
+	return begin+(sock::details::send(soc.native_handle(),std::to_address(begin),static_cast<int>((end-begin)*sizeof(*begin)),0)/sizeof(*begin));
+}
+
+inline constexpr void flush(socket&)
+{
+}
+
+#ifdef __linux__
+inline auto zero_copy_out_handle(socket& soc)
+{
+	return soc.native_handle();
+}
+#endif
 
 class address_info
 {
@@ -193,82 +187,34 @@ public:
 	{
 		
 	}*/
-	inline void swap(address_info& o) noexcept
-	{
-		using std::swap;
-		swap(storage,o.storage);
-		swap(size,o.size);
-	}
 };
 
-inline void swap(address_info& a,address_info &b) noexcept
+class client:public socket
 {
-	a.swap(b);
-}
-
-class client
-{
-	socket soc;
 	address_info cinfo;
 public:
 	using char_type = char;
 	template<typename ...Args>
-	client(sock::family const & fm,address const& add,Args&& ...args):soc(fm,std::forward<Args>(args)...)
+	client(sock::family const & fm,address const& add,Args&& ...args):socket(fm,std::forward<Args>(args)...)
 	{
 		if(fm==sock::family::ipv6)
 		{
 			sock::details::set_ipv6_storage(cinfo.native_storage(),add);
-			sock::details::connect<sockaddr_in6>(soc.native_handle(),cinfo.native_storage());
+			sock::details::connect<sockaddr_in6>(native_handle(),cinfo.native_storage());
 		}
 		else if(fm==sock::family::ipv4)
 		{
 			sock::details::set_ipv4_storage(cinfo.native_storage(),add);
-			sock::details::connect<sockaddr_in>(soc.native_handle(),cinfo.native_storage());
+			sock::details::connect<sockaddr_in>(native_handle(),cinfo.native_storage());
 		}
 		else
 			throw std::runtime_error("currently not supported protocals");
-	}
-	auto& handle()
-	{
-		return soc;
-	}
-	template<typename ...Args>
-	auto reads(Args&& ...args)
-	{
-		return soc.reads(std::forward<Args>(args)...);
-	}
-	template<typename ...Args>
-	auto writes(Args&& ...args)
-	{
-		return soc.writes(std::forward<Args>(args)...);
-	}
-	void flush()
-	{
-		soc.flush();
 	}
 	auto& info() const
 	{
 		return cinfo;
 	}
-
-#ifdef __linux__
-	auto zero_copy_out_handle()
-	{
-		return soc.zero_copy_out_handle();
-	}
-#endif
-	inline void swap(client& o) noexcept
-	{
-		using std::swap;
-		swap(soc,o.soc);
-		swap(cinfo,o.cinfo);
-	}
 };
-
-inline void swap(client& a,client &b) noexcept
-{
-	a.swap(b);
-}
 
 class server
 {
@@ -296,74 +242,22 @@ public:
 	{
 		return soc;
 	}
-	inline void swap(server& o) noexcept
-	{
-		using std::swap;
-		swap(soc,o.soc);
-	}
-#ifdef __linux__
-	auto zero_copy_out_handle()
-	{
-		return soc.zero_copy_out_handle();
-	}
-#endif
 };
 
-inline void swap(server& a,server &b) noexcept
+class acceptor:public socket
 {
-	a.swap(b);
-}
-
-class acceptor
-{
-	socket soc;
 	address_info add;
 public:
 	using native_handle_type = sock::details::socket_type;
 	using char_type = char;
 	acceptor(server& listener_socket)
 	{
-		soc.handle=sock::details::accept(listener_socket.handle().native_handle(),add.native_storage(),add.native_storage_size());
-	}
-	auto& handle()
-	{
-		return soc;
-	}
-	template<typename ...Args>
-	auto reads(Args&& ...args)
-	{
-		return soc.reads(std::forward<Args>(args)...);
-	}
-	template<typename ...Args>
-	auto writes(Args&& ...args)
-	{
-		return soc.writes(std::forward<Args>(args)...);
-	}
-	void flush()
-	{
-		soc.flush();
+		protected_native_handle()=sock::details::accept(listener_socket.handle().native_handle(),add.native_storage(),add.native_storage_size());
 	}
 	auto& info() const
 	{
 		return add;
 	}
-	inline void swap(acceptor& o) noexcept
-	{
-		using std::swap;
-		swap(soc,o.soc);
-		swap(add,o.add);
-	}
-#ifdef __linux__
-	auto zero_copy_out_handle()
-	{
-		return soc.zero_copy_out_handle();
-	}
-#endif
 };
-
-inline void swap(acceptor& a,acceptor &b) noexcept
-{
-	a.swap(b);
-}
 
 }

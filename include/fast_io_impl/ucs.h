@@ -24,11 +24,10 @@ public:
 	using native_interface_t = T;
 	using char_type = CharT;
 	using native_char_type = typename native_interface_t::char_type;
-private:
 	using unsigned_char_type = std::make_unsigned_t<char_type>;
 	using unsigned_native_char_type = std::make_unsigned_t<native_char_type>;
-	constexpr char_type get_impl(unsigned_native_char_type ch)
-		requires standard_input_stream<T>
+private:
+	inline constexpr char_type get_impl(unsigned_native_char_type ch)
 	{
 		auto constexpr ch_bits(sizeof(native_char_type)*8);
 		union
@@ -50,7 +49,7 @@ private:
 		unsigned_char_type converted_ch(u.ch);
 		for(std::size_t i(0);i!=bytes;++i)
 		{
-			unsigned_native_char_type t(ib.get());
+			unsigned_native_char_type t(get(ib));
 			if((t>>ch_bits_m2)==2)
 				converted_ch=((converted_ch<<ch_bits_m2)|(t&limitm1))&((1<<((i+2)*6)) -1);
 			else
@@ -66,41 +65,25 @@ public:
 	{
 		return ib;
 	}
-	constexpr auto eof() const requires standard_input_stream<T>
+	constexpr char_type mmget() requires character_input_stream<T>
 	{
-		return ib.eof();
+		return get_impl(get(ib));
 	}
-	constexpr char_type get() requires standard_input_stream<T>
+	constexpr std::pair<char_type,bool> mmtry_get() requires character_input_stream<T>
 	{
-		return get_impl(ib.get());
-	}
-	constexpr std::pair<char_type,bool> try_get() requires standard_input_stream<T>
-	{
-		auto ch(ib.try_get());
+		auto ch(try_get(ib));
 		if(ch.second)
 			return {0,true};
 		return {get_impl(ch.first),false};
 	}
-	template<std::contiguous_iterator Iter>
-	constexpr Iter reads(Iter b,Iter e)
-		requires standard_input_stream<T>
-	{
-		auto pb(static_cast<char_type*>(static_cast<void*>(std::to_address(b))));
-		auto pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));
-		auto pi(pb);
-		for(;pi!=pe;++pi)
-			*pi=get();
-		return b+(pi-pb)*sizeof(char_type)/sizeof(*b);
-	}
-	constexpr void put(char_type ch)
-		requires standard_output_stream<T>
+	constexpr void mmput(char_type ch) requires character_output_stream<T>
 	{
 		unsigned_native_char_type constexpr native_char_bits(8*sizeof(unsigned_native_char_type));
 		unsigned_native_char_type constexpr fair(1<<(native_char_bits-1));
 		unsigned_native_char_type constexpr utf8_limit(1<<(native_char_bits-2));
 		if(ch<fair)
 		{
-			ib.put(static_cast<native_char_type>(ch));
+			put(ib,static_cast<native_char_type>(ch));
 			return;
 		}
 		std::array<unsigned_native_char_type,sizeof(char_type)/sizeof(unsigned_native_char_type)+1> v{};
@@ -118,23 +101,58 @@ public:
 		}
 		unsigned_native_char_type constexpr max_native_char_type(-1);
 		*ed |= max_native_char_type>>(native_char_bits-v_elements-1)<<(native_char_bits-v_elements);
-		ib.writes(ed,v.data()+v.size());
-	}
-	template<std::contiguous_iterator Iter>
-	constexpr void writes(Iter b,Iter e)
-		requires standard_output_stream<T>
-	{
-		writes_precondition<char_type>(b,e);
-		auto pb(static_cast<char_type const*>(static_cast<void const*>(std::to_address(b))));
-		for(auto pi(pb),pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));pi!=pe;++pi)
-			put(*pi);
-	}
-	constexpr void flush()
-		requires standard_output_stream<T>
-	{
-		ib.flush();
+		writes(ib,ed,v.data()+v.size());
 	}
 };
+
+namespace ucs_details
+{
+}
+
+
+template<output_stream T,typename CharT>
+inline constexpr void flush(ucs<T,CharT>& uc)
+{
+	flush(uc.native_handle());
+}
+template<character_output_stream T,typename char_type>
+inline constexpr void put(ucs<T,char_type>& uc,typename ucs<T,char_type>::char_type ch)
+{
+	uc.mmput(ch);
+}
+
+template<character_output_stream T,typename char_type,std::contiguous_iterator Iter>
+inline constexpr void writes(ucs<T,char_type>& uc,Iter b,Iter e)
+{
+	writes_precondition<char_type>(b,e);
+	auto pb(static_cast<char_type const*>(static_cast<void const*>(std::to_address(b))));
+	for(auto pi(pb),pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));pi!=pe;++pi)
+		uc.mmput(*pi);
+}
+
+template<character_input_stream T,typename char_type>
+inline constexpr auto get(ucs<T,char_type>& uc)
+{
+	return uc.mmget();
+}
+
+template<character_input_stream T,typename char_type>
+inline constexpr auto try_get(ucs<T,char_type>& uc)
+{
+	return uc.mmtry_get();
+}
+
+
+template<character_input_stream T,typename char_type,std::contiguous_iterator Iter>
+inline constexpr Iter reads(ucs<T,char_type>&uc,Iter b,Iter e)
+{
+	auto pb(static_cast<char_type*>(static_cast<void*>(std::to_address(b))));
+	auto pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));
+	auto pi(pb);
+	for(;pi!=pe;++pi)
+		*pi=uc.mmget();
+	return b+(pi-pb)*sizeof(char_type)/sizeof(*b);
+}
 
 template<typename T>
 inline constexpr void in_place_utf8_to_ucs(T& t,std::string_view view)
@@ -159,7 +177,7 @@ inline void in_place_ucs_to_utf8(std::string& v,std::basic_string_view<T> view)
 {
 	v.clear();
 	ucs<basic_ostring<std::string>,T> uv(std::move(v));
-	uv.writes(view.cbegin(),view.cend());
+	writes(uv,view.cbegin(),view.cend());
 	v=std::move(uv.native_handle().str());
 }
 
@@ -167,7 +185,7 @@ template<typename T>
 inline std::string ucs_to_utf8(std::basic_string_view<T> view)
 {
 	ucs<basic_ostring<std::string>,T> uv;
-	uv.writes(view.cbegin(),view.cend());
+	writes(uv,view.cbegin(),view.cend());
 	return std::move(uv.native_handle().str());
 }
 }

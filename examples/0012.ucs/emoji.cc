@@ -19,7 +19,7 @@ int main()
 	print(ob,"\n\n");
 	for(auto const & e : u32emoji)
 	{
-		view.put(e);
+		put(view,e);
 		fprint(ob," % (0x%)\n",unsigned_view(e),hexupper(unsigned_view(e)));
 	}
 	println(ob);

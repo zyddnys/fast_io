@@ -11,7 +11,7 @@ Correct examples:
 
 
 	print(fast_io::out,3);
-	fast_io::out.put('\n');
+	put(fast_io::out,'\n');
 
 	print(fast_io::out,3,"\n");
 

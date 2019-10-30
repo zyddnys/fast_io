@@ -6,7 +6,7 @@ namespace fast_io
 namespace details
 {
 
-template<standard_output_stream output,std::floating_point T>
+template<character_output_stream output,std::floating_point T>
 inline bool constexpr output_inf(output& out,T e)
 {
 	if(e==std::numeric_limits<T>::signaling_NaN()||e==std::numeric_limits<T>::quiet_NaN())
@@ -41,7 +41,7 @@ inline constexpr F mpow(F const &f,U const& u)
 }
 
 
-template<standard_output_stream output,std::floating_point T>
+template<character_output_stream output,std::floating_point T>
 inline void output_fixed_floats(output& out,T e,std::size_t precision)
 {
 	auto u(std::floor(e));
@@ -64,10 +64,10 @@ inline void output_fixed_floats(output& out,T e,std::size_t precision)
 				bas.push_back(48);
 		}
 		while((u=temp));
-		for(std::size_t i(bas.size());i--;out.put(bas[i]));
+		for(std::size_t i(bas.size());i--;put(out,bas[i]));
 		if(!precision)
 			return;
-		out.put('.');
+		put(out,'.');
 		bas.clear();
 		do
 		{
@@ -80,8 +80,8 @@ inline void output_fixed_floats(output& out,T e,std::size_t precision)
 		}
 		while((ptg=temp)&&bas.size()<=precision);
 		for(std::size_t i(bas.size());i<precision;++i)
-			out.put(48);
-		for(std::size_t i(bas.size());i--;out.put(bas[i]));
+			put(out,48);
+		for(std::size_t i(bas.size());i--;put(out,bas[i]));
 	}
 	else
 	{
@@ -120,48 +120,48 @@ inline void output_fixed_floats(output& out,T e,std::size_t precision)
 		}
 		while((u=temp));
 		if(bas2.empty())
-			out.put('0');
+			put(out,'0');
 		else
-			for(std::size_t i(bas2.size());i--;out.put(bas2[i]));
+			for(std::size_t i(bas2.size());i--;put(out,bas2[i]));
 		if(!precision)
 			return;
-		out.put('.');
+		put(out,'.');
 		if(!hasone)
 			bas.clear();
 		for(std::size_t i(bas.size());i<precision;++i)
-			out.put('0');
-		for(std::size_t i(bas.size());i--;out.put(bas[i]));
+			put(out,'0');
+		for(std::size_t i(bas.size());i--;put(out,bas[i]));
 	}
 }
 
 }
 
-template<standard_output_stream output,std::floating_point T>
+template<character_output_stream output,std::floating_point T>
 inline void print(output& out,details::fixed<T const> a)
 {
 	auto e(a.reference);
 	if(e<0)
 	{
 		e=-e;
-		out.put('-');
+		put(out,'-');
 	}
 	if(details::output_inf(out,e))
 		return;
 	details::output_fixed_floats(out,e,a.precision);
 }
 
-template<standard_output_stream output,std::floating_point T>
+template<character_output_stream output,std::floating_point T>
 inline void print(output& out,details::scientific<T const> a)
 {
 	auto e(a.reference);
 	if(e==0)	//if e==0 then log10 is UNDEFINED
 	{
-		out.put('0');
+		put(out,'0');
 		if(a.precision)
 		{
-			out.put('.');
+			put(out,'.');
 			for(std::size_t i(0);i!=a.precision;++i)
-				out.put('0');
+				put(out,'0');
 		}
 		print(out,"e0");
 		return;
@@ -169,34 +169,34 @@ inline void print(output& out,details::scientific<T const> a)
 	if(e<0)
 	{
 		e=-e;
-		out.put('-');
+		put(out,'-');
 	}
 	if(details::output_inf(out,e))
 		return;
 	auto x(std::floor(std::log10(e)));
 	details::output_fixed_floats(out,e*std::pow(10,-x),a.precision);
-	out.put('e');
+	put(out,'e');
 	if(x<0)
 	{
-		out.put('-');
+		put(out,'-');
 		x=-x;
 	}
 	print(out,static_cast<std::uint64_t>(x));
 }
 
-template<standard_output_stream output,std::floating_point T>
+template<character_output_stream output,std::floating_point T>
 inline void print(output& out,details::floating_point_default<T const> a)
 {
 	auto e(a.reference);
 	if(e==0)	//if e==0 then log10 is UNDEFINED
 	{
-		out.put('0');
+		put(out,'0');
 		return;
 	}
 	if(e<0)
 	{
 		e=-e;
-		out.put('-');
+		put(out,'-');
 	}
 	if(details::output_inf(out,e))
 		return;
@@ -221,30 +221,30 @@ inline void print(output& out,details::floating_point_default<T const> a)
 	}
 	if(x==0)
 		return;
-	out.put('e');
+	put(out,'e');
 	if(x<0)
 	{
-		out.put('-');
+		put(out,'-');
 		x=-x;
 	}
 	print(out,static_cast<std::uint64_t>(x));
 }
 
-template<standard_output_stream soutp,std::floating_point T>
+template<character_output_stream soutp,std::floating_point T>
 inline void print(soutp &output,T const& p)
 {
 	print(output,floating_point_default(p,6));
 }
 
-template<standard_input_stream input,std::floating_point T>
+template<character_input_stream input,std::floating_point T>
 inline constexpr void scan(input& in,T &t)
 {
-	decltype(in.get()) ch;
+	decltype(get(in)) ch;
 	bool negative(false);
 	bool phase2(false);
 	for(;;)
 	{
-		ch=in.get();
+		ch=get(in);
 		if(48<=ch&&ch<=57)
 		{
 			t=ch-48;
@@ -254,7 +254,7 @@ inline constexpr void scan(input& in,T &t)
 		{
 			if(ch=='-')
 			{
-				ch=in.get();
+				ch=get(in);
 				if(48<=ch&&ch<=57)
 				{
 					negative=true;
@@ -271,7 +271,7 @@ inline constexpr void scan(input& in,T &t)
 			}
 			else if(ch=='.')
 			{
-				ch=in.get();
+				ch=get(in);
 				if(48<=ch&&ch<=57)
 				{
 					phase2=true;
@@ -285,7 +285,7 @@ inline constexpr void scan(input& in,T &t)
 	{
 		while(true)
 		{
-			auto try_ch(in.try_get());
+			auto try_ch(try_get(in));
 			if(48<=try_ch.first&&try_ch.first<=57)
 				t=t*10+try_ch.first-48;
 			else if(try_ch.first=='.')
@@ -308,7 +308,7 @@ inline constexpr void scan(input& in,T &t)
 		T current(10);
 		for(;;current*=10)
 		{
-			auto try_ch(in.try_get());
+			auto try_ch(try_get(in));
 			if(48<=try_ch.first&&try_ch.first<=57)
 				t+=(try_ch.first-48)/current;
 			else if(try_ch.first=='e'||try_ch.first=='E')
@@ -328,25 +328,25 @@ inline constexpr void scan(input& in,T &t)
 		t=-t;
 }
 
-template<standard_output_stream output,std::integral T>
+template<character_output_stream output,std::integral T>
 inline void print(output& out,details::floating_point_default<T const> a)
 {
 	print(out,a.reference);
 }
 
-template<standard_output_stream output,std::integral T>
+template<character_output_stream output,std::integral T>
 inline void print(output& out,details::fixed<T const> a)
 {
 	print(out,a.reference);
 	if(a.precision)
 	{
-		out.put('.');
+		put(out,'.');
 		for(std::size_t i(0);i!=a.precision;++i)
-			out.put('0');
+			put(out,'0');
 	}
 }
 
-template<standard_output_stream output,std::integral T>
+template<character_output_stream output,std::integral T>
 inline void print(output& out,details::scientific<T const> sc)
 {
 	print(out,scientific(static_cast<long double>(sc.reference),sc.precision));

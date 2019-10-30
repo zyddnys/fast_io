@@ -64,9 +64,9 @@ try
 	for(std::size_t i(0);i!=N;++i)
 		scan(view,v[i]);
 	}
-	{
+/*	{
 	cqw::timer t("dynamic standard input stream ibuf");
-	fast_io::dynamic_standard_input_stream ibuf(std::in_place_type<fast_io::ibuf>,"cfilestar.txt");
+	fast_io::dynamic_character_input_stream ibuf(std::in_place_type<fast_io::ibuf>,"cfilestar.txt");
 	for(std::size_t i(0);i!=N;++i)
 		scan(ibuf,v[i]);
 	}
@@ -75,10 +75,10 @@ try
 	fast_io::ibuf_dynamic ibuf(std::in_place_type<fast_io::isystem_file>,"cfilestar.txt");
 	for(std::size_t i(0);i!=N;++i)
 		scan(ibuf,v[i]);
-	}
+	}*/
 	{
 	cqw::timer t("speck128/128");
-	fast_io::crypto::basic_ictr<fast_io::ibuf, fast_io::crypto::speck::speck_dec_128_128> enc_stream(
+	fast_io::crypto::basic_ictr<fast_io::ibuf, fast_io::crypto::speck::speck_enc_128_128> enc_stream(
 		std::array<uint8_t, 16>{'8','3','3','4',';','2','3','4','a','2','c','4',']','0','3','4'},
 		std::array<uint8_t, 8>{'1','2','3','4','1','2','3','4'},"speck.txt");
 	for(auto & e : v)

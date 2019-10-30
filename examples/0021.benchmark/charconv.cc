@@ -20,7 +20,7 @@ int main()
 	{
 		auto [p,ec] = std::to_chars(buffer.data(), buffer.data() + buffer.size(),i);
 		*p='\n';
-		obuf.writes(buffer.data(),++p);
+		writes(obuf,buffer.data(),++p);
 	}
 	}
 }

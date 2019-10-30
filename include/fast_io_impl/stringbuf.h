@@ -8,8 +8,7 @@ class basic_istring_view
 {
 	T s;
 public:
-	using value_type = T;
-	using char_type = std::make_unsigned_t<typename T::value_type>;
+	using char_type = typename T::value_type;
 	template<typename ...Args>
 	requires std::constructible_from<T,Args...>
 	constexpr basic_istring_view(Args&& ...args):s(std::forward<Args>(args)...){}
@@ -17,32 +16,44 @@ public:
 	{
 		return s;
 	}
-	template<std::contiguous_iterator Iter>
-	constexpr Iter reads(Iter begin,Iter end)
-	{
-		auto pb(static_cast<char_type*>(static_cast<void*>(std::to_address(begin))));
-		auto pe(static_cast<char_type*>(static_cast<void*>(std::to_address(end))));
-		std::size_t const cped(s.copy(pb,pe-pb));
-		s.remove_prefix(cped);
-		return begin+cped*sizeof(*begin)/sizeof(char_type);
-	}
-	constexpr char_type get()
-	{
-		if(s.empty())
-			throw eof();
-		auto ch(s.front());
-		s.remove_prefix(1);
-		return ch;
-	}
-	constexpr std::pair<char_type,bool> try_get()
-	{
-		if(s.empty())
-			return {0,true};
-		auto ch(s.front());
-		s.remove_prefix(1);
-		return {ch,false};
-	}
+	constexpr auto empty() const {return s.empty();}
 };
+
+template<typename T>
+[[nodiscard]] inline constexpr auto ireserve(basic_istring_view<T>& isv,std::size_t size)
+{
+	isv.str().remove_prefix(size);
+	return isv.str().begin();
+}
+
+template<typename T,std::contiguous_iterator Iter>
+inline constexpr Iter reads(basic_istring_view<T>& istrvw,Iter begin,Iter end)
+{
+	auto pb(static_cast<typename T::value_type*>(static_cast<void*>(std::to_address(begin))));
+	auto pe(static_cast<typename T::value_type*>(static_cast<void*>(std::to_address(end))));
+	std::size_t const cped(istrvw.str().copy(pb,pe-pb));
+	istrvw.str().remove_prefix(cped);
+	return begin+cped*sizeof(*begin)/sizeof(typename T::value_type);
+}
+
+template<typename T>
+inline constexpr typename T::value_type get(basic_istring_view<T>& istrvw)
+{
+	if(istrvw.empty())
+		throw eof();
+	auto ch(istrvw.str().front());
+	istrvw.str().remove_prefix(1);
+	return ch;
+}
+template<typename T>
+inline constexpr std::pair<typename T::value_type,bool> try_get(basic_istring_view<T>& istrvw)
+{
+	if(istrvw.empty())
+		return {0,true};
+	auto ch(istrvw.str().front());
+	istrvw.str().remove_prefix(1);
+	return {ch,false};
+}
 
 template< typename T>
 class basic_ostring
@@ -58,20 +69,32 @@ public:
 	{
 		return s;
 	}
-	template<std::contiguous_iterator Iter>
-	constexpr void writes(Iter cbegin,Iter cend)
-	{
-		writes_precondition<char_type>(cbegin,cend);
-		s.append(static_cast<char_type const*>(static_cast<void const*>(std::to_address(cbegin))),static_cast<char_type const*>(static_cast<void const*>(std::to_address(cend))));
-	}
-	constexpr void put(char_type ch)
-	{
-		s.push_back(ch);
-	}
-	constexpr void flush() const {}
 	constexpr void clear(){s.clear();}
 	constexpr auto empty() const {return s.empty();}
 };
+
+template<typename T>
+[[nodiscard]] inline constexpr auto oreserve(basic_ostring<T>& ob,std::size_t size)
+{
+	ob.str().append(size,0);
+	return ob.str().end();
+}
+
+template<typename T,std::contiguous_iterator Iter>
+inline constexpr void writes(basic_ostring<T>& ostr,Iter cbegin,Iter cend)
+{
+	using char_type = typename T::value_type;
+	writes_precondition<char_type>(cbegin,cend);
+	ostr.str().append(static_cast<char_type const*>(static_cast<void const*>(std::to_address(cbegin))),static_cast<char_type const*>(static_cast<void const*>(std::to_address(cend))));
+}
+template<typename T>
+inline constexpr void put(basic_ostring<T>& ostr,typename T::value_type ch)
+{
+	ostr.str().push_back(ch);
+}
+
+template<typename T>
+inline constexpr void flush(basic_ostring<T>&){}
 
 template<typename T>
 inline constexpr void fill_nc(basic_ostring<T>& os,std::size_t count,typename T::value_type const& ch)

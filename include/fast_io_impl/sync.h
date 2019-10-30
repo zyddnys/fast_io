@@ -18,44 +18,55 @@ public:
 	template<typename ...Args>
 	requires std::constructible_from<output,Args...>
 	basic_sync(Args&& ...args):handle(std::forward<Args>(args)...){}
-	void flush()
-	{
-		handle.writes(mostr.str().cbegin(),mostr.str().cend());
-		mostr.clear();
-	}
-	template<typename ...Args>
-	void writes(Args&& ...args)
-	{
-		mostr.writes(std::forward<Args>(args)...);
-	}
-	void put(char_type ch)
-	{
-		mostr.put(ch);
-	}
-	template<typename... Args>
-	auto seek(Args&& ...args) requires random_access_stream<native_handle_type>
-	{
-		flush();
-		return handle.seek(std::forward<Args>(args)...);
-	}
-	template<std::contiguous_iterator Iter>
-	Iter reads(Iter begin,Iter end)
-		requires input_stream<native_handle_type>
-	{
-		flush();
-		return handle.reads(begin,end);
-	}
-	auto get() requires standard_input_stream<native_handle_type>
-	{
-		flush();
-		return handle.get();
-	}
-	auto try_get() requires standard_input_stream<native_handle_type>
-	{
-		flush();
-		return handle.try_get();
-	}
 };
+
+template<output_stream output,typename ostr>
+inline constexpr void flush(basic_sync<output,ostr>& sync)
+{
+	writes(sync.native_handle(),sync.buffer().str().cbegin(),sync.buffer().str().cend());
+	sync.buffer().clear();
+}
+
+template<output_stream output,typename ostr,std::contiguous_iterator Iter>
+inline constexpr void writes(basic_sync<output,ostr>& sync,Iter cbegin,Iter cend)
+{
+	writes(sync.buffer(),cbegin,cend);
+}
+template<output_stream output,typename ostr>
+inline constexpr void put(basic_sync<output,ostr>& sync,typename output::char_type ch)
+{
+	put(sync.buffer(),ch);
+}
+
+template<output_stream output,typename ostr,typename... Args>
+requires random_access_stream<output>
+inline constexpr auto seek(basic_sync<output,ostr>& sync,Args&& ...args)
+{
+	flush(sync);
+	return seek(sync.native_handle(),std::forward<Args>(args)...);
+}
+
+template<io_stream input,typename ostr,std::contiguous_iterator Iter>
+inline constexpr Iter reads(basic_sync<input,ostr>& sync,Iter begin,Iter end)
+{
+	flush(sync);
+	return reads(sync.native_handle(),begin,end);
+}
+template<io_stream input,typename ostr>
+requires character_input_stream<input>
+inline constexpr auto get(basic_sync<input,ostr>& sync)
+{
+	flush(sync);
+	return get(sync.native_handle());
+}
+
+template<io_stream input,typename ostr>
+requires character_input_stream<input>
+inline constexpr auto try_get(basic_sync<input,ostr>& sync)
+{
+	flush(sync);
+	return try_get(sync.native_handle());
+}
 
 template<output_stream output,typename ostr>
 inline constexpr void fill_nc(basic_sync<output,ostr>& ob,std::size_t count,typename output::char_type const& ch)
@@ -71,7 +82,7 @@ class basic_fsync:public basic_sync<output,ostr>
 	try
 	{
 		if(need_sync)
-			basic_sync<output,ostr>::flush();
+			flush(static_cast<basic_sync<output,ostr>&>(*this));
 	}
 	catch(...){}
 public:

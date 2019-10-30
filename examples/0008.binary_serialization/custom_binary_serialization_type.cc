@@ -8,15 +8,15 @@ struct foo
 	std::vector<std::size_t> vec;
 };
 
-// standard_input_stream is a CONCEPT. THIS IS NOT OBJECT ORIENTED PROGRAMMING!
-template<fast_io::standard_input_stream input>
+// character_input_stream is a CONCEPT. THIS IS NOT OBJECT ORIENTED PROGRAMMING!
+template<fast_io::character_input_stream input>
 inline constexpr void read(input& in, foo& f)
 {
 // most standard library containers can all be directly read/write
 	read(in,f.str,f.vec);
 }
 
-template<fast_io::standard_output_stream output>
+template<fast_io::character_output_stream output>
 inline constexpr void write(output& out, foo const& f)
 {
 //Their order must be same with read

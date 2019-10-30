@@ -153,27 +153,27 @@ inline constexpr details::floating_point_default<T const> floating_point_default
 	return {f,precision};
 }
 
-template<standard_input_stream input,std::integral T>
+template<character_input_stream input,std::integral T>
 inline void scan(input& in,details::char_view_t<T> a)
 {
-	a.reference = in.get();
+	a.reference = get(in);
 }
 
-template<standard_output_stream output,std::integral T>
+template<character_output_stream output,std::integral T>
 inline void print(output& out,details::char_view_t<T> a)
 {
-	out.put(static_cast<typename output::char_type>(a.reference));
+	put(out,static_cast<typename output::char_type>(a.reference));
 }
-template<standard_input_stream input,std::floating_point T>
+template<character_input_stream input,std::floating_point T>
 inline void scan(input& in,details::char_view_t<T> a)
 {
-	a.reference = in.get();
+	a.reference = get(in);
 }
 
-template<standard_output_stream output,std::floating_point T>
+template<character_output_stream output,std::floating_point T>
 inline void print(output& out,details::char_view_t<T> a)
 {
-	out.put(static_cast<typename output::char_type>(a.reference));
+	put(out,static_cast<typename output::char_type>(a.reference));
 }
 
 template<typename T>
@@ -188,7 +188,7 @@ inline constexpr details::setw_fill_t<T const,char_type> setw(std::size_t width,
 	return {width,t,ch};
 }
 
-template<standard_output_stream output,typename T,std::integral U>
+template<character_output_stream output,typename T,std::integral U>
 inline void print(output& out,details::setw_fill_t<T,U> a)
 {
 	basic_ostring<std::basic_string<typename output::char_type>> bas;
@@ -199,7 +199,7 @@ inline void print(output& out,details::setw_fill_t<T,U> a)
 	print(out,bas.str());
 }
 
-template<standard_output_stream output,typename T>
+template<character_output_stream output,typename T>
 inline void print(output& out,details::setw_t<T> a)
 {
 	basic_ostring<std::basic_string<typename output::char_type>> bas;

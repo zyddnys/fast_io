@@ -33,7 +33,7 @@ private:
 	T ib;
 	Enc enc;
 
-	unsigned_char_type *mread(unsigned_char_type *pb, unsigned_char_type *pe)
+	inline constexpr unsigned_char_type *mread(unsigned_char_type *pb, unsigned_char_type *pe)
 	{
 		auto pi(pb);
 
@@ -55,8 +55,8 @@ private:
 
 		for (; pi != pe;)
 		{
-			auto old_pos = cipher_buf_pos;
-			cipher_buf_pos = ib.reads(cipher_buf_pos, cipher_buf.end());
+			auto old_pos(cipher_buf_pos);
+			cipher_buf_pos = reads(ib,cipher_buf_pos, cipher_buf.end());
 			char_counter += cipher_buf_pos - old_pos;
 			if (cipher_buf_pos != cipher_buf.end())
 				return pi;
@@ -76,7 +76,7 @@ private:
 			if (available_out_space < cipher_type::block_size)
 			{
 				pi = std::uninitialized_copy(plain.begin(), plain.begin() + available_out_space, pi);
-				plaintext_buf_pos = plaintext_buf.end() - cipher_type::block_size + available_out_space;
+				plaintext_buf_pos = plaintext_buf.begin() + available_out_space;
 				std::uninitialized_copy(plain.begin() + available_out_space, plain.end(), plaintext_buf_pos);
 				break;
 			}
@@ -92,23 +92,23 @@ private:
 public:
 	template<typename T1, typename T2,typename ...Args>
 	requires std::constructible_from<key_type, T1> && std::constructible_from<nonce_type, T2> && std::constructible_from<T,Args...>
-	basic_ictr(T1&& init_key, T2&& nonce, Args &&...args) : key(std::forward<T1>(init_key)), nonce(std::forward<T2>(nonce)), char_counter(0), ib(std::forward<Args>(args)...), enc(key.data())
+	inline constexpr basic_ictr(T1&& init_key, T2&& nonce, Args &&...args) : key(std::forward<T1>(init_key)), nonce(std::forward<T2>(nonce)), char_counter(0), ib(std::forward<Args>(args)...), enc(key.data())
 	{
 	}
 	template<std::contiguous_iterator Iter>
-	Iter reads(Iter begin, Iter end)
+	inline constexpr Iter mmreads(Iter begin, Iter end)
 	{
 		auto bgchadd(static_cast<unsigned_char_type *>(static_cast<void *>(std::to_address(begin))));
 		return begin + (mread(bgchadd, static_cast<unsigned_char_type *>(static_cast<void *>(std::to_address(end)))) - bgchadd) / sizeof(*begin);
 	}
 
-	char_type get()
+	inline constexpr char_type mmget()
 	{
 		if (plaintext_buf_pos == plaintext_buf.end())
 		{
 			block_type tmp;
-			auto next_ch(tmp.begin() + 1);
-			auto ret(reads(tmp.begin(), next_ch));
+			auto next_ch(tmp.data() + 1);
+			auto ret(mread(tmp.data(), std::to_address(next_ch)));
 			if (ret != next_ch)
 			{
 				plaintext_buf_pos = plaintext_buf.begin();
@@ -119,13 +119,13 @@ public:
 		return static_cast<char_type>(*plaintext_buf_pos++);
 	}
 
-	std::pair<char_type, bool> try_get()
+	inline constexpr std::pair<char_type, bool> mmtry_get()
 	{
 		if (plaintext_buf_pos == plaintext_buf.end())
 		{
 			block_type tmp;
-			auto next_ch(tmp.begin() + 1);
-			auto ret(reads(tmp.begin(), next_ch));
+			auto next_ch(tmp.data() + 1);
+			auto ret(mread(tmp.data(), std::to_address(next_ch)));
 			if (ret != next_ch)
 			{
 				plaintext_buf_pos = plaintext_buf.begin(); // TODO: begin or end
@@ -137,9 +137,9 @@ public:
 	}
 public:
 	template<typename ...Args>
-	auto seek(Args&& ...args) requires(random_access_stream<T>)
+	inline constexpr auto mmseek(Args&& ...args) requires(random_access_stream<T>)
 	{
-		auto ret(ib.seek(std::forward<Args>(args)...));
+		auto ret(seek(ib,std::forward<Args>(args)...));
 		std::size_t pos_rel_to_begin = ret;
 		std::size_t counter_pos(pos_rel_to_begin / cipher_type::block_size);
 		std::size_t char_pos_block_aligned = counter_pos * cipher_type::block_size;
@@ -153,8 +153,8 @@ public:
 		block_type tmp;
 		std::size_t read_length(pos_rel_to_begin - char_pos_block_aligned);
 		auto const needreed = tmp.data() + read_length;
-		ib.seek(char_pos_block_aligned, seekdir::beg);
-		auto tmp_pos(ib.reads(tmp.data(), needreed));
+		seek(ib,char_pos_block_aligned, seekdir::beg);
+		auto tmp_pos(reads(ib,tmp.data(), needreed));
 		if (tmp_pos != needreed)
 			throw eof();
 		cipher_buf = tmp;
@@ -192,7 +192,7 @@ private:
 	T ob;
 	Enc enc;
 	template<typename V>
-	auto encrypt_out(V& v, std::size_t block_counter)
+	inline constexpr auto encrypt_out(V& v, std::size_t block_counter)
 	{
 		block_type block;
 		memcpy(block.data(), nonce.data(), cipher_type::block_size - sizeof(std::size_t));
@@ -201,11 +201,11 @@ private:
 		auto cipher(enc(block.data()));
 		for (std::size_t i(0); i != cipher.size(); ++i)
 			cipher[i] ^= v[i];
-		ob.writes(cipher.cbegin(), cipher.cend());
+		writes(ob,cipher.cbegin(), cipher.cend());
 		return block_counter;
 	}
 
-	void write_remain()
+	inline constexpr void write_remain()
 	{
 		if (plaintext_buf_pos != plaintext_buf.begin())
 		{
@@ -221,18 +221,18 @@ private:
 public:
 	template<typename T1, typename T2,typename ...Args>
 	requires std::constructible_from<key_type, T1> && std::constructible_from<nonce_type, T2> && std::constructible_from<T, Args...>
-	basic_octr(T1&& init_key, T2&& nonce, Args&& ...args) : key(std::forward<T1>(init_key)), nonce(std::forward<T2>(nonce)), char_counter(0), ob(std::forward<Args>(args)...), enc(key.data())
+	inline constexpr basic_octr(T1&& init_key, T2&& nonce, Args&& ...args) : key(std::forward<T1>(init_key)), nonce(std::forward<T2>(nonce)), char_counter(0), ob(std::forward<Args>(args)...), enc(key.data())
 	{
 	}
 
-	void flush()
+	inline constexpr void mmflush()
 	{
 		write_remain();
-		ob.flush();
+		flush(ob);
 	}
 
 	template<std::contiguous_iterator Iter>
-	void writes(Iter b, Iter e)
+	inline constexpr void mmwrites(Iter b, Iter e)
 	{
 		writes_precondition<unsigned_char_type>(b, e);
 		auto pb(static_cast<unsigned_char_type const *>(static_cast<void const *>(std::to_address(b))));
@@ -263,7 +263,7 @@ public:
 		char_counter += pe - pi;
 	}
 
-	void put(char_type ch) {
+	inline constexpr void mmput(char_type ch) {
 		if (plaintext_buf_pos == plaintext_buf.end())
 		{
 			encrypt_out(plaintext_buf, char_counter / cipher_type::block_size - 1);
@@ -288,7 +288,7 @@ public:
 		{
 			try
 			{
-				flush();
+				mmflush();
 			}
 			catch(...){}
 			plaintext_buf=std::move(octr.plaintext_buf);
@@ -326,6 +326,40 @@ template <output_stream T, typename Enc>
 inline void swap(basic_octr<T,Enc>& a,basic_octr<T,Enc>& b) noexcept
 {
 	a.swap(b);
+}
+template <input_stream T, typename Enc,std::contiguous_iterator Iter>
+inline constexpr auto reads(basic_ictr<T,Enc>& ctr,Iter begin,Iter end)
+{
+	return ctr.mmreads(begin,end);
+}
+
+template <input_stream T, typename Enc>
+inline constexpr auto try_get(basic_ictr<T,Enc>& ctr)
+{
+	return ctr.mmtry_get();
+}
+
+template <input_stream T, typename Enc>
+inline constexpr auto get(basic_ictr<T,Enc>& ctr)
+{
+	return ctr.mmget();
+}
+
+template <output_stream T, typename Enc,std::contiguous_iterator Iter>
+inline constexpr void writes(basic_octr<T,Enc>& ctr,Iter cbegin,Iter cend)
+{
+	ctr.mmwrites(cbegin,cend);
+}
+
+template <output_stream T, typename Enc>
+inline constexpr void flush(basic_octr<T,Enc>& ctr)
+{
+	ctr.mmflush();
+}
+template <output_stream T, typename Enc>
+inline constexpr void put(basic_octr<T,Enc>& ctr,typename basic_octr<T,Enc>::char_type ch)
+{
+	ctr.mmput(ch);
 }
 
 } // namespace fast_io::crypto

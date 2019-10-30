@@ -1,11 +1,9 @@
 #pragma once
 
-#include<random>
-
 namespace fast_io::crypto
 {
 
-template<standard_output_stream T,typename strT = std::basic_string_view<typename T::char_type>>
+template<character_output_stream T,typename strT = std::basic_string_view<typename T::char_type>>
 class oone_time_pad
 {
 public:
@@ -18,36 +16,36 @@ private:
 	void write_remain()
 	{
 		if(iter!=strvw.cend())
-			t.writes(iter,strvw.cend());
+			writes(t,iter,strvw.cend());
 	}
 public:
     template<typename T1, typename ...Args>
 	requires std::constructible_from<key_type, strT>&&std::constructible_from<T, Args...>
-	oone_time_pad(T1&& t1,Args&& ...args):strvw(std::forward<T1>(t1)),t(std::forward<Args>(args)...),iter(strvw.cbegin()){}
-	void put(char_type ch)
+	inline constexpr oone_time_pad(T1&& t1,Args&& ...args):strvw(std::forward<T1>(t1)),t(std::forward<Args>(args)...),iter(strvw.cbegin()){}
+	inline constexpr void mmput(char_type ch)
 	{
 		if(iter==strvw.cend())
 			throw std::runtime_error("key is too short for one time pad");
-		t.put(*iter^ch);
+		put(t,*iter^ch);
 		++iter;
 	}
 	template<std::contiguous_iterator Iter>
-	void writes(Iter b,Iter e)
+	inline constexpr void mmwrites(Iter b,Iter e)
 	{
 		writes_precondition<char_type>(b, e);
         auto pb(static_cast<char_type const*>(static_cast<void const*>(std::addressof(*b))));
 		auto pi(pb), pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));
 		for(;pi!=pe;++pi)
-			put(*pi);
+			mmput(*pi);
 	}
-	void flush()
+	inline constexpr void mmflush()
 	{
 		write_remain();
 		iter=strvw.cend();
-		t.flush();
+		flush(t);
 	}
-	auto& key()  const {return strvw;}
-	auto& key() {return strvw;}
+	inline constexpr auto& key()  const {return strvw;}
+	inline constexpr auto& key() {return strvw;}
 	oone_time_pad(oone_time_pad const&) = delete;
 	oone_time_pad& operator=(oone_time_pad const&) = delete;
 	oone_time_pad(oone_time_pad&& o) noexcept:strvw(std::move(strvw)),t(std::move(o.t)),iter(std::move(o.iter)){}
@@ -76,7 +74,23 @@ public:
 	}
 };
 
-template<standard_input_stream T,typename strv = std::basic_string_view<typename T::char_type>>
+template<character_output_stream T,typename strT>
+inline constexpr void put(oone_time_pad<T,strT>& oon,typename oone_time_pad<T,strT>::char_type ch)
+{
+	oon.mmput(ch);
+}
+template<character_output_stream T,typename strT,std::contiguous_iterator Iter>
+inline constexpr void writes(oone_time_pad<T,strT>& oon,Iter cbegin,Iter cend)
+{
+	oon.mmwrites(cbegin,cend);
+}
+template<character_output_stream T,typename strT>
+inline constexpr void flush(oone_time_pad<T,strT>& oon)
+{
+	oon.mmflush(oon);
+}
+
+template<character_input_stream T,typename strv = std::basic_string_view<typename T::char_type>>
 class ione_time_pad
 {
 	fast_io::basic_istring_view<strv> istr;
@@ -87,27 +101,26 @@ public:
 	template<typename T1,typename ...Args>
 	requires std::constructible_from<key_type, T1>&&std::constructible_from<T, Args...>
 	ione_time_pad(T1&& t1,Args&& ...args):istr(std::forward<T1>(t1)),t(std::forward<Args>(args)...){}
-	char_type get()
+	inline constexpr char_type mmget()
 	{
-		return t.get()^istr.get();
+		return get(t)^get(istr);
 	}
-	std::pair<char_type,bool> try_get()
+	inline constexpr std::pair<char_type,bool> mmtry_get()
 	{
-		auto ch(t.try_get());
+		auto ch(try_get(t));
 		if(ch.second)
 			return {0,true};
-		return {ch.first^istr.get(),false};
+		return {ch.first^get(istr),false};
 	}
 	template<std::contiguous_iterator Iter>
-	Iter reads(Iter b,Iter e)
-		requires standard_input_stream<T>
+	inline constexpr Iter mmreads(Iter b,Iter e)
 	{
 		auto pb(static_cast<char_type*>(static_cast<void*>(std::addressof(*b))));
 		auto pe(pb+(e-b)*sizeof(*b)/sizeof(char_type));
 		auto pi(pb);
 		for(;pi!=pe;++pi)
 		{
-			auto ch(try_get());
+			auto ch(mmtry_get());
 			if(ch.second)
 				break;
 			*pi=ch.first;
@@ -116,5 +129,23 @@ public:
 	}
 	auto& key_istrview() {return istr;}
 };
+
+template<character_input_stream T,typename strT>
+inline constexpr auto try_get(ione_time_pad<T,strT>& oon)
+{
+	return oon.mmtry_get();
+}
+
+template<character_input_stream T,typename strT>
+inline constexpr auto get(ione_time_pad<T,strT>& oon)
+{
+	return oon.mmget();
+}
+
+template<character_input_stream T,typename strT,std::contiguous_iterator Iter>
+inline constexpr auto reads(ione_time_pad<T,strT>& oon,Iter begin,Iter end)
+{
+	return oon.mmreads(begin,end);
+}
 
 }

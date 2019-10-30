@@ -6,7 +6,7 @@
 
 std::string_view process_tag;
 
-fast_io::osync_mutex file_log("log.txt",fast_io::open::interface<fast_io::open::out>);
+fast_io::sync_mutex file_log("log.txt",fast_io::open::interface<fast_io::open::out>);
 
 void log_func(std::size_t thread_number)
 {

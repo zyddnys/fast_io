@@ -74,7 +74,7 @@ inline constexpr T to_bits(F const& f)
 	return */
 }
 
-template<standard_output_stream output,typename mantissaType>
+template<character_output_stream output,typename mantissaType>
 inline constexpr void easy_case(output& out,bool sign, mantissaType const& mantissa)
 {
 	if (mantissa)
@@ -83,7 +83,7 @@ inline constexpr void easy_case(output& out,bool sign, mantissaType const& manti
 		return;
 	}
 	if (sign)
-		out.put('-');
+		put(out,'-');
 	print(out,"Inf");
 }
 
@@ -95,7 +95,7 @@ inline constexpr unrep<mantissaType,exponentType> init_rep(mantissaType const& m
 	return {static_cast<mantissaType>(1)<<floating_traits<floating>::bits|mantissa,exponent-floating_traits<floating>::bias-floating_traits<floating>::bits-2};
 }
 
-template<standard_output_stream output,typename T,typename E,std::floating_point F>
+template<character_output_stream output,typename T,typename E,std::floating_point F>
 inline constexpr void output_fixed(output& out, F d,std::size_t precision)
 {
 	auto const bits(to_bits<T>(d));
@@ -113,10 +113,10 @@ inline constexpr void output_fixed(output& out, F d,std::size_t precision)
 	if (!exponent&& !mantissa)
 	{
 		if(sign)
-			out.put('-');
+			put(out,'-');
 		if(precision)
 		{
-			out.put('.');
+			put(out,'.');
 			fill_nc(out,precision,0);
 		}
 		return;
@@ -126,7 +126,7 @@ inline constexpr void output_fixed(output& out, F d,std::size_t precision)
 	std::size_t index(0);
 	if (sign)
 	{
-		out.put('-');
+		put(out,'-');
 		++index;
 	}
 	bool nonzero(false);

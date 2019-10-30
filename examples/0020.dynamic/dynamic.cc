@@ -5,7 +5,7 @@
 
 int main()
 {
-	std::vector<fast_io::dynamic_standard_output_stream> vec;
+	std::vector<fast_io::dynamic_character_output_stream> vec;
 	vec.emplace_back(std::in_place_type<fast_io::obuf>,"demo_to_file.txt");
 	vec.emplace_back(std::in_place_type<fast_io::c_style_file>,"cstyle.txt","wb");
 // no longer allowed since mutex stream is slow with locking every byte

@@ -11,7 +11,7 @@ template<input_stream input,Trivial_copyable T>
 inline void read(input& in,T& v)
 {
 	auto address(std::addressof(v));
-	if(in.reads(address,address+1)!=(address+1))
+	if(reads(in,address,address+1)!=(address+1))
 		throw std::runtime_error("cannot read data from input_stream&");
 }
 
@@ -19,19 +19,19 @@ template<output_stream output,Trivial_copyable T>
 inline void write(output& out,T const& v)
 {
 	auto address(std::addressof(v));
-	out.writes(address,address+1);
+	writes(out,address,address+1);
 }
 
-template<standard_input_stream input>
+template<character_input_stream input>
 inline std::size_t read_size(input& in)
 {
-	auto constexpr bytes(sizeof(in.get())*8);
+	auto constexpr bytes(sizeof(get(in))*8);
 	auto constexpr lshift(bytes-1);
 	auto constexpr limit(static_cast<std::size_t>(1)<<lshift);
 	auto constexpr limitm1(limit-1);
 	for(std::size_t temp(0),lsf(0);lsf<sizeof(std::size_t)*8;lsf+=lshift)
 	{
-		std::make_unsigned_t<decltype(in.get())> ch(in.get());
+		std::make_unsigned_t<decltype(get(in))> ch(get(in));
 		temp|=(ch&limitm1)<<lsf;
 		if(ch<limit)
 			return temp;
@@ -39,7 +39,7 @@ inline std::size_t read_size(input& in)
 	throw std::runtime_error("size is out of std::size_t range");
 }
 
-template<standard_output_stream output>
+template<character_output_stream output>
 inline void write_size(output& out,std::size_t size)
 {
 	using ch_type = typename output::char_type;
@@ -48,11 +48,11 @@ inline void write_size(output& out,std::size_t size)
 	auto constexpr limit(static_cast<std::size_t>(1)<<lshift);
 	auto constexpr limitm1(limit-1);
 	for(;limitm1<size;size>>=lshift)
-		out.put(static_cast<ch_type>((size&limitm1)|limit));
-	out.put(static_cast<ch_type>(size));
+		put(out,static_cast<ch_type>((size&limitm1)|limit));
+	put(out,static_cast<ch_type>(size));
 }
 
-template<standard_input_stream input,Dynamic_size_container D>
+template<character_input_stream input,Dynamic_size_container D>
 inline void read(input& in,D& v)
 {
 	v.resize(read_size(in));
@@ -60,22 +60,22 @@ inline void read(input& in,D& v)
 		read(in,e);
 }
 
-template<standard_input_stream input,Contiguous_trivial_dynamic_size_container D>
+template<character_input_stream input,Contiguous_trivial_dynamic_size_container D>
 inline void read(input& in,D& v)
 {
 	v.resize(read_size(in));
-	if(in.reads(v.begin(),v.end())!=v.end())
+	if(reads(in,v.begin(),v.end())!=v.end())
 		throw std::runtime_error("read contiguous trivial containers error");
 }
 
-template<standard_output_stream output,Contiguous_trivial_dynamic_size_container D>
+template<character_output_stream output,Contiguous_trivial_dynamic_size_container D>
 inline void write(output& out,D const& v)
 {
 	write_size(out,v.size());
-	out.writes(v.begin(),v.end());
+	writes(out,v.begin(),v.end());
 }
 
-template<standard_output_stream output,Dynamic_size_container D>
+template<character_output_stream output,Dynamic_size_container D>
 inline void write(output& out,D const& v)
 {
 	write_size(out,v.size());
@@ -83,7 +83,7 @@ inline void write(output& out,D const& v)
 		write(out,e);
 }
 
-template<standard_output_stream output,Contiguous_fixed_size_none_trivial_copyable_container D>
+template<character_output_stream output,Contiguous_fixed_size_none_trivial_copyable_container D>
 inline void write(output& out,D const& v)
 {
 	for(auto const& e : v)

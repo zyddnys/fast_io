@@ -52,8 +52,9 @@ try
 	for(std::size_t i(0);i!=N;++i)
 	{
 		auto [p,ec] = std::to_chars(buffer.data(), buffer.data() + buffer.size(),i);
-		obuf.writes(buffer.data(),p);
-		obuf.put('\n');
+		*p='\n';
+		writes(obuf,buffer.data(),++p);
+//		put(obuf,'\n');
 	}
 	}
 	{
@@ -87,9 +88,9 @@ try
 	for(std::size_t i(0);i!=N;++i)
 		println(uv,i);
 	}
-	{
+/*	{
 	cqw::timer t("dynamic obuf");
-	fast_io::dynamic_standard_output_stream dobuf(std::in_place_type<fast_io::obuf>,"dynamic_obuf.txt");
+	fast_io::dynamic_character_output_stream dobuf(std::in_place_type<fast_io::obuf>,"dynamic_obuf.txt");
 	for(std::size_t i(0);i!=N;++i)
 		println(dobuf,i);
 	}
@@ -98,7 +99,7 @@ try
 	fast_io::iobuf_dynamic dobuf(std::in_place_type<fast_io::osystem_file>,"iobuf_dynamic_system_file.txt");
 	for(std::size_t i(0);i!=N;++i)
 		println(dobuf,i);
-	}
+	}*/
 	{
 	cqw::timer t("obuf_mutex");
 	fast_io::obuf_mutex obuf("obuf_mutex.txt");
@@ -106,8 +107,8 @@ try
 		println(obuf,i);
 	}
 	{
-	cqw::timer t("ofsync");
-	fast_io::ofsync obuf("ofsync.txt",fast_io::open::interface<fast_io::open::out|fast_io::open::trunc>);
+	cqw::timer t("fsync");
+	fast_io::fsync obuf("fsync.txt",fast_io::open::interface<fast_io::open::out|fast_io::open::trunc>);
 	for(std::size_t i(0);i!=N;++i)
 		println(obuf,i);
 	}

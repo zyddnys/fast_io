@@ -17,23 +17,23 @@ inline constexpr bool isspace(T ch)
 
 }
 
-template<standard_input_stream input>
+template<character_input_stream input>
 inline constexpr auto eat_space_get(input& in)
 {
-	decltype(in.get()) ch(in.get());
-	for(;details::isspace(ch);ch=in.get());
+	decltype(get(in)) ch(get(in));
+	for(;details::isspace(ch);ch=get(in));
 	return ch;
 }
 
-template<standard_input_stream input>
+template<character_input_stream input>
 inline constexpr auto try_eat_space_get(input& in)
 {
-	auto ch(in.try_get());
-	for(;details::isspace(ch.first);ch=in.try_get());
+	auto ch(try_get(in));
+	for(;details::isspace(ch.first);ch=try_get(in));
 	return ch;
 }
 
-template<standard_input_stream input,std::integral T>
+template<character_input_stream input,std::integral T>
 requires std::same_as<T,bool>
 inline constexpr void scan(input& in, T& b)
 {
@@ -44,17 +44,17 @@ inline constexpr void scan(input& in, T& b)
 		b=1;
 }
 
-template<standard_output_stream output,std::integral T>
+template<character_output_stream output,std::integral T>
 requires std::same_as<T,bool>
 inline constexpr void print(output& out, T const& b)
 {
-	out.put(b+'0');
+	put(out,b+'0');
 }
 
 template<output_stream output>
 inline void print(output& out,std::basic_string_view<typename output::char_type> str)
 {
-	out.writes(str.data(),str.data()+str.size());
+	writes(out,str.data(),str.data()+str.size());
 }
 
 template<output_stream output>
@@ -70,26 +70,26 @@ inline void print(output& out,std::system_error const &e)
 	print(out,"std::system_error, value:",code.value(),"\tmessage:",code.message());
 }
 
-template<standard_input_stream input>
+template<character_input_stream input>
 inline void scan(input& in,std::basic_string<typename input::char_type> &str)
 {
 	str.clear();
 	str.push_back(eat_space_get(in));
-	for(decltype(in.try_get()) ch;!(ch=in.try_get()).second&&!details::isspace(ch.first);str.push_back(ch.first));
+	for(decltype(try_get(in)) ch;!(ch=try_get(in)).second&&!details::isspace(ch.first);str.push_back(ch.first));
 }
 
-template<standard_input_stream input>
+template<character_input_stream input>
 inline void getline(input& in,std::basic_string<typename input::char_type> &str)
 {
 	str.clear();
-	for(decltype(in.try_get()) ch;!(ch=in.try_get()).second&&ch.first!='\n';str.push_back(ch.first));
+	for(decltype(try_get(in)) ch;!(ch=try_get(in)).second&&ch.first!='\n';str.push_back(ch.first));
 }
 
-template<standard_input_stream input>
+template<character_input_stream input>
 inline void getwhole(input& in,std::basic_string<typename input::char_type> &str)
 {
 	str.clear();
-	for(decltype(in.try_get()) ch;!(ch=in.try_get()).second;str.push_back(ch.first));
+	for(decltype(try_get(in)) ch;!(ch=try_get(in)).second;str.push_back(ch.first));
 }
 
 namespace details
@@ -99,10 +99,10 @@ inline void fprint(os &out,std::basic_string_view<typename os::char_type> format
 {
 	std::size_t percent_pos;
 	for(;(percent_pos=format.find('%'))!=std::string_view::npos&&percent_pos+1!=format.size()&&format[percent_pos+1]=='%';format.remove_prefix(percent_pos+2))
-		out.writes(format.cbegin(),format.cbegin()+percent_pos+1);
+		writes(out,format.cbegin(),format.cbegin()+percent_pos+1);
 	if(percent_pos!=std::string_view::npos)
 		throw std::runtime_error("fprint() format error");
-	out.writes(format.cbegin(),format.cend());
+	writes(out,format.cbegin(),format.cend());
 }
 
 template<output_stream os,typename T,typename ...Args>
@@ -110,15 +110,15 @@ inline void fprint(os &out,std::basic_string_view<typename os::char_type> format
 {
 	std::size_t percent_pos;
 	for(;(percent_pos=format.find('%'))!=std::string_view::npos&&percent_pos+1!=format.size()&&format[percent_pos+1]=='%';format.remove_prefix(percent_pos+2))
-		out.writes(format.cbegin(),format.cbegin()+percent_pos+1);
+		writes(out,format.cbegin(),format.cbegin()+percent_pos+1);
 	if(percent_pos==std::string_view::npos)
 	{
-		out.writes(format.cbegin(),format.cend());
+		writes(out,format.cbegin(),format.cend());
 		return;
 	}
 	else
 	{
-		out.writes(format.cbegin(),format.cbegin()+percent_pos);
+		writes(out,format.cbegin(),format.cbegin()+percent_pos);
 		format.remove_prefix(percent_pos+1);
 	}
 	print(out,std::forward<T>(cr));
@@ -158,35 +158,35 @@ template<output_stream output,typename ...Args>
 inline constexpr void println(output &out,Args&& ...args)
 {
 	print(out,std::forward<Args>(args)...);
-	out.put('\n');
+	put(out,'\n');
 }
 
 template<output_stream output,typename ...Args>
 inline constexpr void print_flush(output &out,Args&& ...args)
 {
 	print(out,std::forward<Args>(args)...);
-	out.flush();
+	flush(out);
 }
 
 template<output_stream output,typename ...Args>
 inline constexpr void println_flush(output &out,Args&& ...args)
 {
 	println(out,std::forward<Args>(args)...);
-	out.flush();
+	flush(out);
 }
 
 template<output_stream output,typename ...Args>
 inline constexpr void fprint_flush(output &out,Args&& ...args)
 {
 	fprint(out,std::forward<Args>(args)...);
-	out.flush();
+	flush(out);
 }
 
 template<output_stream output,typename ...Args>
 inline constexpr void write_flush(output& out,Args&& ...args)
 {
 	writes(out,std::forward<Args>(args)...);
-	out.flush();
+	flush(out);
 }
 
 }

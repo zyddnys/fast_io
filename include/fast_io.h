@@ -16,9 +16,11 @@
 #include<cstdint>
 #include"fast_io_impl/concept.h"
 #include"fast_io_impl/eof.h"
+#include"fast_io_impl/io_ref.h"
 #include"fast_io_impl/seek.h"
 #include"fast_io_impl/precondition.h"
 #include"fast_io_impl/mode.h"
+#include"fast_io_impl/shared_base_table.h"
 #include"fast_io_impl/base.h"
 #include"fast_io_impl/fill_nc.h"
 #include"fast_io_impl/transmit.h"
@@ -34,8 +36,7 @@
 #include"fast_io_impl/wrapper.h"
 #include"fast_io_impl/tie.h"
 #include"fast_io_impl/flush.h"
-#include"fast_io_impl/erasure.h"
-#include"fast_io_impl/dynamic.h"
+//#include"fast_io_impl/dynamic.h"
 #include"fast_io_impl/sync.h"
 #include"fast_io_impl/streambuf_view.h"
 #include"fast_io_impl/stream_view.h"
@@ -45,23 +46,16 @@ namespace fast_io
 
 using pipe = immediately_flush<nobuf_reader<io_wrapper<system_pipe>>>;
 
-using system_ohandle = ierasure<system_io_handle>;
-using system_ihandle = oerasure<system_io_handle>;
-
 using isystem_file = input_file_wrapper<system_file>;
 using osystem_file = output_file_wrapper<system_file>;
 using iosystem_file = io_file_wrapper<system_file>;
 
 
 using sync = basic_sync<basic_file_wrapper<system_file,fast_io::open::app|fast_io::open::binary>>;
-using osync = ierasure<sync>;
 using fsync = basic_fsync<basic_file_wrapper<system_file,fast_io::open::app|fast_io::open::binary>>;
-using ofsync = ierasure<fsync>;
 
 using sync_mutex = basic_iomutex<sync>;
-using osync_mutex = basic_iomutex<osync>;
 using fsync_mutex = basic_iomutex<fsync>;
-using ofsync_mutex = basic_iomutex<ofsync>;
 
 using ibuf = basic_ibuf<isystem_file>;
 using obuf = basic_obuf<osystem_file>;
@@ -75,11 +69,12 @@ using obuf_mutex = basic_iomutex<obuf>;
 using iobuf_mutex = basic_iomutex<iobuf>;
 using istring_view_mutex = basic_iomutex<istring_view>;
 using ostring_mutex = basic_iomutex<ostring>;
-using ibuf_dynamic = basic_ibuf<dynamic_input_stream>;
-using obuf_dynamic = basic_obuf<dynamic_output_stream>;
-using iobuf_dynamic = basic_iobuf<dynamic_io_stream>;
+//using ibuf_dynamic = basic_ibuf<dynamic_input_stream>;
+//using obuf_dynamic = basic_obuf<dynamic_output_stream>;
+//using iobuf_dynamic = basic_iobuf<dynamic_io_stream>;
 }
 
+#ifndef FAST_IO_NO_IO_DEFAULT_DEVICES
 #ifdef FAST_IO_IOSTREAM_AS_IO_HANDLE
 #include"fast_io_impl/handlers/iostreams.h"
 #elif FAST_IO_CSTDIO_AS_IO_HANDLE
@@ -87,21 +82,20 @@ using iobuf_dynamic = basic_iobuf<dynamic_io_stream>;
 
 namespace fast_io
 {
-using c_style_ohandle = ierasure<c_style_io_handle>;
-using c_style_ihandle = oerasure<c_style_io_handle>;
-inline c_style_ohandle out(stdout);
-inline tie<c_style_ihandle,decltype(out)> in(out,stdin);
+inline c_style_io_handle out(stdout);
+inline tie<c_style_io_handle,decltype(out)> in(out,stdin);
 inline tie<immediately_flush<decltype(out)>,decltype(out)> err(out,stderr);
-inline fast_io::basic_obuf<c_style_ohandle> log(stderr);
+inline fast_io::basic_obuf<c_style_io_handle> log(stderr);
 }
 #else
 namespace fast_io
 {
-inline basic_obuf<system_ohandle> out(native_stdout_number);
+inline basic_obuf<system_io_handle> out(native_stdout_number);
 inline tie<basic_ibuf<system_io_handle>,decltype(out)> in(out,native_stdin_number);
-inline tie<immediately_flush<system_ohandle>,decltype(out)> err(out,native_stderr_number);
-inline basic_obuf<system_ohandle> log(native_stderr_number);
+inline tie<immediately_flush<system_io_handle>,decltype(out)> err(out,native_stderr_number);
+inline basic_obuf<system_io_handle> log(native_stderr_number);
 }
+#endif
 #endif
 
 #include"fast_io_impl/network/network.h"

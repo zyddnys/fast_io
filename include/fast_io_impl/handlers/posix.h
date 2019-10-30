@@ -93,48 +93,12 @@ protected:
 public:
 	using char_type = char;
 	using native_handle_type = int;
-	native_handle_type native_handle() const
+	native_handle_type native_handle()
 	{
 		return fd;
 	}
 	posix_io_handle() = default;
 	posix_io_handle(int fdd):fd(fdd){}
-	template<std::contiguous_iterator Iter>
-	Iter reads(Iter begin,Iter end)
-	{
-		auto read_bytes(::read(fd,std::to_address(begin),(end-begin)*sizeof(*begin)));
-		if(read_bytes==-1)
-			throw std::system_error(errno,std::generic_category());
-		return begin+(read_bytes/sizeof(*begin));
-	}
-	template<std::contiguous_iterator Iter>
-	Iter writes(Iter begin,Iter end)
-	{
-		auto write_bytes(::write(fd,std::to_address(begin),(end-begin)*sizeof(*begin)));
-		if(write_bytes==-1)
-			throw std::system_error(errno,std::generic_category());
-		return begin+(write_bytes/sizeof(*begin));
-	}
-	template<typename T,std::integral R>
-	std::common_type_t<off64_t, std::size_t> seek(seek_type_t<T>,R i=0,seekdir s=seekdir::cur)
-	{
-		auto ret(::lseek64(fd,seek_precondition<off64_t,T,char_type>(i),static_cast<int>(s)));
-		if(ret==-1)
-			throw std::system_error(errno,std::generic_category());
-		return ret;
-	}
-	template<std::integral R>
-	auto seek(R i=0,seekdir s=seekdir::cur)
-	{
-		return seek(seek_type<char_type>,i,s);
-	}
-	void flush()
-	{
-		// no need fsync. OS can deal with it
-//		if(::fsync(fd)==-1)
-//			throw std::system_error(errno,std::generic_category());
-	}
-
 	posix_io_handle(posix_io_handle const& dp):fd(dup(dp.fd))
 	{
 		if(fd<0)
@@ -167,17 +131,55 @@ public:
 		using std::swap;
 		swap(fd,o.fd);
 	}
-#ifdef __linux__
-	auto zero_copy_in_handle()
-	{
-		return fd;
-	}
-	auto zero_copy_out_handle()
-	{
-		return fd;
-	}
-#endif
 };
+
+template<std::contiguous_iterator Iter>
+inline Iter reads(posix_io_handle& h,Iter begin,Iter end)
+{
+	auto read_bytes(::read(h.native_handle(),std::to_address(begin),(end-begin)*sizeof(*begin)));
+	if(read_bytes==-1)
+		throw std::system_error(errno,std::generic_category());
+	return begin+(read_bytes/sizeof(*begin));
+}
+template<std::contiguous_iterator Iter>
+inline Iter writes(posix_io_handle& h,Iter begin,Iter end)
+{
+	auto write_bytes(::write(h.native_handle(),std::to_address(begin),(end-begin)*sizeof(*begin)));
+	if(write_bytes==-1)
+		throw std::system_error(errno,std::generic_category());
+	return begin+(write_bytes/sizeof(*begin));
+}
+
+template<typename T,std::integral R>
+inline std::common_type_t<off64_t, std::size_t> seek(posix_io_handle& h,seek_type_t<T>,R i=0,seekdir s=seekdir::cur)
+{
+	auto ret(::lseek64(h.native_handle(),seek_precondition<off64_t,T,posix_io_handle::char_type>(i),static_cast<int>(s)));
+	if(ret==-1)
+		throw std::system_error(errno,std::generic_category());
+	return ret;
+}
+template<std::integral R>
+inline auto seek(posix_io_handle& h,R i=0,seekdir s=seekdir::cur)
+{
+	return seek(h,seek_type<posix_io_handle::char_type>,i,s);
+}
+inline void flush(posix_io_handle&)
+{
+	// no need fsync. OS can deal with it
+//		if(::fsync(fd)==-1)
+//			throw std::system_error(errno,std::generic_category());
+}
+
+#ifdef __linux__
+inline auto zero_copy_in_handle(posix_io_handle& h)
+{
+	return h.native_handle();
+}
+inline auto zero_copy_out_handle(posix_io_handle& h)
+{
+	return h.native_handle();
+}
+#endif
 
 inline void swap(posix_io_handle& a,posix_io_handle& b) noexcept
 {
@@ -199,13 +201,13 @@ public:
 	posix_file(std::string_view file,open::interface_t<om>):posix_file(native_interface,file.data(),details::posix_file_openmode<om>::mode,420)
 	{
 		if constexpr (with_ate(open::mode(om)))
-			seek(0,seekdir::end);
+			seek(*this,0,seekdir::end);
 	}
 	//potential support modification prv in the future
 	posix_file(std::string_view file,open::mode const& m):posix_file(native_interface,file.data(),details::calculate_posix_open_mode(m),420)
 	{
 		if(with_ate(m))
-			seek(0,seekdir::end);
+			seek(*this,0,seekdir::end);
 	}
 	posix_file(std::string_view file,std::string_view mode):posix_file(file,fast_io::open::c_style(mode)){}
 	~posix_file()
@@ -272,26 +274,6 @@ public:
 	{
 		return pipes.back();
 	}
-#ifdef __linux__
-	auto zero_copy_in_handle()
-	{
-		return in().native_handle();
-	}
-	auto zero_copy_out_handle()
-	{
-		return out().native_handle();
-	}
-#endif
-	template<std::contiguous_iterator Iter>
-	Iter reads(Iter begin,Iter end)
-	{
-		return pipes.front().reads(begin,end);
-	}
-	template<std::contiguous_iterator Iter>
-	Iter writes(Iter begin,Iter end)
-	{
-		return pipes.back().writes(begin,end);
-	}
 	void swap(posix_pipe& o) noexcept
 	{
 		using std::swap;
@@ -302,6 +284,37 @@ inline void swap(posix_pipe& a,posix_pipe& b) noexcept
 {
 	a.swap(b);
 }
+
+template<std::contiguous_iterator Iter>
+inline Iter reads(posix_pipe& h,Iter begin,Iter end)
+{
+	return reads(h.in(),begin,end);
+}
+template<std::contiguous_iterator Iter>
+inline Iter writes(posix_pipe& h,Iter begin,Iter end)
+{
+	return writes(h.out(),begin,end);
+}
+
+inline void flush(posix_pipe&)
+{
+	// no need fsync. OS can deal with it
+//		if(::fsync(fd)==-1)
+//			throw std::system_error(errno,std::generic_category());
+}
+
+#ifdef __linux__
+inline auto zero_copy_in_handle(posix_pipe& h)
+{
+	return h.in().native_handle();
+}
+inline auto zero_copy_out_handle(posix_pipe& h)
+{
+	return h.out().native_handle();
+}
+#endif
+
+
 
 #ifndef __WINNT__
 using system_file = posix_file;
@@ -320,7 +333,7 @@ namespace details
 template<zero_copy_output_stream output,zero_copy_input_stream input>
 inline std::size_t zero_copy_transmit_once(output& outp,input& inp,std::size_t bytes)
 {
-	auto transmitted_bytes(::sendfile(outp.zero_copy_out_handle(),inp.zero_copy_in_handle(),nullptr,bytes));
+	auto transmitted_bytes(::sendfile(zero_copy_out_handle(outp),zero_copy_in_handle(inp),nullptr,bytes));
 	if(transmitted_bytes==-1)
 		throw std::system_error(errno,std::generic_category());
 	return transmitted_bytes;

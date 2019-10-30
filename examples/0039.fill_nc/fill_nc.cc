@@ -13,6 +13,6 @@ int main()
 		cqw::timer tmr("loop_put");
 		fast_io::obuf ob("loop_put.txt");
 		for(std::size_t i(0);i!=s;++i)
-			ob.put('0');
+			put(ob,'0');
 	}
 }

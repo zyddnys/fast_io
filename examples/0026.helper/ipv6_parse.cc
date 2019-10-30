@@ -10,27 +10,27 @@ inline auto ipv6_address(std::string_view str)
 		if(e==':')
 		{
 			if(it==str.cbegin())
-				ostr.put('0');
+				put(ostr,'0');
 			++prefix_zero;
-			ostr.put(' ');
+			put(ostr,' ');
 			if(it+1==str.cend())
-				ostr.put('0');
+				put(ostr,'0');
 			else if(it[1]==':')
 			{
-				ostr.put('0');
+				put(ostr,'0');
 				auto j(it+1);
 				for(;j!=str.cend();++j)
 					if(*j==':')
 						++prefix_zero;
 				for(;prefix_zero<7;++prefix_zero)
 				{
-					ostr.put(' ');
-					ostr.put('0');
+					put(ostr,' ');
+					put(ostr,'0');
 				}
 			}
 		}
 		else if(e-'0'<10||e-'a'<6||e-'A'<6)
-			ostr.put(e);
+			put(ostr,e);
 		else
 			break;
 	}

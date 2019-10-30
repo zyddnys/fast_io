@@ -4,14 +4,14 @@ int main()
 {
 	using namespace fast_io;
 	ibuf ib("asfaf.txt");
-	ib.seek(4);
+	seek(ib,4);
 	char ch;
 	scan(ib,char_view(ch));
-	out.put(ch);
-	out.put('\n');
-	ib.seek(seek_type<std::uint32_t>,-1,seekdir::end);
+	put(out,ch);
+	put(out,'\n');
+	seek(ib,seek_type<std::uint32_t>,-1,seekdir::end);
 	scan(ib,char_view(ch));
-	out.put(ch);
-	out.put('\n');
-	ib.seek(std::size_t(-1));
+	put(out,ch);
+	put(out,'\n');
+	seek(ib.std::size_t(-1));
 }

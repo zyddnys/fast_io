@@ -20,11 +20,11 @@ int main()
 		{
 			auto ch(ud(eng));
 			if(ch<10)
-				ob.put(ch+'0');
+				put(ob,ch+'0');
 			else if(ch<36)
-				ob.put(ch-10+'a');
+				put(ob,ch-10+'a');
 			else
-				ob.put(ch-36+'A');
+				put(ob,ch-36+'A');
 		}
 		println(ob);
 	}
