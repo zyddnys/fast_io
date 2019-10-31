@@ -10,14 +10,6 @@ namespace std
 template<typename T>
 concept floating_point = std::is_floating_point_v<T>;
 }
-#else
-namespace std _GLIBCXX_VISIBILITY(default)
-{
-_GLIBCXX_BEGIN_NAMESPACE_VERSION
-template<typename T>
-concept contiguous_iterator = requires(T const &t) { {to_address(t)};};
-_GLIBCXX_END_NAMESPACE_VERSION
-}
 #endif
 
 
