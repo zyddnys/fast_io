@@ -150,11 +150,16 @@ Updated benchmark with trunk gcc
 
 I did some optimizations to my fast_io library. Now there is NO reason to use charconv any more. It is insecure and the APIs are terrible. I hope isocpp would deprecate charconv in the future.
 
+```
 
 cqwrteur@DESKTOP-7H7UHQ9:~/fast_io/examples/build$ g++ --version
+
 g++ (cqwrteur) 10.0.0 20191031 (experimental)
+
 Copyright (C) 2019 Free Software Foundation, Inc.
+
 This is free software; see the source for copying conditions.  There is NO 
+
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 cqwrteur@DESKTOP-7H7UHQ9:~/fast_io/examples/build$ ./output_10M_size_t
@@ -184,3 +189,4 @@ obuf_mutex:     0.08375820s
 fsync:  0.17738210s
 
 speck128/128:   0.26626790s
+```
