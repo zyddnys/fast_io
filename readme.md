@@ -31,8 +31,7 @@ Since C++ 20 has not been released. No standard supporting libraries for concept
   20. Pipe line support
   21. Zero copy IO
   22. Cryptography (Under construction) to replace openssl
-  23. Say NO to  charconv
- 
+
 ## Future Plan After C++ 20
   1. Module support
   2. Coroutine support for async IO
@@ -144,3 +143,44 @@ ibuf_dynamic isystem_file:	0.07600900s
 
 visual studio preview 2019
 https://visualstudio.microsoft.com/vs/preview/
+
+
+
+Updated benchmark with trunk gcc
+
+I did some optimizations to my fast_io library. Now there is NO reason to use charconv any more. It is insecure and the APIs are terrible. I hope isocpp would deprecate charconv in the future.
+
+
+cqwrteur@DESKTOP-7H7UHQ9:~/fast_io/examples/build$ g++ --version
+g++ (cqwrteur) 10.0.0 20191031 (experimental)
+Copyright (C) 2019 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO 
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+cqwrteur@DESKTOP-7H7UHQ9:~/fast_io/examples/build$ ./output_10M_size_t
+
+std::FILE*:     0.56558740s
+
+std::ofstream:  0.57254780s
+
+std::ofstream with tricks:      0.37952570s
+
+std::to_chars + ofstream rdbuf tricks:  0.16530360s
+
+std::to_chars + obuf:   0.12705310s
+
+obuf:   0.07508470s
+
+obuf text:      0.13640670s
+
+steam_view for ofstream:        0.35196200s
+
+steambuf_view for ofstream:     0.15705550s
+
+obuf ucs_view:  0.15152370s
+
+obuf_mutex:     0.08375820s
+
+fsync:  0.17738210s
+
+speck128/128:   0.26626790s
