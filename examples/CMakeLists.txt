@@ -13,7 +13,7 @@ endif()
 
 add_definitions(-fconcepts -ffast-math -Wall -Wextra)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-add_definitions(-Xclang -fconcepts-ts -ffast-math -stdlib=libc++ -lc++abi)
+add_definitions(-Xclang -fconcepts-ts -ffast-math)
 endif()
 
 set(CMAKE_CXX_STANDARD 20)
