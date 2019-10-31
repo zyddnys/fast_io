@@ -125,11 +125,11 @@ public:
 };
 
 template<input_stream Ihandler,typename Buf>
-[[nodiscard]] inline constexpr auto ireserve(basic_ibuf<Ihandler,Buf>& ib,std::size_t size)
+[[nodiscard]] inline constexpr auto ireserve(basic_ibuf<Ihandler,Buf>& ib,std::size_t size)->decltype(ib.ibuffer.curr)
 {
-	if(ib.end<=ib.curr+size)
+	if(ib.ibuffer.end<=ib.ibuffer.curr+size)
 		return nullptr;
-	return ib.curr+=size;
+	return ib.ibuffer.curr+=size;
 }
 
 template<input_stream Ihandler,typename Buf,std::contiguous_iterator Iter>
@@ -306,11 +306,11 @@ inline constexpr auto seek(basic_obuf<Ohandler,Buf>& ob,Args&& ...args)
 }
 
 template<output_stream Ohandler,typename Buf>
-[[nodiscard]] inline constexpr auto oreserve(basic_obuf<Ohandler,Buf>& ob,std::size_t size)
+[[nodiscard]] inline constexpr auto oreserve(basic_obuf<Ohandler,Buf>& ob,std::size_t size) -> decltype(ob.obuffer.curr)
 {
-	if(ob.end<=ob.curr+size)
+	if(ob.obuffer.end<=ob.obuffer.curr+size)
 		return nullptr;
-	return ob.curr+=size;
+	return ob.obuffer.curr+=size;
 }
 namespace details
 {

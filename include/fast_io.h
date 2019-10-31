@@ -61,6 +61,8 @@ using ibuf = basic_ibuf<isystem_file>;
 using obuf = basic_obuf<osystem_file>;
 using iobuf = basic_iobuf<iosystem_file>;
 
+static_assert(buffer_output_stream<obuf>,"obuf is not a buffer output stream");
+
 using istring_view = basic_istring_view<std::string_view>;
 using ostring = basic_ostring<std::string>;
 

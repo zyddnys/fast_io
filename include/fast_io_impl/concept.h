@@ -54,15 +54,15 @@ concept random_access_stream_impl = requires(T& t)
 };
 
 template<typename T>
-concept buffer_input_stream_impl = requires(T& in)
+concept buffer_input_stream_impl = requires(T& in,std::size_t n)
 {
-	ireserve(in);
+	ireserve(in,n);
 };
 
 template<typename T>
-concept buffer_output_stream_impl = requires(T& out)
+concept buffer_output_stream_impl = requires(T& out,std::size_t n)
 {
-	oreserve(out);
+	oreserve(out,n);
 };
 
 template<typename T>
