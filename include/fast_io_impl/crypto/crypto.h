@@ -11,15 +11,15 @@ namespace fast_io::crypto
 {
 
 template<input_stream in>
-inline ictr_speck=basic_ictr<in,speck::speck_enc_128_256>;
+using ictr_speck=basic_ictr<in,speck::speck_enc_128_256>;
 
 template<output_stream out>
-inline octr_speck=basic_octr<out,speck::speck_enc_128_256>;
+using octr_speck=basic_octr<out,speck::speck_enc_128_256>;
 
 template<input_stream in>
-inline icbc_speck=basic_ictr<in,speck::speck_dec_128_256>;
+using icbc_speck=basic_ictr<in,speck::speck_dec_128_256>;
 
 template<output_stream out>
-inline ocbc_speck=basic_octr<out,speck::speck_enc_128_256>;
+using ocbc_speck=basic_octr<out,speck::speck_enc_128_256>;
 
 }
