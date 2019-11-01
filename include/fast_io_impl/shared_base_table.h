@@ -41,7 +41,7 @@ inline constexpr auto cal_content()
 	}
 	for(auto &e : vals)
 		for(auto &e1 : e)
-			if constexpr(base<10)
+			if constexpr(10<base)
 			{
 				if(e1<10)
 					e1+='0';
