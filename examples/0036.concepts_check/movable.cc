@@ -1,5 +1,10 @@
 #include"../../include/fast_io.h"
 
+void transfer_ownership(fast_io::stream auto strm)
+{
+
+}
+
 int main()
 {
 	static_assert(std::movable<fast_io::system_io_handle>,"system_io_handle not movable");
@@ -9,6 +14,6 @@ int main()
 	static_assert(std::movable<fast_io::isystem_file>,"isystem_file not movable");
 	static_assert(std::movable<fast_io::ibuf>,"ibuf not movable");
 	static_assert(std::movable<fast_io::ibuf_mutex>,"ibuf_mutex not movable");
-//	fast_io::obuf ob("abcd");
-//	fast_io::obuf ob2(std::move(ob));
+	fast_io::obuf ob("abcd");
+	transfer_ownership(std::move(ob));
 }
