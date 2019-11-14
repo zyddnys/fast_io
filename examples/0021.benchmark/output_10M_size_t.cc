@@ -1,6 +1,8 @@
 #include"timer.h"
 #include<fstream>
 #include"../../include/fast_io.h"
+#include"../../include/fast_io_device.h"
+#include"../../include/fast_io_crypto.h"
 #include<exception>
 #include<cmath>
 #include<memory>
@@ -70,31 +72,18 @@ try
 		println(view,i);
 	}
 	{
-	cqw::timer t("steam_view for ofstream");
-	fast_io::stream_view<std::ofstream> view("stream_view_ofstream.txt",std::ofstream::binary);
-	for(std::size_t i(0);i!=N;++i)
-		println(view,i);
-	}
-	{
-	cqw::timer t("steambuf_view for ofstream");
-	std::ofstream fout("streambuf_view_ofstream.txt",std::ofstream::binary);
-	fast_io::streambuf_view view(fout.rdbuf());
-	for(std::size_t i(0);i!=N;++i)
-		println(view,i);
-	}
-	{
 	cqw::timer t("obuf ucs_view");
 	fast_io::ucs<fast_io::obuf,char32_t> uv("obuf_ucsview.txt");
 	for(std::size_t i(0);i!=N;++i)
 		println(uv,i);
 	}
-/*	{
+	{
 	cqw::timer t("dynamic obuf");
-	fast_io::dynamic_character_output_stream dobuf(std::in_place_type<fast_io::obuf>,"dynamic_obuf.txt");
+	fast_io::dynamic_output_stream dobuf(std::in_place_type<fast_io::obuf>,"dynamic_obuf.txt");
 	for(std::size_t i(0);i!=N;++i)
 		println(dobuf,i);
 	}
-	{
+/*	{
 	cqw::timer t("iobuf_dynamic system_file");
 	fast_io::iobuf_dynamic dobuf(std::in_place_type<fast_io::osystem_file>,"iobuf_dynamic_system_file.txt");
 	for(std::size_t i(0);i!=N;++i)

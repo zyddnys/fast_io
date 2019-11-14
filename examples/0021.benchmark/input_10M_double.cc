@@ -3,6 +3,8 @@
 #include"timer.h"
 #include<fstream>
 #include"../../include/fast_io.h"
+#include"../../include/fast_io_device.h"
+#include"../../include/fast_io_crypto.h"
 #include<exception>
 #include<memory>
 #include<cstdio>
@@ -25,7 +27,7 @@ try
 	for(std::size_t i(0);i!=N;++i)
 		fin>>v[i];
 	}
-	{
+/*	{
 	cqw::timer t("stream_view for std::ifstream");
 	fast_io::stream_view<std::ifstream> view("cfilestardb.txt",std::ifstream::binary);
 	for(std::size_t i(0);i!=N;++i)
@@ -37,7 +39,7 @@ try
 	fast_io::streambuf_view view(fin.rdbuf());
 	for(std::size_t i(0);i!=N;++i)
 		scan(view,v[i]);
-	}
+	}*/
 	{
 	cqw::timer t("ibuf");
 	fast_io::ibuf ibuf("cfilestardb.txt");

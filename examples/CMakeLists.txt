@@ -39,8 +39,8 @@ add_executable(getwhole "./0002.input string/getwhole.cc")
 add_executable(hexa+b "./0018.base/hexa+b.cc")
 add_executable(base "./0018.base/base.cc")
 
-add_executable(binary_serialization "./0008.binary_serialization/binary_serialization.cc")
-add_executable(custom_binary_serialization_type "./0008.binary_serialization/custom_binary_serialization_type.cc")
+#add_executable(binary_serialization "./0008.binary_serialization/binary_serialization.cc")
+#add_executable(custom_binary_serialization_type "./0008.binary_serialization/custom_binary_serialization_type.cc")
 
 add_executable(random_password "./0014.random_password/random_password.cc")
 add_executable(unsigned_view "./0017.unsigned_view/unsigned_view.cc")
@@ -71,7 +71,7 @@ add_executable(osync "./0025.multiprocesses/osync.cc")
 add_executable(run_mt_sync "./0025.multiprocesses/run_mt_sync.cc")
 target_link_libraries(run_mt_sync ${CMAKE_THREAD_LIBS_INIT} )
 add_executable(addressof "./0027.pointer/addressof.cc")
-add_executable(pipe "./0028.pipe/pipe.cc")
+#add_executable(pipe "./0028.pipe/pipe.cc")
 
 add_executable(emoji "./0012.ucs/emoji.cc")
 add_executable(ucs "./0012.ucs/ucs.cc")
@@ -83,29 +83,17 @@ add_executable(output_10M_size_t "./0021.benchmark/output_10M_size_t.cc")
 add_executable(output_10M_double "./0021.benchmark/output_10M_double.cc")
 add_executable(input_10M_double "./0021.benchmark/input_10M_double.cc")
 add_executable(input_10M_size_t_as_string "./0021.benchmark/input_10M_size_t_as_string.cc")
-add_executable(charconv "./0021.benchmark/charconv.cc")
+add_executable(dynamic "./0020.dynamic/dynamic.cc")
 
 add_executable(client "./0033.socket/client.cc")
 add_executable(server "./0033.socket/server.cc")
 
 add_executable(text_view "./0030.text_view/text_view.cc")
 add_executable(read_text_view "./0030.text_view/read_text_view.cc")
-
-add_executable(ifstream "./0031.iostream/ifstream.cc")
-add_executable(ofstream "./0031.iostream/ofstream.cc")
-add_executable(sstream "./0031.iostream/sstream.cc")
-add_executable(streambuf_view "./0031.iostream/streambuf_view.cc")
-
 add_executable(scan_int_until_eof "./0032.eof/scan_int_until_eof.cc")
 
 
 
-add_executable(double_default "./0009.floating point/double_default.cc")
-add_executable(double_scientific "./0009.floating point/double_scientific.cc")
-add_executable(double_fixed "./0009.floating point/double_fixed.cc")
-add_executable(double_fixed_setw "./0009.floating point/double_fixed_setw.cc")
-add_executable(integer_scientific "./0009.floating point/integer_scientific.cc")
-add_executable(floating_view "./0009.floating point/floating_view.cc")
 add_executable(one_time_pad "./0034.crypto/one_time_pad.cc")
 add_executable(my_copy "./0035.transmit/my_copy.cc")
 

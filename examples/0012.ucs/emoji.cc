@@ -1,4 +1,5 @@
 #include"../../include/fast_io.h"
+#include"../../include/fast_io_device.h"
 
 int main()
 {
@@ -22,7 +23,7 @@ int main()
 		put(view,e);
 		fprint(ob," % (0x%)\n",unsigned_view(e),hexupper(unsigned_view(e)));
 	}
-	println(ob);
+	put(ob,'\n');
 	auto const convert_back(ucs_to_utf8(u32emoji));
 	println(ob,"convert back emoji string:\n",emoji);
 	for(auto const& e : convert_back)

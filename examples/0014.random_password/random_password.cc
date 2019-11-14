@@ -1,4 +1,5 @@
 #include"../../include/fast_io.h"
+#include"../../include/fast_io_device.h"
 #include<vector>
 #include<cctype>
 #include<random>
@@ -26,6 +27,6 @@ int main()
 			else
 				put(ob,ch-36+'A');
 		}
-		println(ob);
+		put(ob,'\n');
 	}
 }

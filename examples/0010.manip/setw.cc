@@ -2,7 +2,7 @@
 
 int main()
 {
-	fprint(fast_io::out,"%\n%\n",fast_io::setw(5,"abc"),fast_io::setw(4,"def",'0'));
+	fprint(fast_io::out,"%\n%\n",fast_io::width<5>("abc"),fast_io::width<4,false,'0'>("def"));
 }
 
 /*Output:

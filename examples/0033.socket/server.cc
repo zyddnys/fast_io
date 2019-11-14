@@ -1,4 +1,6 @@
 #include"../../include/fast_io.h"
+#include"../../include/fast_io_network.h"
+
 
 int main()
 try

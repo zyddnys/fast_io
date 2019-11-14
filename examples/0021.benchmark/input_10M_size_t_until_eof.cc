@@ -3,6 +3,7 @@
 #include"timer.h"
 #include<fstream>
 #include"../../include/fast_io.h"
+#include"../../include/fast_io_device.h"
 #include<exception>
 
 int main()
@@ -15,7 +16,7 @@ try
 	for(std::size_t v;fin>>v;++count);
 	println(fast_io::out,"ifstream: ",count);
 	}
-	{
+/*	{
 	cqw::timer t("streambuf_view for std::ifstream");
 	std::ifstream fin("cfilestar.txt",std::ifstream::binary);
 	fast_io::streambuf_view view(fin.rdbuf());
@@ -27,7 +28,7 @@ try
 	}
 	catch(fast_io::eof const &){}
 	println(fast_io::out,"streambuf_view for ifstream: ",count);
-	}
+	}*/
 	{
 	cqw::timer t("ibuf");
 	fast_io::ibuf ibuf("cfilestar.txt");

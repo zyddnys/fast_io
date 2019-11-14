@@ -1,4 +1,4 @@
-#include"../../include/fast_io.h"
+#include"../../include/fast_io_device.h"
 #include<thread>
 
 fast_io::obuf_mutex file_log("log.txt");

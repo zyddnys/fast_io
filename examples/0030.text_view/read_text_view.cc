@@ -1,4 +1,5 @@
 #include"../../include/fast_io.h"
+#include"../../include/fast_io_device.h"
 
 int main()
 try
@@ -13,6 +14,6 @@ try
 }
 catch(std::exception const & e)
 {
-	println(fast_io::out,e);
+	println(fast_io::err,e);
 	return 1;
 }

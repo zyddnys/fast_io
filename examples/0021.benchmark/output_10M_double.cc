@@ -1,12 +1,15 @@
 #include"timer.h"
 #include<fstream>
 #include"../../include/fast_io.h"
+#include"../../include/fast_io_device.h"
+#include"../../include/fast_io_crypto.h"
 #include<exception>
 #include<cmath>
 #include<memory>
 #include<cstdio>
 #include<random>
 #include<iomanip>
+#include<charconv>
 
 int main()
 try
@@ -36,13 +39,26 @@ try
 	cqw::timer t("obuf");
 	fast_io::obuf obuf("obufdb.txt");
 	for(std::size_t i(0);i!=N;++i)
-		println(obuf,fast_io::fixed(vec[i],6));
+		println(obuf,fast_io::fixed<6>(vec[i]));
 	}
+#ifdef _MSC_VER
+	{
+		cqw::timer t("charconv");
+		fast_io::obuf obuf("charconv.txt");
+		std::array<char,100> arr;
+		for(std::size_t i(0);i!=N;++i)
+		{
+			auto [p,ec]=std::to_chars(arr.data(),arr.data()+arr.size(),vec[i],std::chars_format::fixed,6);
+			*p='\n';
+			writes(obuf,arr.data(),++p);
+		}
+	}
+#endif
 	{
 	cqw::timer t("obuf_mutex");
 	fast_io::obuf_mutex obuf("obuf_mutexdb.txt");
 	for(std::size_t i(0);i!=N;++i)
-		println(obuf,fast_io::fixed(vec[i],6));
+		println(obuf,fast_io::fixed<6>(vec[i]));
 	}
 	{
 	cqw::timer t("speck128/128");
@@ -50,7 +66,7 @@ try
 		std::array<uint8_t, 16>{'8','3','3','4',';','2','3','4','a','2','c','4',']','0','3','4'},
 		std::array<uint8_t, 8>{'1','2','3','4','1','2','3','4'},"speckdb.txt");
 	for(std::size_t i(0);i!=N;++i)
-		println(enc_stream,fast_io::fixed(vec[i],6));
+		println(enc_stream,fast_io::fixed<6>(vec[i]));
 	}
 }
 catch(std::exception const& e)

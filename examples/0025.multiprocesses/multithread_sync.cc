@@ -1,4 +1,5 @@
 #include"../../include/fast_io.h"
+#include"../../include/fast_io_device.h"
 #include<thread>
 #include<random>
 #include<vector>
@@ -11,14 +12,14 @@ fast_io::sync_mutex file_log("log.txt",fast_io::open::interface<fast_io::open::o
 void log_func(std::size_t thread_number)
 {
 	for(std::size_t i(0);i!=10000;++i)
-		println_flush(file_log,"Process",fast_io::setw(5,process_tag)," Thread",fast_io::setw(5,thread_number)," Loop",fast_io::setw(5,i));
+		println_flush(file_log,"Process",fast_io::width<5>(process_tag)," Thread",fast_io::width<5>(thread_number)," Loop",fast_io::width<5>(i));
 }
 
 int main(int argc,char **argv)
 {
 	if(argc!=2)
 	{
-		println(fast_io::err,"Usage: ",*argv," <process tag>");
+		print(fast_io::err,"Usage: ",*argv," <process tag>\n");
 		return 1;
 	}
 	process_tag=argv[1];

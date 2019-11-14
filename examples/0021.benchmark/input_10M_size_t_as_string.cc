@@ -1,6 +1,7 @@
 #include"timer.h"
 #include<fstream>
 #include"../../include/fast_io.h"
+#include"../../include/fast_io_device.h"
 #include<exception>
 #include<string>
 #include<vector>
