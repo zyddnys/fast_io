@@ -138,7 +138,7 @@ inline constexpr std::size_t chars_len(U value) noexcept
 		}
 		if constexpr(3<sizeof(U))
 		{
-			if constexpr(!ryu_mode)
+			if constexpr(4<sizeof(U)||!ryu_mode)
 			{
 				if(1000000000U<=value)
 					return 10;
@@ -151,16 +151,19 @@ inline constexpr std::size_t chars_len(U value) noexcept
 				return 7;
 			if(100000U<=value)
 				return 6;
+		}
+		if constexpr(1<sizeof(U))
+		{
 			if(10000U<=value)
 				return 5;
 			if(1000U<=value)
 				return 4;
-			if(100U<=value)
-				return 3;
-			if(10U<=value)
-				return 2;
-			return 1;
 		}
+		if(100U<=value)
+			return 3;
+		if(10U<=value)
+			return 2;
+		return 1;
 	}
 	else
 	{

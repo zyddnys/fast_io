@@ -299,12 +299,32 @@ inline void print_define(output& out,manip::scientific<precision,uppercase_e,T c
 }
 
 
-template<buffer_output_stream soutp,std::floating_point T>
-inline void print_define(soutp &output,T const& p)
+template<output_stream output,std::floating_point T>
+inline void print_define(output& out,T a)
 {
-//	I haven't implement shortest & scientific. Use fixed mode first
-//	print(output,shortest<6>(p));
-	print_define(output,fixed<6>(p));
+	std::size_t constexpr reserved_size(30);
+	if constexpr(buffer_output_stream<output>)
+	{
+
+		auto reserved(oreserve(out,reserved_size));
+		if constexpr(std::is_pointer_v<decltype(reserved)>)
+		{
+			if(reserved)
+			{
+				auto start(reserved-reserved_size);
+				orelease(out,reserved-details::ryu::output_shortest<false>(start,static_cast<double>(a)));
+				return;
+			}
+		}
+		else
+		{
+			auto start(reserved-reserved_size);
+			orelease(out,reserved-details::ryu::output_shortest<false>(start,static_cast<double>(a)));
+			return;
+		}
+	}
+	std::array<typename output::char_type,reserved_size> array;
+	writes(out,array.data(),details::ryu::output_shortest<false>(array.data(),static_cast<double>(a)));
 }
 
 template<character_input_stream input,std::floating_point T>

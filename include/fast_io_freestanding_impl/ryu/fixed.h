@@ -18,8 +18,8 @@ struct floating_traits<float>
 	static inline constexpr mantissa_type mantissa_bits = sizeof(float)*8-1-exponent_bits;
 	static inline constexpr exponent_type exponent_max = (static_cast<exponent_type>(1)<<exponent_bits)-1;
 	static inline constexpr exponent_type bias = (static_cast<exponent_type>(1)<<(exponent_bits - 1)) - 1;
-	static inline constexpr exponent_type pow5_inv_bitcount= 59;
-	static inline constexpr exponent_type pow5_bitcount= pow5_inv_bitcount-1;
+//	static inline constexpr exponent_type pow5_inv_bitcount= 61;
+	static inline constexpr exponent_type pow5_bitcount= 61;
 };
 
 template<>	
@@ -31,8 +31,8 @@ struct floating_traits<double>
 	static inline constexpr mantissa_type mantissa_bits = sizeof(double)*8-1-exponent_bits;
 	static inline constexpr exponent_type exponent_max = (static_cast<exponent_type>(1)<<exponent_bits)-1;
 	static inline constexpr exponent_type bias = (static_cast<exponent_type>(1)<<(exponent_bits - 1)) - 1;
-	static inline constexpr exponent_type pow5_inv_bitcount= 122;
-	static inline constexpr exponent_type pow5_bitcount= pow5_inv_bitcount-1;
+//	static inline constexpr exponent_type pow5_inv_bitcount= 125;
+	static inline constexpr exponent_type pow5_bitcount= 125;
 };
 
 template<>	
@@ -44,8 +44,8 @@ struct floating_traits<long double>
 	static inline constexpr std::uint32_t mantissa_bits = sizeof(long double)*8-1-exponent_bits;
 	static inline constexpr exponent_type exponent_max = (static_cast<exponent_type>(1)<<exponent_bits)-1;
 	static inline constexpr exponent_type bias = (static_cast<exponent_type>(1)<<(exponent_bits - 1)) - 1;
-//	static inline constexpr std::size_t pow5_inv_bitcount= ??;
-//	static inline constexpr std::size_t pow5_bitcount= ??;
+//	static inline constexpr std::size_t pow5_inv_bitcount= 249;
+	static inline constexpr std::size_t pow5_bitcount= 249;
 };
 
 template<std::integral mantissaType,std::integral exponentType>
@@ -80,20 +80,46 @@ inline constexpr std::uint32_t pow5_factor(T value)
 	return 0;
 }
 
+template<std::integral U>
+inline constexpr std::int32_t pow5bits(U e)
+{
+	return static_cast<int32_t>(((static_cast<std::uint32_t>(e) * 1217359) >> 19) + 1);
+}
+
+
 // Returns true if value is divisible by 5^p.
 template<typename T>
-inline constexpr bool multiple_of_power_of5(T value,std::uint32_t p)
+inline constexpr bool multiple_of_power_of_5(T value,std::uint32_t p)
 {
 	// The author tried a case distinction on p, but there was no performance difference.
 	return p<=pow5_factor(value);
 }
 
-inline constexpr uint32_t log10_pow2(std::uint64_t e) {
-return static_cast<std::uint32_t> (((static_cast<std::uint64_t>(e)) * 169464822037455ull) >> 49);
+inline constexpr uint32_t log10_pow2(std::uint64_t e)
+{
+	return static_cast<std::uint32_t> (((static_cast<std::uint64_t>(e)) * 169464822037455ull) >> 49);
 }
 template<std::unsigned_integral T>
-inline constexpr std::size_t length_for_index(T idx)
-{return (log10_pow2(idx<<4)+25)/9;}
+inline constexpr std::size_t length_for_index(T idx){return (log10_pow2(idx<<4)+25)/9;}
+
+template<std::integral T>
+inline constexpr uint32_t log10_pow5(T e)
+{
+	// The first value this approximation fails for is 5^2621 which is just greater than 10^1832.
+	return static_cast<uint32_t> (((static_cast<uint64_t>(e)) * 196742565691928ull) >> 48);
+}
+template<std::unsigned_integral T>
+requires std::same_as<T,std::uint64_t>
+inline constexpr T mul_shift(T m, std::array<T,2> const& mul, std::size_t j)
+{
+	return low((mul_extend(m,mul.back())+high(mul_extend(m,mul.front())))>>(j-64));
+}
+
+inline constexpr std::array<std::uint64_t,3> mul_shift_all(std::uint64_t m, std::array<std::uint64_t,2> const& mul,std::size_t j,std::uint32_t mmshift)
+{
+	auto const m4(m<<2);
+	return {mul_shift(m4,mul,j),mul_shift(m4+2,mul,j),mul_shift(m4-1-mmshift,mul,j)};
+}
 
 template<typename T>
 inline constexpr std::uint32_t mul_shift_mod_1e9(std::uint64_t m, std::array<T,3> const& mul, std::size_t j)
@@ -124,6 +150,40 @@ inline constexpr unrep<mantissaType,exponentType> init_rep(mantissaType const& m
 		return {mantissa,1-static_cast<exponentType>(floating_traits<floating>::bias+floating_traits<floating>::exponent_bits)};
 	return {static_cast<mantissaType>((static_cast<mantissaType>(1)<<floating_traits<floating>::mantissa_bits)|mantissa),
 		static_cast<exponentType>(exponent-static_cast<exponentType>(floating_traits<floating>::bias+floating_traits<floating>::mantissa_bits))};
+}
+
+template<bool uppercase_e=false,std::signed_integral T,std::random_access_iterator Iter>
+requires std::same_as<T,std::int32_t>
+inline constexpr Iter output_exp(T exp,Iter result)
+{
+	if constexpr(uppercase_e)
+		*result='E';
+	else
+		*result='e';
+	++result;
+	if(exp<0)
+	{
+		*result='-';
+		++result;
+		exp=-exp;
+	}
+	else
+	{
+		*result='+';
+		++result;
+	}
+	using char_type = std::remove_reference_t<decltype(*result)>;
+	std::make_unsigned_t<T> unsigned_exp(exp);
+	if(99<unsigned_exp)
+	{
+		auto const quo(unsigned_exp/100);
+		unsigned_exp%=100;
+		*result=static_cast<char_type>(quo+'0');
+		++result;
+	}
+	auto exp_tb(shared_static_base_table<10,false>::table[unsigned_exp]);
+	constexpr auto sz(exp_tb.size()-2);
+	return std::copy_n(exp_tb.data()+sz,2,result);
 }
 
 template<std::size_t precision,bool scientific = false,bool uppercase_e=false,std::random_access_iterator Iter,std::floating_point F>
@@ -286,7 +346,7 @@ inline constexpr auto output_fixed(Iter result, F d)
 			if (rexp < 0)
 			{
 				signed_exponent_type required_fives = -rexp;
-				trailing_zeros = trailing_zeros && multiple_of_power_of5(r2.m, static_cast<exponent_type>(required_fives));
+				trailing_zeros = trailing_zeros && multiple_of_power_of_5(r2.m, static_cast<exponent_type>(required_fives));
 			}
 			round_up = trailing_zeros ? 2 : 1;
 		}
@@ -366,34 +426,7 @@ inline constexpr auto output_fixed(Iter result, F d)
 				++exp;
 			}
 		}
-		if constexpr(uppercase_e)
-			*result='E';
-		else
-			*result='e';
-		++result;
-		if(exp<0)
-		{
-			*result='-';
-			++result;
-			exp=-exp;
-		}
-		else
-		{
-			*result='+';
-			++result;
-		}
-		exponent_type unsigned_exp(exp);
-		if(99<unsigned_exp)
-		{
-			auto const quo(unsigned_exp/100);
-			unsigned_exp%=100;
-			*result=static_cast<char_type>(quo+'0');
-			++result;
-		}
-		auto exp_tb(shared_static_base_table<10,false>::table[unsigned_exp]);
-		constexpr auto sz(exp_tb.size()-2);
-		result=std::copy_n(exp_tb.data()+sz,2,result);
-		return result;
+		return output_exp<uppercase_e>(exp,result);
 	}
 	else
 	{
@@ -557,6 +590,169 @@ inline constexpr auto output_fixed(Iter result, F d)
 		}
 		return std::fill_n(result,precision,'0');
 	}
+}
+template<std::floating_point floating,std::unsigned_integral mantissaType,std::signed_integral exponentType>
+inline constexpr unrep<mantissaType,exponentType> init_repm2(mantissaType const& mantissa,exponentType const& exponent)
+{
+	if(!exponent)
+		return {mantissa,1-static_cast<exponentType>(floating_traits<floating>::bias+floating_traits<floating>::exponent_bits+2)};
+	return {static_cast<mantissaType>((static_cast<mantissaType>(1)<<floating_traits<floating>::mantissa_bits)|mantissa),
+		static_cast<exponentType>(exponent-static_cast<exponentType>(floating_traits<floating>::bias+floating_traits<floating>::mantissa_bits+2))};
+}
+
+template<bool uppercase_e=false,std::random_access_iterator Iter,std::floating_point F>
+inline constexpr Iter output_shortest(Iter result, F d)
+{
+	using floating_trait = floating_traits<F>;
+	using mantissa_type = typename floating_trait::mantissa_type;
+	using exponent_type = typename floating_trait::exponent_type;
+	using signed_exponent_type = std::make_signed_t<exponent_type>;
+	auto const bits(bit_cast<mantissa_type>(d));
+	// Decode bits into sign, mantissa, and exponent.
+	bool const sign((bits >> (floating_trait::mantissa_bits + floating_trait::exponent_bits)) & 1u);
+	mantissa_type const mantissa(bits & ((static_cast<mantissa_type>(1u) << floating_trait::mantissa_bits) - 1u));
+	exponent_type const exponent(static_cast<exponent_type>(((bits >> floating_trait::mantissa_bits) & floating_trait::exponent_max)));
+	// Case distinction; exit early for the easy cases.
+	if(exponent == floating_trait::exponent_max)
+		return easy_case(result,sign,mantissa);
+	if(!exponent&&!mantissa)
+	{
+		if(sign)
+		{
+			*result='-';
+			++result;
+		}
+		*result='0';
+		++result;
+		return result;
+	}
+	auto const r2(init_repm2<F>(mantissa,static_cast<signed_exponent_type>(exponent)));
+	bool const accept_bounds(!(r2.m&1));
+	auto const mv(r2.m<<2);
+	exponent_type const mm_shift(mantissa||static_cast<signed_exponent_type>(exponent)<2);
+	std::array<mantissa_type,3> v{};
+	//vr,vp,vm
+	signed_exponent_type e10{};
+	bool vm_is_trailing_zeros(false),vr_is_trailing_zeros(false);
+	if(0<=r2.e)
+	{
+		exponent_type const q(log10_pow2(r2.e)-(3<r2.e));
+		e10=static_cast<signed_exponent_type>(q);
+		signed_exponent_type const k(floating_trait::pow5_bitcount + pow5bits(q) - 1);
+		signed_exponent_type const i(-r2.e+static_cast<signed_exponent_type>(q)+k);
+		v=mul_shift_all(r2.m,pow5<F,true>::inv_split[q],i,mm_shift);
+		if(q<=21)
+		{
+			if(!(mv%5))
+				vm_is_trailing_zeros=multiple_of_power_of_5(mv,q);
+			else if(accept_bounds)
+				vm_is_trailing_zeros=multiple_of_power_of_5(mv-1-mm_shift,q);
+			else
+				v[1]-=multiple_of_power_of_5(mv+2,q);
+		}
+	}
+	else
+	{
+		exponent_type abs_e2(static_cast<exponent_type>(-r2.e));
+		exponent_type const q(log10_pow5(abs_e2)-(1<abs_e2));
+		signed_exponent_type const signed_q(static_cast<signed_exponent_type>(q));
+		e10=signed_q+r2.e;
+		signed_exponent_type const i(-r2.e-signed_q);
+		signed_exponent_type const k(pow5bits(i)-floating_trait::pow5_bitcount);
+		signed_exponent_type const j(signed_q-k);
+		v=mul_shift_all(r2.m,pow5<F,true>::split[i],j,mm_shift);
+		if(q<2)
+		{
+			vr_is_trailing_zeros=true;
+			if(accept_bounds)
+				vm_is_trailing_zeros=mm_shift==1;
+			else
+				--v[1];
+		}
+		else if(q<63)	//be aware of constants like this
+			vr_is_trailing_zeros=multiple_of_power_of_2(mv,q);
+	}
+	signed_exponent_type removed(0);
+	std::uint8_t last_removed_digit(0);
+	if(vm_is_trailing_zeros||vr_is_trailing_zeros)
+	{
+		for(;;)
+		{
+			mantissa_type const vpdiv10(v[1]/10);
+			mantissa_type const vmdiv10(v[2]/10);
+			auto const vmmod10(static_cast<std::uint8_t>(v[2]%10));
+			if(vpdiv10 <= vmdiv10)
+				break;
+			mantissa_type const vrdiv10(v.front()/10);
+			auto const vrmod10(static_cast<std::uint8_t>(v.front()%10));
+			vm_is_trailing_zeros&=!vmmod10;
+			vr_is_trailing_zeros&=!last_removed_digit;
+			last_removed_digit=static_cast<std::uint8_t>(vrmod10);
+			v.front()=vrdiv10;
+			v[1]=vpdiv10;
+			v[2]=vmdiv10;
+			++removed;
+		}
+		if(vm_is_trailing_zeros)
+			for(;;)
+			{
+				mantissa_type const vmdiv10(v[2]/10);
+				auto const vmmod10(static_cast<std::uint8_t>(v[2]%10));
+				if(vmmod10)
+					break;
+				mantissa_type const vpdiv10(v[1]/10);
+				mantissa_type const vrdiv10(v.front()/10);
+				auto const vrmod10(v.front()%10);
+				vr_is_trailing_zeros&=!last_removed_digit;
+				last_removed_digit=static_cast<std::uint8_t>(vrmod10);
+				v.front()=vrdiv10;
+				v[1]=vpdiv10;
+				v[2]=vmdiv10;
+				++removed;
+			}
+		if(vr_is_trailing_zeros&&last_removed_digit==5&&!(v.front()&1))
+			last_removed_digit=4;
+		v.front() += ((v.front()==std::get<2>(v)&&(!accept_bounds || !vm_is_trailing_zeros))|| 4 < last_removed_digit);
+	}
+	else
+	{
+		bool round_up(false);
+		mantissa_type const vpdiv100(v[1]/100);
+		mantissa_type const vmdiv100(v[2]/100);
+		if(vmdiv100<vpdiv100)
+		{
+			mantissa_type const vrdiv100(v.front()/100);
+			auto const vrmod100(v.front()%100);
+			round_up=50<=vrmod100;
+			v.front()=vrdiv100;
+			v[1]=vpdiv100;
+			v[2]=vmdiv100;
+			removed+=2;
+		}
+		for (;;)
+		{
+			mantissa_type const vpdiv10(v[1]/10);
+			mantissa_type const vmdiv10(v[2]/10);
+			if(vpdiv10<=vmdiv10)
+				break;
+			mantissa_type const vrdiv10(v.front()/10);
+			auto const vrmod10(v.front()%10);
+			round_up=5<=vrmod10;
+			v.front()=vrdiv10;
+			v[1]=vpdiv10;
+			v[2]=vmdiv10;
+			++removed;
+		}
+		v.front()+=(v.front()==v[2]||round_up);
+	}
+	if(sign)
+	{
+		*result='-';
+		++result;
+	}
+	std::int32_t olength(static_cast<std::int32_t>(chars_len<10,true>(v.front())));
+	output_base_number_impl<10,false,true>(result+=olength+1,v.front());
+	return output_exp<uppercase_e>(static_cast<std::int32_t>(e10 + removed + olength - 1),result);
 }
 
 }
