@@ -60,7 +60,7 @@ try
 		keys.clear();
 	}
 	fast_io::client_buf hd(fast_io::dns_once(domain),80,fast_io::sock::type::stream);
-	print_flush(hd,"POST ",battlenet::enroll_path," HTTP/1.1\r\n",
+	print(hd,"POST ",battlenet::enroll_path," HTTP/1.1\r\n",
 		"Host: ",domain,"\r\n"
 		"Content-Type: application/octet-stream\r\n"
 		"Content-Length: ",result.vec().size()*8,"\r\n"
