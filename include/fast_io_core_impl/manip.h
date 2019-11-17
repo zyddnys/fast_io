@@ -40,6 +40,30 @@ struct scientific
 	T& reference;
 };
 
+template<typename T>
+struct fixed_shortest
+{
+	T& reference;
+};
+
+template<bool uppercase_e,typename T>
+struct scientific_shortest
+{
+	T& reference;
+};
+
+template<std::size_t precision,bool uppercase_e,typename T>
+struct shortest
+{
+	T& reference;
+};
+
+template<bool uppercase_e,typename T>
+struct shortest_shortest
+{
+	T& reference;
+};
+
 }
 template<typename T>
 requires (std::floating_point<T>||std::integral<T>)
@@ -111,8 +135,24 @@ inline constexpr std::size_t unsigned_view(T * const pointer)
 template<std::size_t precision,typename T>
 inline constexpr manip::fixed<precision,T const> fixed(T const &f){return {f};}
 
-template<std::size_t precision,bool uppercase_e=false,typename T>
-inline constexpr manip::scientific<precision,uppercase_e,T const> scientific(T const &f){return {f};}
+template<std::size_t precision,typename T>
+inline constexpr manip::scientific<precision,false,T const> scientific(T const &f){return {f};}
+template<std::size_t precision,typename T>
+inline constexpr manip::scientific<precision,true,T const> scientific_upper(T const &f){return {f};}
+
+template<typename T>
+inline constexpr manip::scientific_shortest<false,T const> scientific(T const &f){return {f};}
+template<typename T>
+inline constexpr manip::scientific_shortest<true,T const> scientific_upper(T const &f){return {f};}
+
+template<typename T>
+inline constexpr manip::fixed_shortest<T const> fixed(T const &f){return {f};}
+
+
+template<typename T>
+inline constexpr manip::shortest_shortest<false,T const> shortest(T const &f){return {f};}
+template<typename T>
+inline constexpr manip::shortest_shortest<true,T const> shortest_upper(T const &f){return {f};}
 
 template<character_input_stream input,std::integral T>
 inline void scan_define(input& in,manip::char_view<T> a)

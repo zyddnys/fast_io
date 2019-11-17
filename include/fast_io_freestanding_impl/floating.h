@@ -298,6 +298,92 @@ inline void print_define(output& out,manip::scientific<precision,uppercase_e,T c
 	}
 }
 
+template<output_stream output,std::floating_point T>
+inline void print_define(output& out,manip::fixed_shortest<T const> a)
+{
+
+	std::size_t constexpr reserved_size(325);
+	if constexpr(buffer_output_stream<output>)
+	{
+
+		auto reserved(oreserve(out,reserved_size));
+		if constexpr(std::is_pointer_v<decltype(reserved)>)
+		{
+			if(reserved)
+			{
+				auto start(reserved-reserved_size);
+				orelease(out,reserved-details::ryu::output_shortest<false,1>(start,static_cast<double>(a.reference)));
+				return;
+			}
+		}
+		else
+		{
+			auto start(reserved-reserved_size);
+			orelease(out,reserved-details::ryu::output_shortest<false,1>(start,static_cast<double>(a.reference)));
+			return;
+		}
+	}
+	std::array<typename output::char_type,reserved_size> array;
+	writes(out,array.data(),details::ryu::output_shortest<false,1>(array.data(),static_cast<double>(a.reference)));
+}
+
+template<output_stream output,bool uppercase_e,std::floating_point T>
+inline void print_define(output& out,manip::scientific_shortest<uppercase_e,T const> a)
+{
+
+	std::size_t constexpr reserved_size(30);
+	if constexpr(buffer_output_stream<output>)
+	{
+
+		auto reserved(oreserve(out,reserved_size));
+		if constexpr(std::is_pointer_v<decltype(reserved)>)
+		{
+			if(reserved)
+			{
+				auto start(reserved-reserved_size);
+				orelease(out,reserved-details::ryu::output_shortest<uppercase_e,2>(start,static_cast<double>(a.reference)));
+				return;
+			}
+		}
+		else
+		{
+			auto start(reserved-reserved_size);
+			orelease(out,reserved-details::ryu::output_shortest<uppercase_e,2>(start,static_cast<double>(a.reference)));
+			return;
+		}
+	}
+	std::array<typename output::char_type,reserved_size> array;
+	writes(out,array.data(),details::ryu::output_shortest<uppercase_e,2>(array.data(),static_cast<double>(a.reference)));
+}
+
+template<output_stream output,bool uppercase_e,std::floating_point T>
+inline void print_define(output& out,manip::shortest_shortest<uppercase_e,T const> a)
+{
+
+	std::size_t constexpr reserved_size(30);
+	if constexpr(buffer_output_stream<output>)
+	{
+
+		auto reserved(oreserve(out,reserved_size));
+		if constexpr(std::is_pointer_v<decltype(reserved)>)
+		{
+			if(reserved)
+			{
+				auto start(reserved-reserved_size);
+				orelease(out,reserved-details::ryu::output_shortest<uppercase_e>(start,static_cast<double>(a.reference)));
+				return;
+			}
+		}
+		else
+		{
+			auto start(reserved-reserved_size);
+			orelease(out,reserved-details::ryu::output_shortest<uppercase_e>(start,static_cast<double>(a.reference)));
+			return;
+		}
+	}
+	std::array<typename output::char_type,reserved_size> array;
+	writes(out,array.data(),details::ryu::output_shortest<uppercase_e>(array.data(),static_cast<double>(a.reference)));
+}
 
 template<output_stream output,std::floating_point T>
 inline void print_define(output& out,T a)

@@ -223,7 +223,6 @@ inline constexpr auto output_fixed(Iter result, F d)
 					return std::copy_n("E+00",4,result);
 				else
 					return std::copy_n("e+00",4,result);
-				
 			}
 		}
 		return result;
@@ -600,7 +599,7 @@ inline constexpr unrep<mantissaType,exponentType> init_repm2(mantissaType const&
 		static_cast<exponentType>(exponent-static_cast<exponentType>(floating_traits<floating>::bias+floating_traits<floating>::mantissa_bits+2))};
 }
 
-template<bool uppercase_e=false,std::random_access_iterator Iter,std::floating_point F>
+template<bool uppercase_e=false,std::size_t mode=0,std::random_access_iterator Iter,std::floating_point F>
 inline constexpr Iter output_shortest(Iter result, F d)
 {
 	using floating_trait = floating_traits<F>;
@@ -624,6 +623,13 @@ inline constexpr Iter output_shortest(Iter result, F d)
 		}
 		*result='0';
 		++result;
+		if constexpr(mode==2)
+		{
+			if constexpr(uppercase_e)
+				return std::copy_n("E+00",4,result);
+			else
+				return std::copy_n("e+00",4,result);
+		}
 		return result;
 	}
 	auto const r2(init_repm2<F>(mantissa,static_cast<signed_exponent_type>(exponent)));
@@ -751,8 +757,108 @@ inline constexpr Iter output_shortest(Iter result, F d)
 		++result;
 	}
 	std::int32_t olength(static_cast<std::int32_t>(chars_len<10,true>(v.front())));
-	output_base_number_impl<10,false,true>(result+=olength+1,v.front());
-	return output_exp<uppercase_e>(static_cast<std::int32_t>(e10 + removed + olength - 1),result);
+	std::int32_t const real_exp(static_cast<std::int32_t>(e10 + removed + olength - 1));
+	if constexpr(mode==0) //shortest
+	{
+		std::uint32_t fixed_length(0),this_case(0);
+		if(olength<real_exp)
+		{
+			fixed_length=real_exp+1;
+			this_case=1;
+		}
+		else if(0<=real_exp&&real_exp<olength)
+		{
+			fixed_length=olength+2;
+			this_case=2;
+		}
+		else
+			fixed_length=static_cast<exponent_type>(-real_exp)+olength+1;
+		std::uint32_t scientific_length(olength==1?olength+3:olength+5);
+		if(scientific_length<fixed_length)
+		{
+			output_base_number_impl<10,false,true>(result+=olength+1,v.front());
+			return output_exp<uppercase_e>(static_cast<std::int32_t>(real_exp),result);
+		}
+		switch(this_case)
+		{
+		case 1:
+			output_base_number_impl<10,false>(result+=olength,v.front());
+			return std::fill_n(result,real_exp+1-olength,'0');
+		case 2:
+		{
+			constexpr auto &table(details::shared_static_base_table<10,uppercase_e>::table);
+			constexpr std::uint32_t pw(table.size());
+			constexpr std::uint32_t chars(table.front().size());
+			auto a(v.front());
+			auto eposition(result+real_exp+1);
+			auto iter(result+=olength+1);
+			for(;eposition+2<iter&&pw<=a;)
+			{
+				auto const rem(a%pw);
+				a/=pw;
+				std::copy_n(table[rem].data(),chars,iter-=chars);
+			}
+			if(iter==eposition+2)
+			{
+				auto const rem(a%10);
+				a/=10;
+				*--iter=static_cast<char>('0'+rem);
+			}
+			*--iter='.';
+			output_base_number_impl<10,false>(iter,a);
+			return result;
+		}
+		default:
+			result=std::copy_n("0.",2,result);
+			result=std::fill_n(result,static_cast<exponent_type>(-real_exp-1),'0');
+			output_base_number_impl<10,false>(result+=olength,v.front());
+			return result;
+		}
+	}
+	else if constexpr(mode==1) //fixed
+	{
+		if(olength<real_exp)
+		{
+			output_base_number_impl<10,false>(result+=olength,v.front());
+			return std::fill_n(result,real_exp+1-olength,'0');	
+		}
+		else if(0<=real_exp&&real_exp<olength)
+		{
+			constexpr auto &table(details::shared_static_base_table<10,uppercase_e>::table);
+			constexpr std::uint32_t pw(table.size());
+			constexpr std::uint32_t chars(table.front().size());
+			auto a(v.front());
+			auto eposition(result+real_exp+1);
+			auto iter(result+=olength+1);
+			for(;eposition+2<iter&&pw<=a;)
+			{
+				auto const rem(a%pw);
+				a/=pw;
+				std::copy_n(table[rem].data(),chars,iter-=chars);
+			}
+			if(iter==eposition+2)
+			{
+				auto const rem(a%10);
+				a/=10;
+				*--iter=static_cast<char>('0'+rem);
+			}
+			*--iter='.';
+			output_base_number_impl<10,false>(iter,a);
+			return result;
+		}
+		else
+		{
+			result=std::copy_n("0.",2,result);
+			result=std::fill_n(result,static_cast<exponent_type>(-real_exp-1),'0');
+			output_base_number_impl<10,false>(result+=olength,v.front());
+			return result;
+		}
+	}
+	else		//scientific
+	{
+		output_base_number_impl<10,false,true>(result+=olength+1,v.front());
+		return output_exp<uppercase_e>(static_cast<std::int32_t>(real_exp),result);
+	}
 }
 
 }
