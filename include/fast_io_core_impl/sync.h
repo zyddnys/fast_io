@@ -28,12 +28,6 @@ inline constexpr void flush(basic_sync<output,ostr>& sync)
 }
 
 template<output_stream output,typename ostr>
-inline constexpr auto& orange(basic_sync<output,ostr>& sync)
-{
-	return orange(sync.buffer());
-}
-
-template<output_stream output,typename ostr>
 inline constexpr auto oreserve(basic_sync<output,ostr>& sync)
 {
 	return oreserve(sync.buffer());

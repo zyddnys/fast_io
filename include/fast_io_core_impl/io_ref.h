@@ -97,4 +97,37 @@ inline constexpr decltype(auto) zero_copy_out_handle(io_ref<out>& t)
 	return zero_copy_out_handle(*t);
 }
 
+template<buffer_input_stream in>
+inline constexpr decltype(auto) ireserve(io_ref<in>& t)
+{
+	return ireserve(*t);
+}
+
+template<buffer_input_stream in>
+inline constexpr void irelease(io_ref<in>& t)
+{
+	irelease(*t);
+}
+
+template<output_stream output,buffer_input_stream in>
+inline constexpr void idump(output& out,io_ref<in>& t)
+{
+	idump(out,*t);
+}
+
+template<buffer_output_stream out>
+inline constexpr decltype(auto) oreserve(io_ref<out>& t)
+{
+	return zero_copy_in_handle(*t);
+}
+
+template<buffer_output_stream out>
+inline constexpr decltype(auto) orelease(io_ref<out>& t)
+{
+	orelease(*t);
+}
+
+
+
+
 }

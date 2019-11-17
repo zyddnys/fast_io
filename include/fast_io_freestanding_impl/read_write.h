@@ -2,10 +2,6 @@
 
 namespace fast_io
 {
-template<character_input_stream input>
-inline constexpr void read(input&){}
-template<output_stream output>
-inline constexpr void write(output&){}
 
 template<character_input_stream input,Trivial_copyable T>
 inline constexpr void read(input& in,T& v)
@@ -16,7 +12,7 @@ inline constexpr void read(input& in,T& v)
 }
 
 template<output_stream output,Trivial_copyable T>
-inline constexpr void write(output& out,T const& v)
+inline constexpr void write_define(output& out,T const& v)
 {
 	auto address(std::addressof(v));
 	writes(out,address,address+1);
@@ -53,7 +49,7 @@ inline constexpr void write_size(output& out,std::size_t size)
 }
 
 template<character_input_stream input,Dynamic_size_container D>
-inline constexpr void read(input& in,D& v)
+inline constexpr void read_define(input& in,D& v)
 {
 	v.resize(read_size(in));
 	for(auto & e : v)
@@ -61,7 +57,7 @@ inline constexpr void read(input& in,D& v)
 }
 
 template<character_input_stream input,Contiguous_trivial_dynamic_size_container D>
-inline constexpr void read(input& in,D& v)
+inline constexpr void read_define(input& in,D& v)
 {
 	v.resize(read_size(in));
 	if(reads(in,v.begin(),v.end())!=v.end())
@@ -69,14 +65,14 @@ inline constexpr void read(input& in,D& v)
 }
 
 template<character_output_stream output,Contiguous_trivial_dynamic_size_container D>
-inline constexpr void write(output& out,D const& v)
+inline constexpr void write_define(output& out,D const& v)
 {
 	write_size(out,v.size());
 	writes(out,v.begin(),v.end());
 }
 
 template<character_output_stream output,Dynamic_size_container D>
-inline constexpr void write(output& out,D const& v)
+inline constexpr void write_define(output& out,D const& v)
 {
 	write_size(out,v.size());
 	for(auto const& e : v)
@@ -84,7 +80,7 @@ inline constexpr void write(output& out,D const& v)
 }
 
 template<character_output_stream output,Contiguous_fixed_size_none_trivial_copyable_container D>
-inline constexpr void write(output& out,D const& v)
+inline constexpr void write_define(output& out,D const& v)
 {
 	for(auto const& e : v)
 		write(out,e);

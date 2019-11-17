@@ -26,12 +26,11 @@ try
 	cqw::timer t("std::FILE*");
 	std::unique_ptr<std::FILE,decltype(fclose)*> fp(std::fopen("cfilestardb.txt","wb"),fclose);
 	for(std::size_t i(0);i!=N;++i)
-		fprintf(fp.get(),"%.6f\n",vec[i]);
+		fprintf(fp.get(),"%f\n",vec[i]);
 	}
 	{
 	cqw::timer t("std::ofstream");
 	std::ofstream fout("ofstreamdb.txt",std::ofstream::binary);
-	fout<<std::fixed<<std::setprecision(6);
 	for(std::size_t i(0);i!=N;++i)
 		fout<<vec[i]<<'\n';
 	}
@@ -39,7 +38,7 @@ try
 	cqw::timer t("obuf");
 	fast_io::obuf obuf("obufdb.txt");
 	for(std::size_t i(0);i!=N;++i)
-		println(obuf,fast_io::fixed<6>(vec[i]));
+		println(obuf,vec[i]);
 	}
 #ifdef _MSC_VER
 	{
@@ -48,7 +47,7 @@ try
 		std::array<char,100> arr;
 		for(std::size_t i(0);i!=N;++i)
 		{
-			auto [p,ec]=std::to_chars(arr.data(),arr.data()+arr.size(),vec[i],std::chars_format::fixed,6);
+			auto [p,ec]=std::to_chars(arr.data(),arr.data()+arr.size(),vec[i]);
 			*p='\n';
 			writes(obuf,arr.data(),++p);
 		}
@@ -58,7 +57,7 @@ try
 	cqw::timer t("obuf_mutex");
 	fast_io::obuf_mutex obuf("obuf_mutexdb.txt");
 	for(std::size_t i(0);i!=N;++i)
-		println(obuf,fast_io::fixed<6>(vec[i]));
+		println(obuf,vec[i]);
 	}
 	{
 	cqw::timer t("speck128/128");
@@ -66,7 +65,7 @@ try
 		std::array<uint8_t, 16>{'8','3','3','4',';','2','3','4','a','2','c','4',']','0','3','4'},
 		std::array<uint8_t, 8>{'1','2','3','4','1','2','3','4'},"speckdb.txt");
 	for(std::size_t i(0);i!=N;++i)
-		println(enc_stream,fast_io::fixed<6>(vec[i]));
+		println(enc_stream,vec[i]);
 	}
 }
 catch(std::exception const& e)

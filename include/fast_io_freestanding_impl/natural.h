@@ -44,7 +44,7 @@ void fft(std::vector<std::complex<long double>>& a)
 class natural;
 
 template<character_input_stream input>
-inline void scan(input&,natural&);
+inline void scan_define(input&,natural&);
 
 class natural
 {
@@ -59,7 +59,7 @@ public:
 	explicit natural(std::string_view sv)
 	{
 		istring_view is(sv);
-		scan(is,*this);
+		scan_define(is,*this);
 	}
 	auto& vec() {return cont;}
 	auto& vec() const{return cont;}
@@ -924,31 +924,31 @@ inline constexpr void input_base_natural_number(input& in,natural& a)
 }
 
 template<output_stream output>
-inline constexpr void print(output& out,natural const& a)
+inline constexpr void print_define(output& out,natural const& a)
 {
 	details::output_base_natural_number<10,false>(out,a);
 }
 
 template<std::size_t base,bool uppercase,character_output_stream output>
-inline constexpr void print(output& out,manip::base_t<base,uppercase,natural const> v)
+inline constexpr void print_define(output& out,manip::base_t<base,uppercase,natural const> v)
 {
 	details::output_base_natural_number<base,uppercase>(out,v.reference);
 }
 template<std::size_t base,bool uppercase,character_output_stream output>
-inline constexpr void print(output& out,manip::base_t<base,uppercase,natural> v)
+inline constexpr void print_define(output& out,manip::base_t<base,uppercase,natural> v)
 {
 	details::output_base_natural_number<base,uppercase>(out,v.reference);
 }
 
 
 template<std::size_t base,bool uppercase,character_input_stream input>
-inline constexpr void scan(input& in,manip::base_t<base,uppercase,natural> v)
+inline constexpr void scan_define(input& in,manip::base_t<base,uppercase,natural> v)
 {
 	details::input_base_natural_number<base>(in,v.reference);
 }
 
 template<character_input_stream input>
-inline void scan(input& in,natural& a)
+inline void scan_define(input& in,natural& a)
 {
 	details::input_base_natural_number<10>(in,a);
 }
@@ -975,21 +975,21 @@ inline natural operator "" _nb(char const* cstr, size_t n)
 {
 	istring_view view{cstr, n};
 	natural nt;
-	scan(view,bin(nt));
+	scan_define(view,bin(nt));
 	return nt;
 }
 inline natural operator "" _no(char const* cstr, size_t n)
 {
 	istring_view view{cstr, n};
 	natural nt;
-	scan(view,oct(nt));
+	scan_define(view,oct(nt));
 	return nt;
 }
 inline natural operator "" _nh(char const* cstr, size_t n)
 {
 	istring_view view{cstr, n};
 	natural nt;
-	scan(view,hex(nt));
+	scan_define(view,hex(nt));
 	return nt;
 }
 }

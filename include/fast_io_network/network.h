@@ -7,6 +7,8 @@
 #include<unistd.h>
 #include<arpa/inet.h>
 #include<fcntl.h>
+#include <sys/types.h>
+#include <netdb.h>
 #endif
 
 namespace fast_io
@@ -47,16 +49,14 @@ udp = IPPROTO_UDP,
 
 }
 
-class address
-{
-	std::uint16_t prt;
-	std::string_view add;
-public:
-	constexpr address(std::uint16_t port,std::string_view a=""):prt(port),add(a){}
-	constexpr auto port() const {return prt;}
-	constexpr auto addr() const {return add;}
-};
-
 }
 
+#if defined(__WINNT__) || defined(_MSC_VER)
+#include "win32_socket.h"
+#else
+#include "posix_socket.h"
+#endif
+#include"address.h"
 #include"socket.h"
+#include"dns.h"
+#include"http.h"

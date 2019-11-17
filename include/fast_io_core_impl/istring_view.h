@@ -38,6 +38,13 @@ inline constexpr void irelease(basic_istring_view<T>& isv,std::size_t size)
 	isv.str()={isv.str().data()-size,isv.str().size()+size};
 }
 
+template<output_stream output, typename T>
+inline constexpr void idump(output& out,basic_istring_view<T>& isv)
+{
+	writes(out,isv.str().data(),isv.str().data()+isv.str().size());
+	isv.str()={};
+}
+
 template<typename T,std::contiguous_iterator Iter>
 inline constexpr Iter reads(basic_istring_view<T>& istrvw,Iter begin,Iter end)
 {

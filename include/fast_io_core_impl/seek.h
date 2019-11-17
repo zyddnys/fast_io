@@ -13,10 +13,10 @@ end = 2,				//SEEK_END
 template<typename T>
 struct seek_type_t
 {
-	explicit seek_type_t() = default;
+	inline constexpr explicit seek_type_t() = default;
 };
 
 template<typename T>
-inline seek_type_t<T> constexpr seek_type{};
+inline constexpr seek_type_t<T> seek_type{};
 
 }

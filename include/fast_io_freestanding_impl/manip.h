@@ -19,6 +19,22 @@ inline void getline(input& in,std::basic_string<typename input::char_type> &str)
 }
 
 template<character_input_stream input>
+inline constexpr std::size_t skip_line(input& in)
+{
+	std::size_t skipped(0);
+	for(decltype(try_get(in)) ch;!(ch=try_get(in)).second&&ch.first!='\n';++skipped);
+	return skipped;
+}
+
+
+template<character_input_stream input>
+inline void getcarriage(input& in,std::basic_string<typename input::char_type> &str)
+{
+	str.clear();
+	for(decltype(try_get(in)) ch;!(ch=try_get(in)).second&&ch.first!='\r';str.push_back(ch.first));
+}
+
+template<character_input_stream input>
 inline void getwhole(input& in,std::basic_string<typename input::char_type> &str)
 {
 	str.clear();

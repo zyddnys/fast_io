@@ -13,7 +13,7 @@ inline std::size_t bufferred_transmit(output& outp,input& inp)
 		std::size_t transmitted_this_round(p-array.data());
 		transmitted_bytes+=transmitted_this_round;
 		writes(outp,array.data(),p);
-		if(transmitted_this_round!=array.size())
+		if(!transmitted_this_round)
 			return transmitted_bytes;
 	}
 }
@@ -41,8 +41,28 @@ inline std::size_t bufferred_transmit(output& outp,input& inp,std::size_t bytes)
 template<output_stream output,input_stream input,typename... Args>
 inline auto transmit(output& outp,input& inp,Args&& ...args)
 {
-	if constexpr(zero_copy_output_stream<output>&&zero_copy_input_stream<input>)
-		return zero_copy_transmit(outp,inp,std::forward<Args>(args)...);
+	if constexpr((zero_copy_output_stream<output>||zero_copy_buffer_output_stream<output>)
+		&&(zero_copy_buffer_input_stream<input>||zero_copy_input_stream<input>))
+	{
+		if constexpr(zero_copy_output_stream<output>&&zero_copy_input_stream<input>)
+			return zero_copy_transmit(outp,inp,std::forward<Args>(args)...);
+		else if constexpr(zero_copy_buffer_output_stream<output>&&zero_copy_input_stream<input>)
+		{
+			flush(outp);
+			return zero_copy_transmit(zero_copy_out_handle(outp),inp,std::forward<Args>(args)...);
+		}
+		else if constexpr(zero_copy_output_stream<output>&&zero_copy_buffer_input_stream<input>)
+		{
+			idump(outp,outp);
+			return zero_copy_transmit(outp,zero_copy_in_handle(inp),std::forward<Args>(args)...);
+		}
+		else
+		{
+			idump(outp,inp);
+			flush(outp);
+			return zero_copy_transmit(zero_copy_out_handle(outp),zero_copy_in_handle(inp),std::forward<Args>(args)...);
+		}
+	}
 	else
 		return bufferred_transmit(outp,inp,std::forward<Args>(args)...);
 }

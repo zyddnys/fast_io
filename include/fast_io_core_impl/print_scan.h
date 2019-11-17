@@ -53,7 +53,7 @@ inline constexpr void print_define(output& out, T const& b)
 }
 
 template<output_stream output>
-inline void print_define(output& out,std::basic_string_view<typename output::char_type> str)
+inline constexpr void print_define(output& out,std::basic_string_view<typename output::char_type> str)
 {
 	writes(out,str.data(),str.data()+str.size());
 }
