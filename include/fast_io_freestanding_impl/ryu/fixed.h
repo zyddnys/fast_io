@@ -800,6 +800,7 @@ inline constexpr Iter output_shortest(Iter result, F d)
 			if(eposition!=iter)
 			{
 				++result;
+				++iter;
 				for(;eposition+2<iter&&pw<=a;)
 				{
 					auto const rem(a%pw);
@@ -842,6 +843,7 @@ inline constexpr Iter output_shortest(Iter result, F d)
 			if(eposition!=iter)
 			{
 				++result;
+				++iter;
 				for(;eposition+2<iter&&pw<=a;)
 				{
 					auto const rem(a%pw);
