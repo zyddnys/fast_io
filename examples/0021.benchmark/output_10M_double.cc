@@ -19,14 +19,14 @@ try
 	vec.reserve(N);
 	std::random_device device;
 	std::mt19937_64 eng(device());
-	std::uniform_real_distribution dis(-1000.0,1000.0);
+	std::uniform_real_distribution dis(DBL_MIN,DBL_MAX);
 	for(std::size_t i(0);i!=N;++i)
 		vec.emplace_back(dis(eng));
 	{
 	cqw::timer t("std::FILE*");
 	std::unique_ptr<std::FILE,decltype(fclose)*> fp(std::fopen("cfilestardb.txt","wb"),fclose);
 	for(std::size_t i(0);i!=N;++i)
-		fprintf(fp.get(),"%f\n",vec[i]);
+		fprintf(fp.get(),"%g\n",vec[i]);
 	}
 	{
 	cqw::timer t("std::ofstream");
