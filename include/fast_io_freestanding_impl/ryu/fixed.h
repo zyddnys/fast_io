@@ -769,6 +769,8 @@ inline constexpr Iter output_shortest(Iter result, F d)
 		else if(0<=real_exp&&real_exp<olength)
 		{
 			fixed_length=olength+2;
+			if(olength==real_exp+1)
+				--fixed_length;
 			this_case=2;
 		}
 		else
@@ -776,7 +778,10 @@ inline constexpr Iter output_shortest(Iter result, F d)
 		std::uint32_t scientific_length(olength==1?olength+3:olength+5);
 		if(scientific_length<fixed_length)
 		{
-			output_base_number_impl<10,false,true>(result+=olength+1,v.front());
+			if(olength==1)
+				output_base_number_impl<10,false,false>(result+=olength,v.front());
+			else
+				output_base_number_impl<10,false,true>(result+=olength+1,v.front());
 			return output_exp<uppercase_e>(static_cast<std::int32_t>(real_exp),result);
 		}
 		switch(this_case)
@@ -791,20 +796,24 @@ inline constexpr Iter output_shortest(Iter result, F d)
 			constexpr std::uint32_t chars(table.front().size());
 			auto a(v.front());
 			auto eposition(result+real_exp+1);
-			auto iter(result+=olength+1);
-			for(;eposition+2<iter&&pw<=a;)
+			auto iter(result+=olength);
+			if(eposition!=iter)
 			{
-				auto const rem(a%pw);
-				a/=pw;
-				std::copy_n(table[rem].data(),chars,iter-=chars);
+				++result;
+				for(;eposition+2<iter&&pw<=a;)
+				{
+					auto const rem(a%pw);
+					a/=pw;
+					std::copy_n(table[rem].data(),chars,iter-=chars);
+				}
+				if(iter==eposition+2)
+				{
+					auto const rem(a%10);
+					a/=10;
+					*--iter=static_cast<char>('0'+rem);
+				}
+				*--iter='.';
 			}
-			if(iter==eposition+2)
-			{
-				auto const rem(a%10);
-				a/=10;
-				*--iter=static_cast<char>('0'+rem);
-			}
-			*--iter='.';
 			output_base_number_impl<10,false>(iter,a);
 			return result;
 		}
@@ -829,20 +838,24 @@ inline constexpr Iter output_shortest(Iter result, F d)
 			constexpr std::uint32_t chars(table.front().size());
 			auto a(v.front());
 			auto eposition(result+real_exp+1);
-			auto iter(result+=olength+1);
-			for(;eposition+2<iter&&pw<=a;)
+			auto iter(result+=olength);
+			if(eposition!=iter)
 			{
-				auto const rem(a%pw);
-				a/=pw;
-				std::copy_n(table[rem].data(),chars,iter-=chars);
+				++result;
+				for(;eposition+2<iter&&pw<=a;)
+				{
+					auto const rem(a%pw);
+					a/=pw;
+					std::copy_n(table[rem].data(),chars,iter-=chars);
+				}
+				if(iter==eposition+2)
+				{
+					auto const rem(a%10);
+					a/=10;
+					*--iter=static_cast<char>('0'+rem);
+				}
+				*--iter='.';
 			}
-			if(iter==eposition+2)
-			{
-				auto const rem(a%10);
-				a/=10;
-				*--iter=static_cast<char>('0'+rem);
-			}
-			*--iter='.';
 			output_base_number_impl<10,false>(iter,a);
 			return result;
 		}
@@ -856,7 +869,10 @@ inline constexpr Iter output_shortest(Iter result, F d)
 	}
 	else		//scientific
 	{
-		output_base_number_impl<10,false,true>(result+=olength+1,v.front());
+		if(olength==1)
+			output_base_number_impl<10,false,false>(result+=olength,v.front());
+		else
+			output_base_number_impl<10,false,true>(result+=olength+1,v.front());
 		return output_exp<uppercase_e>(static_cast<std::int32_t>(real_exp),result);
 	}
 }
