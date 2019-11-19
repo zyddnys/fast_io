@@ -105,12 +105,12 @@ inline constexpr typename T::char_type* internal_mreads(T& ib,typename T::char_t
 }
 
 template<input_stream Ihandler,typename Buf=basic_buf_handler<typename Ihandler::char_type>>
-struct basic_ibuf
+class basic_ibuf
 {
+public:
 	Ihandler ih;
-public:
 	Buf ibuffer;
-public:
+
 	using native_handle_type = Ihandler;
 	using buffer_type = Buf;
 	using char_type = typename Buf::char_type;	

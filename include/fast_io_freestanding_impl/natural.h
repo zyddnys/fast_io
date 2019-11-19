@@ -425,7 +425,7 @@ public:
 		for(std::size_t i(this_size);i--;)
 		{
 			auto const tot(p32[i]+(temp<<32));
-			p32[i]=tot/v;
+			p32[i]=static_cast<std::uint32_t>(tot/v);
 			temp=tot%v;
 		}
 		for(;!cont.empty()&&!cont.back();cont.pop_back());
@@ -550,7 +550,7 @@ inline natural operator/(natural a,T&& b)
 
 inline std::uint32_t operator/(std::uint32_t a,natural b)
 {
-	return a/b.vec().front();
+	return static_cast<std::uint32_t>(a/b.vec().front());
 }
 
 template<typename T>
@@ -664,11 +664,11 @@ inline std::uint32_t in_place_div_mod(fast_io::natural& n,std::uint32_t value)
 	for(std::size_t i(this_size);i--;)
 	{
 		auto const tot(p32[i]+(quo<<32));
-		p32[i]=tot/value;
+		p32[i] = static_cast<std::uint32_t>(tot/value);
 		quo=tot%value;
 	}
 	for(;!cont.empty()&&!cont.back();cont.pop_back());
-	return quo;
+	return static_cast<std::uint32_t>(quo);
 }
 
 inline natural pow_mod(fast_io::natural lhs, fast_io::natural rhs, fast_io::natural const& mod)

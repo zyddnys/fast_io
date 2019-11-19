@@ -13,14 +13,15 @@ struct base_number_upper_constraints
 	static constexpr bool value = 2<=bs&&bs<=36&&((bs<=10&&!uppercase)||10<bs);
 };
 
-template<std::uint8_t base,bool uppercase,bool point=false,std::random_access_iterator Iter,std::unsigned_integral U>
+template<std::uint8_t base,bool uppercase,bool point=false,std::random_access_iterator Iter,typename U>
+requires (!std::signed_integral<U>)
 inline constexpr auto output_base_number_impl(Iter iter,U a)
 {
 //number: 0:48 9:57
 //upper: 65 :A 70: F
 //lower: 97 :a 102 :f
 	constexpr auto &table(details::shared_static_base_table<base,uppercase>::table);
-	constexpr std::uint32_t pw(table.size());
+	constexpr std::uint32_t pw(static_cast<std::uint32_t>(table.size()));
 	constexpr std::size_t chars(table.front().size());
 	for(;pw<=a;)
 	{
@@ -105,7 +106,8 @@ inline constexpr auto output_base_number_impl(Iter iter,U a)
 	return iter;
 }
 
-template<std::uint32_t base,bool ryu_mode=false,std::unsigned_integral U>
+template<std::uint32_t base,bool ryu_mode=false,typename U>
+requires (!std::signed_integral<U>)
 inline constexpr std::size_t chars_len(U value) noexcept
 {
 	if constexpr(base==10&&sizeof(U)<9)

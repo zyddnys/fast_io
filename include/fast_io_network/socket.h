@@ -104,7 +104,7 @@ public:
 	server(addrType const& add,U u,Args&& ...args):soc(family(add),std::forward<Args>(args)...)
 	{
 		auto stg(to_socket_address_storage(add,u));
-		sock::details::bind(soc.native_handle(),std::addressof(stg),native_socket_address_size(add));
+		sock::details::bind(soc.native_handle(),stg,native_socket_address_size(add));
 		sock::details::listen(soc.native_handle(),10);
 	}
 	template<std::integral U,typename ...Args>

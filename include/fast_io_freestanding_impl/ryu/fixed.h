@@ -20,6 +20,8 @@ struct floating_traits<float>
 	static inline constexpr exponent_type bias = (static_cast<exponent_type>(1)<<(exponent_bits - 1)) - 1;
 //	static inline constexpr exponent_type pow5_inv_bitcount= 61;
 	static inline constexpr exponent_type pow5_bitcount= 61;
+	static inline constexpr exponent_type floor_log5 = 9;
+	static inline constexpr exponent_type bound = 31;//ryu to do. use a tigher bound
 };
 
 template<>	
@@ -33,6 +35,8 @@ struct floating_traits<double>
 	static inline constexpr exponent_type bias = (static_cast<exponent_type>(1)<<(exponent_bits - 1)) - 1;
 //	static inline constexpr exponent_type pow5_inv_bitcount= 125;
 	static inline constexpr exponent_type pow5_bitcount= 125;
+	static inline constexpr exponent_type floor_log5 = 21;
+	static inline constexpr exponent_type bound = 63;//ryu to do. use a tigher bound
 };
 
 template<>	
@@ -46,6 +50,8 @@ struct floating_traits<long double>
 	static inline constexpr exponent_type bias = (static_cast<exponent_type>(1)<<(exponent_bits - 1)) - 1;
 //	static inline constexpr std::size_t pow5_inv_bitcount= 249;
 	static inline constexpr std::size_t pow5_bitcount= 249;
+	static inline constexpr exponent_type floor_log5 = 55;
+	static inline constexpr exponent_type bound = 127;//ryu to do. use a tigher bound
 };
 
 template<std::integral mantissaType,std::integral exponentType>
@@ -108,14 +114,42 @@ inline constexpr uint32_t log10_pow5(T e)
 	// The first value this approximation fails for is 5^2621 which is just greater than 10^1832.
 	return static_cast<uint32_t> (((static_cast<uint64_t>(e)) * 196742565691928ull) >> 48);
 }
-template<std::unsigned_integral T>
-requires std::same_as<T,std::uint64_t>
-inline constexpr T mul_shift(T m, std::array<T,2> const& mul, std::size_t j)
+/*
+template<bool controller,std::unsigned_integral T>
+inline constexpr std::array<fast_io::uint128_t,2> compute_pow5(T v)
 {
-	return low((mul_extend(m,mul.back())+high(mul_extend(m,mul.front())))>>(j-64));
+	std::uint32_t const base(v/56);
+	std::uint32_t const base2(base*56);
+	std::array<std::uint64_t,4> const& mul(pow5<long double,controller>::split[base]);
+	if(v==base2)
+		return {construct_unsigned_extension(mul.front(),mul[1]),construct_unsigned_extension(mul[2],mul[3])};
+	else
+	{
+		std::uint32_t const offset(v - base2);
+		std::array<std::uint64_t,2> const &m = pow5<long double,controller>::[offset];
+		const uint32_t delta = pow5bits(i) - pow5bits(base2);
+		const uint32_t corr = (uint32_t) ((POW5_ERRORS[i / 32] >> (2 * (i % 32))) & 3);
+		mul_128_256_shift(m, mul, delta, corr, result);
+	}
+//		return pow5<long double,controller>::;
+//	pow5<long double,true>::inv_split[q]
 }
 
-inline constexpr std::array<std::uint64_t,3> mul_shift_all(std::uint64_t m, std::array<std::uint64_t,2> const& mul,std::size_t j,std::uint32_t mmshift)
+template<std::unsigned_integral T>
+inline constexpr std::array<fast_io::uint128_t,2> compute_pow5_inv(T v)
+{
+}
+*/
+template<std::unsigned_integral T,std::size_t muldiff=sizeof(T)*8>
+requires std::same_as<T,std::uint64_t>||std::same_as<T,fast_io::uint128_t>
+inline constexpr T mul_shift(T m, std::array<T,2> const& mul, std::size_t j)
+{
+	return low((mul_extend(m,mul.back())+high(mul_extend(m,mul.front())))>>(j-muldiff));
+}
+
+template<typename T>
+requires (std::same_as<std::uint64_t,T>||std::same_as<fast_io::uint128_t,T>)
+inline constexpr std::array<T,3> mul_shift_all(T m, std::array<T,2> const& mul,std::size_t j,std::uint32_t mmshift)
 {
 	auto const m4(m<<2);
 	return {mul_shift(m4,mul,j),mul_shift(m4+2,mul,j),mul_shift(m4-1-mmshift,mul,j)};
@@ -646,8 +680,11 @@ inline constexpr Iter output_shortest(Iter result, F d)
 		e10=static_cast<signed_exponent_type>(q);
 		signed_exponent_type const k(floating_trait::pow5_bitcount + pow5bits(q) - 1);
 		signed_exponent_type const i(-r2.e+static_cast<signed_exponent_type>(q)+k);
-		v=mul_shift_all(r2.m,pow5<F,true>::inv_split[q],i,mm_shift);
-		if(q<=21)
+		if constexpr(std::same_as<std::remove_cvref_t<F>,long double>)
+			v=mul_shift_all(r2.m,compute_pow5_inv(q),i,mm_shift);
+		else
+			v=mul_shift_all(r2.m,pow5<F,true>::inv_split[q],i,mm_shift);
+		if(q<=floating_trait::floor_log5)//here
 		{
 			if(!(mv%5))
 				vm_is_trailing_zeros=multiple_of_power_of_5(mv,q);
@@ -666,7 +703,10 @@ inline constexpr Iter output_shortest(Iter result, F d)
 		signed_exponent_type const i(-r2.e-signed_q);
 		signed_exponent_type const k(pow5bits(i)-floating_trait::pow5_bitcount);
 		signed_exponent_type const j(signed_q-k);
-		v=mul_shift_all(r2.m,pow5<F,true>::split[i],j,mm_shift);
+		if constexpr(std::same_as<std::remove_cvref_t<F>,long double>)
+			v=mul_shift_all(r2.m,compute_pow5(i),j,mm_shift);
+		else
+			v=mul_shift_all(r2.m,pow5<F,true>::split[i],j,mm_shift);
 		if(q<2)
 		{
 			vr_is_trailing_zeros=true;
@@ -675,7 +715,7 @@ inline constexpr Iter output_shortest(Iter result, F d)
 			else
 				--v[1];
 		}
-		else if(q<63)	//be aware of constants like this
+		else if(q<floating_trait::bound)
 			vr_is_trailing_zeros=multiple_of_power_of_2(mv,q);
 	}
 	signed_exponent_type removed(0);
