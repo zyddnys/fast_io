@@ -1,0 +1,6 @@
+GET /soft/491744.htm HTTP/1.1
+Host:www.onlinedown.net
+User-agent:whatever
+Accept-Type:*/*
+Connection:close
+
