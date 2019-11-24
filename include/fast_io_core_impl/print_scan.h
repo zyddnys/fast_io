@@ -57,7 +57,7 @@ inline constexpr void print_define(output& out,std::basic_string_view<typename o
 {
 	writes(out,str.data(),str.data()+str.size());
 }
-namespace details
+inline namespace print_scan_details
 {
 template<input_stream input,typename ...Args>
 requires(scanable<input,Args>&&...)
@@ -101,7 +101,7 @@ template<input_stream input,typename ...Args>
 requires (sizeof...(Args)!=0)
 inline constexpr void scan(input &in,Args&& ...args)
 {
-	using namespace details;
+	using namespace print_scan_details;
 	if constexpr(mutex_input_stream<input>)
 	{
 		typename input::lock_guard_type lg{mutex(in)};
@@ -115,7 +115,7 @@ template<input_stream input,typename ...Args>
 requires (sizeof...(Args)!=0)
 inline constexpr void read(input &in,Args&& ...args)
 {
-	using namespace details;
+	using namespace print_scan_details;
 	if constexpr(mutex_input_stream<input>)
 	{
 		typename input::lock_guard_type lg{mutex(in)};
@@ -129,7 +129,7 @@ template<output_stream output,typename ...Args>
 requires (sizeof...(Args)!=0)
 inline constexpr void print(output &out,Args&& ...args)
 {
-	using namespace details;
+	using namespace print_scan_details;
 	if constexpr(mutex_output_stream<output>)
 	{
 		typename output::lock_guard_type lg{mutex(out)};
@@ -144,7 +144,7 @@ inline constexpr void print(output &out,Args&& ...args)
 template<output_stream output,typename ...Args>
 inline constexpr void println(output &out,Args&& ...args)
 {
-	using namespace details;
+	using namespace print_scan_details;
 	if constexpr(mutex_output_stream<output>)
 	{
 		typename output::lock_guard_type lg{mutex(out)};
@@ -160,7 +160,7 @@ template<output_stream output,typename ...Args>
 requires (sizeof...(Args)!=0)
 inline constexpr void write(output &out,Args&& ...args)
 {
-	using namespace details;
+	using namespace print_scan_details;
 	if constexpr(mutex_output_stream<output>)
 	{
 		typename output::lock_guard_type lg{mutex(out)};
@@ -177,7 +177,7 @@ template<output_stream output,typename ...Args>
 requires (sizeof...(Args)!=0)
 inline constexpr void print_flush(output &out,Args&& ...args)
 {
-	using namespace details;
+	using namespace print_scan_details;
 	if constexpr(mutex_output_stream<output>)
 	{
 		typename output::lock_guard_type lg{mutex(out)};
@@ -196,7 +196,7 @@ inline constexpr void print_flush(output &out,Args&& ...args)
 template<output_stream output,typename ...Args>
 inline constexpr void println_flush(output &out,Args&& ...args)
 {
-	using namespace details;
+	using namespace print_scan_details;
 	if constexpr(mutex_output_stream<output>)
 	{
 		typename output::lock_guard_type lg{mutex(out)};
@@ -216,7 +216,7 @@ template<output_stream output,typename ...Args>
 requires (sizeof...(Args)!=0)
 inline constexpr void write_flush(output &out,Args&& ...args)
 {
-	using namespace details;
+	using namespace print_scan_details;
 	if constexpr(mutex_output_stream<output>)
 	{
 		typename output::lock_guard_type lg{mutex(out)};
@@ -233,7 +233,7 @@ inline constexpr void write_flush(output &out,Args&& ...args)
 }
 
 
-namespace details
+inline namespace print_scan_details
 {
 template<output_stream os,typename ...Args>
 inline void fprint_impl(os &out,std::basic_string_view<typename os::char_type> format)
@@ -282,7 +282,7 @@ template<output_stream output,typename ...Args>
 requires (sizeof...(Args)!=0)
 inline constexpr void fprint(output &out,Args&& ...args)
 {
-	using namespace details;
+	using namespace print_scan_details;
 	if constexpr(mutex_output_stream<output>)
 	{
 		typename output::lock_guard_type lg{mutex(out)};
@@ -298,7 +298,7 @@ template<output_stream output,typename ...Args>
 requires (sizeof...(Args)!=0)
 inline constexpr void fprint_flush(output &out,Args&& ...args)
 {
-	using namespace details;
+	using namespace print_scan_details;
 	if constexpr(mutex_output_stream<output>)
 	{
 		typename output::lock_guard_type lg{mutex(out)};

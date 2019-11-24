@@ -31,12 +31,16 @@ namespace details
 {
 
 template<std::unsigned_integral U>
-inline constexpr U big_endian(U const& u)
+inline constexpr U big_endian(U u)
 {
-//assume it is little endian before most compiler supports big endian detect
-	auto pun(bit_cast<std::array<std::byte,sizeof(U)>>(u));
-	std::reverse(pun.begin(),pun.end());
-	return bit_cast<U>(pun);
+	if constexpr(std::endian::little==std::endian::native)
+	{
+		auto pun(bit_cast<std::array<std::byte,sizeof(U)>>(u));
+		std::reverse(pun.begin(),pun.end());
+		return bit_cast<U>(pun);
+	}
+	else
+		return u;
 }
 }
 

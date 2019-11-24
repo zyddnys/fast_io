@@ -22,6 +22,8 @@ struct floating_traits<float>
 	static inline constexpr exponent_type pow5_bitcount= 61;
 	static inline constexpr exponent_type floor_log5 = 9;
 	static inline constexpr exponent_type bound = 31;//ryu to do. use a tigher bound
+	static inline constexpr exponent_type digits10=8;
+	static inline constexpr mantissa_type carry10=0x989680;
 };
 
 template<>	
@@ -37,6 +39,8 @@ struct floating_traits<double>
 	static inline constexpr exponent_type pow5_bitcount= 125;
 	static inline constexpr exponent_type floor_log5 = 21;
 	static inline constexpr exponent_type bound = 63;//ryu to do. use a tigher bound
+	static inline constexpr exponent_type digits10=17;
+	static inline constexpr mantissa_type carry10=0x2386F26FC10000;
 };
 
 template<>	
@@ -52,6 +56,8 @@ struct floating_traits<long double>
 	static inline constexpr std::size_t pow5_bitcount= 249;
 	static inline constexpr exponent_type floor_log5 = 55;
 	static inline constexpr exponent_type bound = 127;//ryu to do. use a tigher bound
+	static inline constexpr exponent_type digits10=21;
+//	static inline constexpr mantissa_type carry10=10000000000000000ull;
 };
 
 template<std::integral mantissaType,std::integral exponentType>
@@ -85,11 +91,16 @@ inline constexpr std::uint32_t pow5_factor(T value)
 	}
 	return 0;
 }
+template<std::integral U>
+inline constexpr std::int32_t log2pow5(U e)
+{
+	return static_cast<int32_t>(((static_cast<std::uint32_t>(e) * 1217359) >> 19));
+}
 
 template<std::integral U>
 inline constexpr std::int32_t pow5bits(U e)
 {
-	return static_cast<int32_t>(((static_cast<std::uint32_t>(e) * 1217359) >> 19) + 1);
+	return log2pow5(e)+1;
 }
 
 
@@ -801,7 +812,7 @@ inline constexpr Iter output_shortest(Iter result, F d)
 	if constexpr(mode==0) //shortest
 	{
 		std::uint32_t fixed_length(0),this_case(0);
-		if(olength<real_exp)
+		if(olength<=real_exp)
 		{
 			fixed_length=real_exp+1;
 			this_case=1;
@@ -867,7 +878,7 @@ inline constexpr Iter output_shortest(Iter result, F d)
 	}
 	else if constexpr(mode==1) //fixed
 	{
-		if(olength<real_exp)
+		if(olength<=real_exp)
 		{
 			output_base_number_impl<10,false>(result+=olength,v.front());
 			return std::fill_n(result,real_exp+1-olength,'0');	

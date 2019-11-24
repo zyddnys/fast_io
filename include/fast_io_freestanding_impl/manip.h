@@ -64,4 +64,20 @@ inline constexpr void print_define(output& out,manip::width<indent_width,left,ch
 		print(out,bas.str());
 }
 
+template<output_stream output>
+inline constexpr void print_define(output& out,std::endian e)
+{
+	switch(e)
+	{
+	case std::endian::little:
+		print(out,"little");
+	break;
+	case std::endian::big:
+		print(out,"big");
+	break;
+	default:
+		print(out,"unknown");
+	}
+}
+
 }

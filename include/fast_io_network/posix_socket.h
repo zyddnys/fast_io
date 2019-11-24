@@ -1,8 +1,23 @@
 #pragma once
 
+namespace fast_io
+{
+class gai_exception
+{
+	int ec;
+public:
+	explicit gai_exception(int errorc):std::runtime_error(gai_strerror(ec)),ec(errorc){}	
+	auto get() const
+	{
+		return ec;
+	}
+};
+}
+
 namespace fast_io::sock::details
 {
-
+namespace
+{
 template<typename Func,typename ...Args>
 inline auto call_posix(Func&& func,Args&& ...args)
 {
@@ -70,17 +85,6 @@ inline auto inet_pton(family fm,std::string_view address,void* dst)
 	return call_posix(::inet_pton,static_cast<int>(fm),address.data(),dst);
 }
 
-class gai_exception:public std::runtime_error
-{
-	int ec;
-public:
-	explicit gai_exception(int errorc):std::runtime_error(gai_strerror(ec)),ec(errorc){}	
-	auto get() const
-	{
-		return ec;
-	}
-};
-
 template<typename ...Args>
 inline void getaddrinfo(Args&& ...args)
 {
@@ -99,4 +103,5 @@ inline void freeaddrinfo(Args&& ...args)
 using address_family = sa_family_t;
 using socket_type = int;
 inline constexpr auto invalid_socket(-1);
+}
 }

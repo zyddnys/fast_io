@@ -1,15 +1,6 @@
 #pragma once
 // Since the library is written before C++20. Will use standard libraries concepts after C++ 20 being official published. PLEASE Do not use these concepts!!!
 
-#ifdef _MSC_VER
-namespace std
-{
-template<typename T>
-concept floating_point = std::is_floating_point_v<T>;
-}
-#endif
-
-
 namespace fast_io
 {
 

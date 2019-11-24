@@ -414,7 +414,7 @@ inline void print_define(output& out,T a)
 }
 
 template<character_input_stream input,std::floating_point T>
-inline constexpr void scan(input& in,T &t)
+inline constexpr void scan_define(input& in,T &t)
 {
 	decltype(get(in)) ch;
 	bool negative(false);

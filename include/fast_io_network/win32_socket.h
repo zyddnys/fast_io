@@ -3,7 +3,8 @@
 
 namespace fast_io::sock::details
 {
-
+namespace
+{
 inline auto load_ws2_32()
 {
 	auto ws2_32_dll(LoadLibraryW(L"ws2_32.dll"));
@@ -20,7 +21,7 @@ inline auto get_proc_address(char const* proc)
 	auto address(GetProcAddress(ws2_32_dll,proc));
 	if(address==nullptr)
 		throw win32_error();
-	return reinterpret_cast<prototype>(reinterpret_cast<void(*)()>(address));
+	return bit_cast<prototype>(address);
 }
 
 inline auto get_last_error(get_proc_address<decltype(::WSAGetLastError)*>("WSAGetLastError"));
@@ -115,12 +116,6 @@ inline auto inet_pton(family fm,std::string_view address,void* dst)
 }
 
 template<typename ...Args>
-inline auto getaddrinfo(Args&& ...args)
-{
-	return call_win32_ws2_32<decltype(::getaddrinfo)*>("getaddrinfo",std::forward<Args>(args)...);
-}
-
-template<typename ...Args>
 inline void freeaddrinfo(Args&& ...args)
 {
 	get_proc_address<decltype(::freeaddrinfo)*>("freeaddrinfo")(std::forward<Args>(args)...);
@@ -158,7 +153,58 @@ std::int16_t;
 using socket_type = SOCKET;
 inline constexpr auto invalid_socket(INVALID_SOCKET);
 
+}
+}
 
+
+namespace fast_io
+{
+
+class gai_exception:public std::exception
+{
+	int ec;
+public:
+	explicit gai_exception(int errorc):ec(errorc){}
+	auto get() const
+	{
+		return ec;
+	}
+	char const* what() const noexcept
+	{
+		switch(ec)
+		{
+		case EAI_AGAIN:
+			return "A temporary failure in name resolution occurred.";
+		case EAI_BADFLAGS:
+			return "An invalid value was provided for the ai_flags member of the pHints parameter.";
+		case EAI_FAIL:
+			return "A nonrecoverable failure in name resolution occurred.";
+		case EAI_FAMILY:
+			return "The ai_family member of the pHints parameter is not supported.";
+		case EAI_MEMORY:
+			return "A memory allocation failure occurred.";
+		case EAI_NONAME:
+			return "The name does not resolve for the supplied parameters or the pNodeName and pServiceName parameters were not provided.";
+		case EAI_SERVICE:
+			return "The pServiceName parameter is not supported for the specified ai_socktype member of the pHints parameter.";
+		case EAI_SOCKTYPE:
+			return "The ai_socktype member of the pHints parameter is not supported.";
+		default:
+			return "unknown";
+		}
+	}
+};
+
+namespace sock::details
+{
+template<typename ...Args>
+inline void getaddrinfo(Args&& ...args)
+{
+	auto ec(get_proc_address<decltype(::getaddrinfo)*>("getaddrinfo")(std::forward<Args>(args)...));
+	if(ec)
+		throw gai_exception(ec);
+}
+}
 }
 
 namespace fast_io
@@ -174,7 +220,6 @@ inline std::size_t zero_copy_transmit_once(output& outp,input& inp,std::size_t b
 	return bytes;
 }
 }
-
 
 template<zero_copy_output_stream output,zero_copy_input_stream input>
 inline std::size_t zero_copy_transmit(output& outp,input& inp,std::size_t bytes)
