@@ -8,7 +8,10 @@
 
 namespace fast_io
 {
+inline namespace
+{
 inline istack<system_io_handle,4096> in(native_stdin_number);
 inline system_io_handle out(native_stdout_number);
 inline system_io_handle err(native_stderr_number);
+}
 }

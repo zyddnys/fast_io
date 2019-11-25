@@ -27,22 +27,6 @@ inline constexpr auto family(ipv4 const&)
 	return sock::family::ipv4;
 }
 
-namespace details
-{
-
-template<std::unsigned_integral U>
-inline constexpr U big_endian(U u)
-{
-	if constexpr(std::endian::little==std::endian::native)
-	{
-		auto pun(bit_cast<std::array<std::byte,sizeof(U)>>(u));
-		std::reverse(pun.begin(),pun.end());
-		return bit_cast<U>(pun);
-	}
-	else
-		return u;
-}
-}
 
 struct socket_address_storage:sockaddr
 {

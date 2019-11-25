@@ -57,6 +57,15 @@ inline constexpr void print_define(output& out,std::basic_string_view<typename o
 {
 	writes(out,str.data(),str.data()+str.size());
 }
+#if defined(__cpp_lib_char8_t)
+template<output_stream output>
+requires (std::same_as<typename output::char_type,char>)
+inline constexpr void print_define(output& out,std::basic_string_view<char8_t> str)
+{
+	writes(out,str.data(),str.data()+str.size());
+}
+#endif
+
 inline namespace print_scan_details
 {
 template<input_stream input,typename ...Args>
@@ -135,7 +144,7 @@ inline constexpr void print(output &out,Args&& ...args)
 		typename output::lock_guard_type lg{mutex(out)};
 		print(out.native_handle(),std::forward<Args>(args)...);
 	}
-	else if constexpr(sizeof...(Args)==1||buffer_output_stream<output>)
+	else if constexpr((printable<output,Args>&&...)&&(sizeof...(Args)==1||buffer_output_stream<output>))
 		normal_print(out,std::forward<Args>(args)...);
 	else
 		buffer_print(out,std::forward<Args>(args)...);
@@ -150,7 +159,7 @@ inline constexpr void println(output &out,Args&& ...args)
 		typename output::lock_guard_type lg{mutex(out)};
 		println(out.native_handle(),std::forward<Args>(args)...);
 	}
-	else if constexpr(buffer_output_stream<output>||(sizeof...(Args)==1&&character_output_stream<output>))
+	else if constexpr((printable<output,Args>&&...)&&(buffer_output_stream<output>||(sizeof...(Args)==1&&character_output_stream<output>)))
 		normal_println(out,std::forward<Args>(args)...);
 	else
 		buffer_println(out,std::forward<Args>(args)...);
@@ -166,7 +175,7 @@ inline constexpr void write(output &out,Args&& ...args)
 		typename output::lock_guard_type lg{mutex(out)};
 		write(out.native_handle(),std::forward<Args>(args)...);
 	}
-	else if constexpr(sizeof...(Args)==1||buffer_output_stream<output>)
+	else if constexpr((writeable<output,Args>&&...)&&(sizeof...(Args)==1||buffer_output_stream<output>))
 		normal_write(out,std::forward<Args>(args)...);
 	else
 		buffer_write(out,std::forward<Args>(args)...);
@@ -185,7 +194,7 @@ inline constexpr void print_flush(output &out,Args&& ...args)
 	}
 	else
 	{
-		if constexpr(sizeof...(Args)==1||buffer_output_stream<output>)
+		if constexpr((printable<output,Args>&&...)&&(sizeof...(Args)==1||buffer_output_stream<output>))
 			normal_print(out,std::forward<Args>(args)...);
 		else
 			buffer_print(out,std::forward<Args>(args)...);
@@ -204,7 +213,7 @@ inline constexpr void println_flush(output &out,Args&& ...args)
 	}
 	else
 	{
-		if constexpr(buffer_output_stream<output>&&(sizeof...(Args)==1&&character_output_stream<output>))
+		if constexpr((printable<output,Args>&&...)&&(buffer_output_stream<output>&&(sizeof...(Args)==1&&character_output_stream<output>)))
 			normal_println(out,std::forward<Args>(args)...);
 		else
 			buffer_println(out,std::forward<Args>(args)...);
@@ -224,7 +233,7 @@ inline constexpr void write_flush(output &out,Args&& ...args)
 	}
 	else
 	{
-		if constexpr(sizeof...(Args)==1||buffer_output_stream<output>)
+		if constexpr((writeable<output,Args>&&...)&&(sizeof...(Args)==1||buffer_output_stream<output>))
 			normal_write(out,std::forward<Args>(args)...);
 		else
 			buffer_write(out,std::forward<Args>(args)...);
@@ -288,7 +297,7 @@ inline constexpr void fprint(output &out,Args&& ...args)
 		typename output::lock_guard_type lg{mutex(out)};
 		fprint(out.native_handle(),std::forward<Args>(args)...);
 	}
-	else if constexpr(sizeof...(Args)==1||(buffer_output_stream<output>&&character_output_stream<output>))
+	else if constexpr((printable<output,Args>&&...)&&(sizeof...(Args)==1||(buffer_output_stream<output>&&character_output_stream<output>)))
 		normal_fprint(out,std::forward<Args>(args)...);
 	else
 		buffer_fprint(out,std::forward<Args>(args)...);
@@ -306,7 +315,7 @@ inline constexpr void fprint_flush(output &out,Args&& ...args)
 	}
 	else
 	{
-		if constexpr(sizeof...(Args)==1||buffer_output_stream<output>)
+		if constexpr((printable<output,Args>&&...)&&(sizeof...(Args)==1||buffer_output_stream<output>))
 			normal_fprint(out,std::forward<Args>(args)...);
 		else
 			buffer_fprint(out,std::forward<Args>(args)...);
