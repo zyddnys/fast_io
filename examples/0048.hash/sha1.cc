@@ -7,7 +7,7 @@ try
 {
 	if(argc!=2)
 	{
-		print(fast_io::err,"Usage: ",*argv," <path>");
+		print(fast_io::err,"Usage: ",*argv," <path>\n");
 		return 1;
 	}
 	fast_io::isystem_file ib(argv[1]);
