@@ -164,9 +164,20 @@ struct sha1
 	using char_type = char;
 	std::array<std::uint32_t,5> digest{0x67452301,0xefcdab89,0x98badcfe,0x10325476,0xc3d2e1f0};
 	std::array<std::uint32_t,16> block{};
-	char* it=static_cast<char*>(static_cast<void*>(block.data())),*ed=it+64;
+	static inline constexpr std::size_t crypto_hash_block_size=64;
+	std::size_t pos{};
 	std::uint64_t transforms{};
 };
+
+inline constexpr char const* punned_block(sha1 const& sh)
+{
+	return static_cast<char const*>(static_cast<void const*>(sh.block.data()));
+}
+
+inline constexpr char* punned_block(sha1& sh)
+{
+	return static_cast<char*>(static_cast<void*>(sh.block.data()));
+}
 
 inline constexpr void clear(sha1& sh)
 {
@@ -175,29 +186,29 @@ inline constexpr void clear(sha1& sh)
 
 inline constexpr void put(sha1& sh,char ch)
 {
-	if(sh.it==sh.ed) [[unlikely]]
+	if(sh.pos==sha1::crypto_hash_block_size) [[unlikely]]
 	{
 		if constexpr(std::endian::native==std::endian::little)
 			for(auto& e : sh.block)
 				e=details::big_endian(e);
 		details::sha1::transform(sh.digest,sh.block);
 		++sh.transforms;
-		sh.it=sh.ed-64;
+		sh.pos=0;
 	}
-	*sh.it=ch;
-	++sh.it;
+	punned_block(sh)[sh.pos]=ch;
+	++sh.pos;
 }
 
-inline constexpr auto oreserve(sha1& sh,std::size_t size) -> decltype(sh.it)
+inline constexpr char* oreserve(sha1& sh,std::size_t size)
 {
-	if(sh.ed<sh.it+size)
+	if(sha1::crypto_hash_block_size<sh.pos+size)
 		return nullptr;
-	return sh.it+=size;
+	return punned_block(sh)+(sh.pos+=size);
 }
 
 inline constexpr void orelease(sha1& sh,std::size_t size)
 {
-	sh.it-=size;
+	sh.pos-=size;
 }
 
 template<std::contiguous_iterator Iter>
@@ -205,31 +216,32 @@ inline constexpr void writes(sha1& sh,Iter cbegin,Iter cend)
 {
 	auto b(static_cast<char const*>(static_cast<void const*>(std::to_address(cbegin))));
 	auto e(static_cast<char const*>(static_cast<void const*>(std::to_address(cend))));
-	for(std::size_t n{};(n=static_cast<std::size_t>(sh.ed-sh.it))<static_cast<std::size_t>(e-b);b+=n)
+	for(std::size_t n{};(n=sha1::crypto_hash_block_size-sh.pos)<static_cast<std::size_t>(e-b);b+=n)
 	{
-		sh.it=std::copy_n(b,n,sh.it)-64;
+		std::copy_n(b,n,punned_block(sh)+sh.pos);
+		sh.pos={};
 		if constexpr(std::endian::native==std::endian::little)
 			for(auto& e : sh.block)
 				e=details::big_endian(e);
 		details::sha1::transform(sh.digest,sh.block);
 		++sh.transforms;
 	}
-	sh.it=std::copy(b,e,sh.it);
+	std::copy(b,e,punned_block(sh)+sh.pos);
+	sh.pos+=e-b;
 }
 
 [[deprecated("sha1 is no longer a secure algorithm, see wikipedia. The SHAppening: https://en.wikipedia.org/wiki/SHA-1#The_SHAppening")]] 
 inline constexpr void flush(sha1& sh)
 {
+	std::uint64_t const total_count((sh.transforms*64+sh.pos)<<3);
 	put(sh,0x80);
-	std::uint64_t const total_count((sh.transforms*64+(63-(sh.ed-sh.it)))<<3);
-	std::fill(sh.it,sh.ed,0);
+	std::fill(punned_block(sh)+sh.pos,punned_block(sh)+sha1::crypto_hash_block_size,0);
 	if constexpr(std::endian::native==std::endian::little)
 		for(auto& e : sh.block)
 			e=details::big_endian(e);
 	sh.block[sh.block.size()-2]=static_cast<std::uint32_t>(total_count>>32);
 	sh.block.back()=static_cast<std::uint32_t>(total_count);
 	details::sha1::transform(sh.digest,sh.block);
-
 }
 
 template<std::contiguous_iterator Iter>
