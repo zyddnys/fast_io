@@ -43,7 +43,7 @@ inline constexpr win32_open_mode calculate_win32_open_mode(open::mode const &om)
 			mode.dwCreationDisposition=CREATE_ALWAYS;
 	}
 	else
-		mode.dwCreationDisposition=OPEN_ALWAYS;
+		mode.dwCreationDisposition=OPEN_EXISTING;
 	if(value&open::direct.value)
 		mode.dwFlagsAndAttributes|=FILE_FLAG_NO_BUFFERING;
 	if(value&open::sync.value)
