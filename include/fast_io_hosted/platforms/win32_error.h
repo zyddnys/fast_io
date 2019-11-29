@@ -14,7 +14,7 @@ namespace fast_io
 
 class win32_error : public std::runtime_error
 {
-	static std::string format_get_last_error(DWORD error)
+	inline static std::string format_get_last_error(DWORD error)
 	{
 		if (error)
 		{
@@ -34,7 +34,12 @@ class win32_error : public std::runtime_error
 		}
 		return std::string();
 	}
+	DWORD ec;
 public:
-	explicit win32_error(DWORD const& error = GetLastError()):std::runtime_error(format_get_last_error(error)){}
+	explicit win32_error(DWORD error = GetLastError()):std::runtime_error(format_get_last_error(error)),ec(error){}
+	auto get() const noexcept
+	{
+		return ec;
+	}
 };
 }
