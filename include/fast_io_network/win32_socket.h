@@ -71,13 +71,13 @@ inline auto socket(Args&& ...args)
 template<typename T>
 inline auto accept(SOCKET sck,T& sock_address,socklen_t& storage_size)
 {
-	return call_win32_ws2_32_invalid_socket<decltype(::accept)*>("accept",sck,std::addressof(sock_address),std::addressof(storage_size));
+	return call_win32_ws2_32_invalid_socket<decltype(::accept)*>("accept",sck,reinterpret_cast<sockaddr*>(std::addressof(sock_address)),std::addressof(storage_size));
 }
 
 template<typename T,std::unsigned_integral sock_type_size>
 inline auto connect(SOCKET sck,T& sock_address,sock_type_size size)
 {
-	return call_win32_ws2_32_minus_one<decltype(::connect)*>("connect",sck,std::addressof(sock_address),static_cast<int>(size));
+	return call_win32_ws2_32_minus_one<decltype(::connect)*>("connect",sck,reinterpret_cast<sockaddr*>(std::addressof(sock_address)),static_cast<int>(size));
 }
 
 template<typename mem_address,typename ...Args>
@@ -100,7 +100,7 @@ inline auto closesocket(Args&& ...args)
 template<typename T,std::unsigned_integral sock_type_size>
 inline auto bind(SOCKET sck,T& sock_address,sock_type_size size)
 {
-	return call_win32_ws2_32_minus_one<decltype(::bind)*>("bind",sck,std::addressof(sock_address),static_cast<int>(size));
+	return call_win32_ws2_32_minus_one<decltype(::bind)*>("bind",sck,reinterpret_cast<sockaddr*>(std::addressof(sock_address)),static_cast<int>(size));
 }
 
 template<typename ...Args>
@@ -165,7 +165,7 @@ class gai_exception:public std::exception
 	int ec;
 public:
 	explicit gai_exception(int errorc):ec(errorc){}
-	auto get() const
+	auto get() const noexcept
 	{
 		return ec;
 	}

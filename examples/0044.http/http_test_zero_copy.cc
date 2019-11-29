@@ -5,7 +5,7 @@
 int main()
 try
 {
-	fast_io::client_buf hd(fast_io::dns_once("www.onlinedown.net"),80,fast_io::sock::type::stream);
+	fast_io::client_buf hd(fast_io::dns_once("www.jszg.edu.cn"),80,fast_io::sock::type::stream);
 	fast_io::isystem_file request_file("http_request.txt");
 	transmit(hd,request_file);
 	skip_http_header(hd);

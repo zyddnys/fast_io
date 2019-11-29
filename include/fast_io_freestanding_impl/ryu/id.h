@@ -301,7 +301,6 @@ inline constexpr F input_floating(input& in)
 				phase2 = 2;
 		}
 	}
-	exponent_type dot10_index{};
 	if(phase2==1)
 	{
 		for(;m10digits<floating_trait::digits10;++m10digits,--m10e)
@@ -457,7 +456,7 @@ inline constexpr F input_floating(input& in)
 	bool last_removed_bit((m2>>(shift-1))&1);
 	bool round_up((last_removed_bit) && (!trailing_zeros || ((m2 >> shift) & 1)));
 	return bit_cast<F>(((((static_cast<mantissa_type>(negative)) << floating_trait::exponent_bits) | static_cast<mantissa_type>(ieee_e2)) << 
-	floating_trait::mantissa_bits)|((m2 >> shift) + round_up) & ((static_cast<mantissa_type>(1) << floating_trait::mantissa_bits) - 1));
+	floating_trait::mantissa_bits)|(((m2 >> shift) + round_up) & ((static_cast<mantissa_type>(1) << floating_trait::mantissa_bits) - 1)));
 }
 
 }

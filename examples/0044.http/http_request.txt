@@ -1,5 +1,5 @@
-GET /soft/491744.htm HTTP/1.1
-Host:www.onlinedown.net
+GET /portal/home/index HTTP/1.1
+Host:www.jszg.edu.cn
 User-agent:whatever
 Accept-Type:*/*
 Connection:close

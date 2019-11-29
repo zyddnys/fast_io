@@ -28,8 +28,9 @@ inline constexpr auto family(ipv4 const&)
 }
 
 
-struct socket_address_storage:sockaddr
+struct socket_address_storage
 {
+	sockaddr sock;
 	std::array<std::byte,sizeof(sockaddr_storage)<sizeof(sockaddr)?0x0:sizeof(sockaddr_storage)-sizeof(sockaddr)> storage;
 };
 

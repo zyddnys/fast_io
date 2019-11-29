@@ -50,10 +50,31 @@ inline constexpr win32_open_mode calculate_win32_open_mode(open::mode const &om)
 		mode.dwFlagsAndAttributes|=FILE_FLAG_WRITE_THROUGH;
 	return mode;
 }
-template<std::size_t om>
+
+inline constexpr DWORD dw_flag_attribute_with_perms(DWORD dw_flags_and_attributes,perms pm)
+{
+	if((pm&perms::owner_write)==perms::none)
+		return dw_flags_and_attributes|FILE_ATTRIBUTE_READONLY;	
+	return dw_flags_and_attributes;
+}
+
+inline constexpr win32_open_mode calculate_win32_open_mode_with_perms(open::mode const &om,perms pm)
+{
+	auto m(calculate_win32_open_mode(om));
+	m.dwFlagsAndAttributes=dw_flag_attribute_with_perms(m.dwFlagsAndAttributes,pm);
+	return m;
+}
+
+template<std::size_t om,perms pm>
 struct win32_file_openmode
 {
-	static win32_open_mode constexpr mode = calculate_win32_open_mode(om);
+	inline static constexpr win32_open_mode mode = calculate_win32_open_mode_with_perms(om,pm);
+};
+
+template<std::size_t om>
+struct win32_file_openmode_single
+{
+	inline static constexpr win32_open_mode mode = calculate_win32_open_mode(om);
 };
 }
 
@@ -74,8 +95,21 @@ public:
 	win32_io_handle(native_handle_type handle):mhandle(handle){}
 	win32_io_handle(DWORD dw):mhandle(GetStdHandle(dw)){}
 
-	win32_io_handle(win32_io_handle const&)=delete;
-	win32_io_handle& operator=(win32_io_handle const&)=delete;
+	win32_io_handle(win32_io_handle const& other)
+	{
+		auto const current_process(GetCurrentProcess());
+		if(!DuplicateHandle(current_process,other.mhandle,current_process,std::addressof(mhandle), 0, true, DUPLICATE_SAME_ACCESS))
+			throw win32_error();
+	}
+	win32_io_handle& operator=(win32_io_handle const& other)
+	{
+		auto const current_process(GetCurrentProcess());
+		HANDLE new_handle{};
+		if(!DuplicateHandle(current_process,other.mhandle,current_process,std::addressof(new_handle), 0, true, DUPLICATE_SAME_ACCESS))
+			throw win32_error();
+		mhandle=new_handle;
+		return *this;
+	}
 	win32_io_handle(win32_io_handle&& b) noexcept:mhandle(b.mhandle)
 	{
 		b.mhandle=nullptr;
@@ -93,9 +127,6 @@ public:
 	native_handle_type native_handle()
 	{
 		return mhandle;
-	}
-	void flush()
-	{
 	}
 	inline void swap(win32_io_handle& o) noexcept
 	{
@@ -154,25 +185,51 @@ public:
 	using char_type = char;
 	using native_handle_type = HANDLE;
 	template<typename ...Args>
+	requires requires(Args&& ...args)
+	{
+		{CreateFileW(std::forward<Args>(args)...)}->std::same_as<HANDLE>;
+	}
 	win32_file(fast_io::native_interface_t,Args&& ...args):win32_io_handle(CreateFileW(std::forward<Args>(args)...))
 	{
 		if(native_handle()==INVALID_HANDLE_VALUE)
 			throw win32_error();
 	}
-	template<std::size_t om>
-	win32_file(std::string_view filename,open::interface_t<om>):win32_file(fast_io::native_interface,fast_io::utf8_to_ucs<std::wstring>(filename).c_str(),
-				details::win32_file_openmode<om>::mode.dwDesiredAccess,
-				details::win32_file_openmode<om>::mode.dwShareMode,
-				details::win32_file_openmode<om>::mode.lpSecurityAttributes,
-				details::win32_file_openmode<om>::mode.dwCreationDisposition,
-				details::win32_file_openmode<om>::mode.dwFlagsAndAttributes,nullptr)
+	template<std::size_t om,perms pm>
+	win32_file(std::string_view filename,open::interface_t<om>,perms_interface_t<pm>):win32_file(fast_io::native_interface,fast_io::utf8_to_ucs<std::wstring>(filename).c_str(),
+				details::win32_file_openmode<om,pm>::mode.dwDesiredAccess,
+				details::win32_file_openmode<om,pm>::mode.dwShareMode,
+				details::win32_file_openmode<om,pm>::mode.lpSecurityAttributes,
+				details::win32_file_openmode<om,pm>::mode.dwCreationDisposition,
+				details::win32_file_openmode<om,pm>::mode.dwFlagsAndAttributes,nullptr)
 	{
 		if constexpr (with_ate(open::mode(om)))
 			seek(*this,0,seekdir::end);
 	}
-	win32_file(std::string_view filename,open::mode const& m):win32_io_handle(nullptr)
+	template<std::size_t om>
+	win32_file(std::string_view filename,open::interface_t<om>):win32_file(fast_io::native_interface,fast_io::utf8_to_ucs<std::wstring>(filename).c_str(),
+				details::win32_file_openmode_single<om>::mode.dwDesiredAccess,
+				details::win32_file_openmode_single<om>::mode.dwShareMode,
+				details::win32_file_openmode_single<om>::mode.lpSecurityAttributes,
+				details::win32_file_openmode_single<om>::mode.dwCreationDisposition,
+				details::win32_file_openmode_single<om>::mode.dwFlagsAndAttributes,nullptr)
 	{
-		auto const mode(details::calculate_win32_open_mode(m));
+		if constexpr (with_ate(open::mode(om)))
+			seek(*this,0,seekdir::end);
+	}
+	template<std::size_t om>
+	win32_file(std::string_view filename,open::interface_t<om>,perms p):win32_file(fast_io::native_interface,fast_io::utf8_to_ucs<std::wstring>(filename).c_str(),
+				details::win32_file_openmode_single<om>::mode.dwDesiredAccess,
+				details::win32_file_openmode_single<om>::mode.dwShareMode,
+				details::win32_file_openmode_single<om>::mode.lpSecurityAttributes,
+				details::win32_file_openmode_single<om>::mode.dwCreationDisposition,
+				details::dw_flag_attribute_with_perms(details::win32_file_openmode_single<om>::mode.dwFlagsAndAttributes,p),nullptr)
+	{
+		if constexpr (with_ate(open::mode(om)))
+			seek(*this,0,seekdir::end);
+	}
+	win32_file(std::string_view filename,open::mode const& m,perms pm=static_cast<perms>(420)):win32_io_handle(nullptr)
+	{
+		auto const mode(details::calculate_win32_open_mode_with_perms(m,pm));
 		if((protected_native_handle()=CreateFileW(fast_io::utf8_to_ucs<std::wstring>(filename).c_str(),
 					mode.dwDesiredAccess,
 					mode.dwShareMode,
@@ -183,8 +240,8 @@ public:
 		if(with_ate(m))
 			seek(*this,0,seekdir::end);
 	}
-	win32_file(std::string_view file,std::string_view mode):win32_file(file,fast_io::open::c_style(mode)){}
-
+	win32_file(std::string_view file,std::string_view mode,perms pm=static_cast<perms>(420)):win32_file(file,fast_io::open::c_style(mode),pm){}
+/*
 	win32_file(win32_file const&)=delete;
 	win32_file& operator=(win32_file const&)=delete;
 	win32_file(win32_file&& b) noexcept:win32_io_handle(b.protected_native_handle())
@@ -200,7 +257,7 @@ public:
 			b.protected_native_handle()=nullptr;
 		}
 		return *this;
-	}
+	}*/
 	~win32_file()
 	{
 		win32_io_handle::close_impl();
@@ -223,7 +280,7 @@ public:
 		protected_native_handle() = nullptr;
 	}
 	win32_pipe_unique()=default;
-	win32_pipe_unique(win32_pipe_unique const&)=delete;
+/*	win32_pipe_unique(win32_pipe_unique const&)=delete;
 	win32_pipe_unique& operator=(win32_pipe_unique const&)=delete;
 	win32_pipe_unique(win32_pipe_unique&& b) noexcept:win32_io_handle(b.protected_native_handle())
 	{
@@ -238,7 +295,7 @@ public:
 			b.protected_native_handle()=nullptr;
 		}
 		return *this;
-	}
+	}*/
 	~win32_pipe_unique()
 	{
 		win32_io_handle::close_impl();
@@ -254,6 +311,10 @@ private:
 	native_handle_type pipes;
 public:
 	template<typename ...Args>
+	requires requires(Args&& ...args)
+	{
+		{::CreatePipe(static_cast<void**>(static_cast<void*>(pipes.data())),static_cast<void**>(static_cast<void*>(pipes.data()+1)),std::forward<Args>(args)...)}->std::same_as<BOOL>;
+	}
 	win32_pipe(fast_io::native_interface_t, Args&& ...args)
 	{
 		if(!::CreatePipe(static_cast<void**>(static_cast<void*>(pipes.data())),static_cast<void**>(static_cast<void*>(pipes.data()+1)),std::forward<Args>(args)...))
@@ -276,9 +337,6 @@ public:
 	{
 		return pipes;
 	}
-	void flush()
-	{
-	}
 	auto& in()
 	{
 		return pipes.front();
@@ -286,16 +344,6 @@ public:
 	auto& out()
 	{
 		return pipes.back();
-	}
-	template<std::contiguous_iterator Iter>
-	Iter reads(Iter begin,Iter end)
-	{
-		return reads(pipes.front(),begin,end);
-	}
-	template<std::contiguous_iterator Iter>
-	Iter writes(Iter begin,Iter end)
-	{
-		return writes(pipes.back(),begin,end);
 	}
 	void swap(win32_pipe& o) noexcept
 	{
@@ -325,5 +373,6 @@ using system_pipe = win32_pipe;
 inline constexpr DWORD native_stdin_number(-10);
 inline constexpr DWORD native_stdout_number(-11);
 inline constexpr DWORD native_stderr_number(-12);
+
 
 }

@@ -36,13 +36,13 @@ inline auto socket(Args&& ...args)
 template<typename T>
 inline auto accept(int sck,T& sock_address,socklen_t& storage_size)
 {
-	return call_posix(::accept,sck,std::addressof(sock_address),std::addressof(storage_size));
+	return call_posix(::accept,sck,reinterpret_cast<sockaddr*>(std::addressof(sock_address)),std::addressof(storage_size));
 }
 
 template<typename T,std::unsigned_integral sock_type_size>
 inline auto connect(int sck,T& sock_address,sock_type_size size)
 {
-	return call_posix(::connect,sck,std::addressof(sock_address),size);
+	return call_posix(::connect,sck,reinterpret_cast<sockaddr*>(std::addressof(sock_address)),size);
 }
 
 template<typename ...Args>
@@ -65,7 +65,7 @@ inline auto closesocket(Args&& ...args)
 template<typename T,std::unsigned_integral sock_type_size>
 inline auto bind(int sck,T& sock_address,sock_type_size size)
 {
-	return call_posix(::bind,sck,std::addressof(sock_address),size);
+	return call_posix(::bind,sck,reinterpret_cast<sockaddr*>(std::addressof(sock_address)),size);
 }
 
 template<typename ...Args>
