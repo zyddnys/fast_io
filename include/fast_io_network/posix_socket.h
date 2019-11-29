@@ -6,10 +6,14 @@ class gai_exception
 {
 	int ec;
 public:
-	explicit gai_exception(int errorc):std::runtime_error(gai_strerror(ec)),ec(errorc){}	
+	explicit gai_exception(int errorc):ec(errorc){}	
 	auto get() const
 	{
 		return ec;
+	}
+	char const* what() const noexcept
+	{
+		return gai_strerror(ec);
 	}
 };
 }

@@ -74,6 +74,13 @@ inline auto accept(SOCKET sck,T& sock_address,socklen_t& storage_size)
 	return call_win32_ws2_32_invalid_socket<decltype(::accept)*>("accept",sck,reinterpret_cast<sockaddr*>(std::addressof(sock_address)),std::addressof(storage_size));
 }
 
+template<typename T>
+inline auto accept_ex(SOCKET sck,T& sock_address,socklen_t& storage_size)
+{
+	WSAOVERLAPPED overlapped{};
+	return call_win32_ws2_32_invalid_socket<decltype(::accept)*>("AcceptEx",sck,reinterpret_cast<sockaddr*>(std::addressof(sock_address)),std::addressof(storage_size),std::addressof(overlapped));
+}
+
 template<typename T,std::unsigned_integral sock_type_size>
 inline auto connect(SOCKET sck,T& sock_address,sock_type_size size)
 {
