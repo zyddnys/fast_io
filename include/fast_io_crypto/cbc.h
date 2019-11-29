@@ -264,12 +264,14 @@ public:
 		}
 	}
 	~basic_ocbc()
-	try
 	{
-		write_remain();
-	}
-	catch (...)
-	{
+		try
+		{
+			write_remain();
+		}
+		catch (...)
+		{
+		}
 	}
 	void swap(basic_ocbc &other) noexcept
 	{
