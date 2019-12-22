@@ -2,7 +2,7 @@
 
 namespace fast_io
 {
-class gai_exception
+class gai_exception:public std::exception
 {
 	int ec;
 public:

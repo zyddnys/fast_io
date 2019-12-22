@@ -15,8 +15,8 @@ inline constexpr F input_floating(input& in)
 	mantissa_type ipart{};
 	bool negative{};
 	std::uint8_t phase2{};
-	//'.'(46)-48: static_cast<unsigned_char_type>(-2)
-	//'-'(45)-48: static_cast<unsigned_char_type>(-3)
+	//.(46)-48: static_cast<unsigned_char_type>(-2)
+	//-(45)-48: static_cast<unsigned_char_type>(-3)
 	//'E'(69)-48: 21
 	//'e'(101)-48: 53
 	//We do not support Shit like EBCDIC. DEATH TO IBM
@@ -160,7 +160,7 @@ inline constexpr F input_floating(input& in)
 	{
 		for(;m10digits<floating_trait::digits10;++m10digits)
 		{
-			unsigned_char_type const ch(static_cast<unsigned_char_type>(try_get(in).first)-48);
+			unsigned_char_type const ch(static_cast<unsigned_char_type>(get<true>(in).first)-48);
 			if(ch<10)
 				ipart=ipart*10+ch;
 			else if(ch==static_cast<unsigned_char_type>(-2))
@@ -182,7 +182,7 @@ inline constexpr F input_floating(input& in)
 		}
 		if(m10digits==floating_trait::digits10)
 		{
-			unsigned_char_type const ch(static_cast<unsigned_char_type>(try_get(in).first)-48);
+			unsigned_char_type const ch(static_cast<unsigned_char_type>(get<true>(in).first)-48);
 //rounding. 4 discard. 6 carry. 5 is complex
 			if(ch==5)
 			{
@@ -195,7 +195,7 @@ inline constexpr F input_floating(input& in)
 					}
 					for(;;++m10e)
 					{
-						unsigned_char_type const ch(static_cast<unsigned_char_type>(try_get(in).first)-48);
+						unsigned_char_type const ch(static_cast<unsigned_char_type>(get<true>(in).first)-48);
 						if(ch==static_cast<unsigned_char_type>(-2))
 						{
 							phase2 = 1;
@@ -217,7 +217,7 @@ inline constexpr F input_floating(input& in)
 				{
 					for(;;++m10e)
 					{
-						unsigned_char_type const ch(static_cast<unsigned_char_type>(try_get(in).first)-48);
+						unsigned_char_type const ch(static_cast<unsigned_char_type>(get<true>(in).first)-48);
 						if(ch==static_cast<unsigned_char_type>(-2))
 						{
 							phase2 = 1;
@@ -243,7 +243,7 @@ inline constexpr F input_floating(input& in)
 							}
 							for(;;++m10e)
 							{
-								unsigned_char_type const ch(static_cast<unsigned_char_type>(try_get(in).first)-48);
+								unsigned_char_type const ch(static_cast<unsigned_char_type>(get<true>(in).first)-48);
 								if(ch==static_cast<unsigned_char_type>(-2))
 								{
 									phase2 = 1;
@@ -275,7 +275,7 @@ inline constexpr F input_floating(input& in)
 				}
 				for(;;++m10e)
 				{
-					unsigned_char_type const ch(static_cast<unsigned_char_type>(try_get(in).first)-48);
+					unsigned_char_type const ch(static_cast<unsigned_char_type>(get<true>(in).first)-48);
 					if(ch==static_cast<unsigned_char_type>(-2))
 					{
 						phase2 = 1;
@@ -305,7 +305,7 @@ inline constexpr F input_floating(input& in)
 	{
 		for(;m10digits<floating_trait::digits10;++m10digits,--m10e)
 		{
-			unsigned_char_type const ch(static_cast<unsigned_char_type>(try_get(in).first)-48);
+			unsigned_char_type const ch(static_cast<unsigned_char_type>(get<true>(in).first)-48);
 			if(ch<10)
 				ipart=ipart*10+ch;
 			else if(ch==21||ch==53)
@@ -323,7 +323,7 @@ inline constexpr F input_floating(input& in)
 		//FUCK CONSTEXPR NOT ALLOWING ME TO USE GOTO
 		if(m10digits==floating_trait::digits10)
 		{
-			unsigned_char_type const ch(static_cast<unsigned_char_type>(try_get(in).first)-48);
+			unsigned_char_type const ch(static_cast<unsigned_char_type>(get<true>(in).first)-48);
 //rounding. 4 discard. 6 carry. 5 is complex
 			if(ch==5)
 			{
@@ -336,7 +336,7 @@ inline constexpr F input_floating(input& in)
 					}
 					for(;;)
 					{
-						unsigned_char_type const ch(static_cast<unsigned_char_type>(try_get(in).first)-48);
+						unsigned_char_type const ch(static_cast<unsigned_char_type>(get<true>(in).first)-48);
 						if(ch==21||ch==53)
 						{
 							phase2 = 0;
@@ -353,7 +353,7 @@ inline constexpr F input_floating(input& in)
 				{
 					for(;;)
 					{
-						unsigned_char_type const ch(static_cast<unsigned_char_type>(try_get(in).first)-48);
+						unsigned_char_type const ch(static_cast<unsigned_char_type>(get<true>(in).first)-48);
 						if(ch==21||ch==53)
 						{
 							phase2 = 0;
@@ -373,7 +373,7 @@ inline constexpr F input_floating(input& in)
 							}
 							for(;;)
 							{
-								unsigned_char_type const ch(static_cast<unsigned_char_type>(try_get(in).first)-48);
+								unsigned_char_type const ch(static_cast<unsigned_char_type>(get<true>(in).first)-48);
 								if(ch==static_cast<unsigned_char_type>(-2))
 								{
 									phase2 = 1;
@@ -404,7 +404,7 @@ inline constexpr F input_floating(input& in)
 				}
 				for(;;)
 				{
-					unsigned_char_type const ch(static_cast<unsigned_char_type>(try_get(in).first)-48);
+					unsigned_char_type const ch(static_cast<unsigned_char_type>(get<true>(in).first)-48);
 					if(ch==21||ch==53)
 					{
 						phase2 = 0;

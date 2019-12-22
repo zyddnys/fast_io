@@ -3,6 +3,7 @@
 #include"../../include/fast_io.h"
 #include"../../include/fast_io_device.h"
 #include"../../include/fast_io_crypto.h"
+#include"../../include/fast_io_legacy.h"
 #include<exception>
 #include<cmath>
 #include<memory>
@@ -40,6 +41,31 @@ try
 	for(std::size_t i(0);i!=N;++i)
 		println(obuf,vec[i]);
 	}
+	{
+	cqw::timer t("c_style_file");
+	fast_io::c_style_file cs("csfdb.txt","wb");
+	for(std::size_t i(0);i!=N;++i)
+		println(cs,vec[i]);
+	}
+	{
+	cqw::timer t("dynamic obuf");
+	fast_io::dynamic_stream dobuf(fast_io::obuf("dynamic_obufdb.txt"));
+	for(std::size_t i(0);i!=N;++i)
+		println(dobuf,vec[i]);
+	}
+	{
+	cqw::timer t("c_style_file_unlocked");
+	fast_io::c_style_file_unlocked cs("csfdb2.txt","wb");
+	for(std::size_t i(0);i!=N;++i)
+		println(cs,vec[i]);
+	}
+	{
+	cqw::timer t("stream_view");
+	std::ofstream fout("smvdb.txt",std::ofstream::binary);
+	fast_io::stream_view stm_v(fout);
+	for(std::size_t i(0);i!=N;++i)
+		println(stm_v,vec[i]);
+	}
 #ifdef _MSC_VER
 	{
 		cqw::timer t("charconv");
@@ -49,7 +75,7 @@ try
 		{
 			auto [p,ec]=std::to_chars(arr.data(),arr.data()+arr.size(),vec[i]);
 			*p='\n';
-			writes(obuf,arr.data(),++p);
+			send(obuf,arr.data(),++p);
 		}
 	}
 #endif

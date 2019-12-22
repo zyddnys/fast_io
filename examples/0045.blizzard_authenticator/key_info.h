@@ -16,6 +16,73 @@ struct key_info
 	std::vector<std::uint8_t> secret_key;
 };
 
+inline std::string normalize_serial(std::string_view serial)
+{
+	std::string ret;
+	for(auto const& e : serial)
+		if('a'<=e&&'e'<='z')
+			ret.push_back(e-'a'+'A');
+		else if(e!='-')
+			ret.push_back(e);
+	return ret;
+}
+
+inline std::string normalize_serial(key_info const& k)
+{
+	return normalize_serial(k.serial);
+}
+
+inline constexpr std::byte char_to_byte(char c)
+{
+	if (c >= '0' && c <= '9')
+		return static_cast<std::byte>(c - '0');
+	auto index(static_cast<unsigned char>(c + 10 - 65));
+	if (c >= 'I') --index;
+	if (c >= 'L') --index;
+	if (c >= 'O') --index;
+	if (c >= 'S') --index;
+	return static_cast<std::byte>(index);
+}
+inline constexpr char byte_to_char(std::byte b)
+{
+	auto index(std::to_integer<unsigned char>(b) & 0x1f);
+	if(index<10)
+		return static_cast<char>(index+'0');
+	index+=55;
+	if (index >= 73) ++index;
+	if (index >= 76) ++index;
+	if (index >= 79) ++index;
+	if (index >= 83) ++index;
+	return static_cast<char>(index);
+}
+
+inline std::string restore_code(key_info const& k)
+{
+	fast_io::sha1 sha1;
+	print(sha1,normalize_serial(k));
+	send(sha1,k.secret_key.cbegin(),k.secret_key.cend());
+	flush(sha1);
+	if constexpr(std::endian::native==std::endian::little)
+	{
+		auto digest(sha1.digest);
+		for(auto & e : digest)
+			e=fast_io::details::big_endian(e);
+		auto byte_digest(std::as_bytes(std::span{digest}).last(10));
+		std::string result;
+		for(auto const& e : byte_digest)
+			result.push_back(byte_to_char(e));
+		return result;
+	}
+	else
+	{
+		auto byte_digest(std::as_bytes(std::span{sha1.digest}).last(10));
+		std::string result;
+		for(auto const& e : byte_digest)
+			result.push_back(byte_to_char(e));
+		return result;
+	}
+}
+
 inline auto to_time_difference(std::uint64_t t)
 {
 	return std::chrono::milliseconds(static_cast<std::int64_t>(t)-
@@ -55,9 +122,9 @@ inline constexpr void print_define(output& out,fast_io::manip::base_t<bas,upperc
 	print(out,"Time difference:",ref.reference.time_difference,
 		"s\tBlizzard Auth Server Time since epoch:",
 		server_time(ref.reference),
-		"s\nSerial:",ref.reference.serial,"\tKey:",fast_io::base_split<bas,uppercase>(ref.reference.secret_key,','));
+		"s\nSerial:",ref.reference.serial,"\tKey:",fast_io::base_split<bas,uppercase>(ref.reference.secret_key,','),
+		"\tRestore:",restore_code(ref.reference));
 }
-
 
 template<fast_io::buffer_output_stream output>
 inline constexpr void print_define(output& out,key_info const& k)

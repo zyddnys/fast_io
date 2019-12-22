@@ -3,6 +3,7 @@
 #include"../../include/fast_io.h"
 #include"../../include/fast_io_device.h"
 #include"../../include/fast_io_crypto.h"
+#include"../../include/fast_io_legacy.h"
 #include<exception>
 #include<cmath>
 #include<memory>
@@ -55,7 +56,7 @@ try
 	{
 		auto [p,ec] = std::to_chars(buffer.data(), buffer.data() + buffer.size(),i);
 		*p='\n';
-		writes(obuf,buffer.data(),++p);
+		send(obuf,buffer.data(),++p);
 //		put(obuf,'\n');
 	}
 	}
@@ -72,6 +73,34 @@ try
 		println(view,i);
 	}
 	{
+	cqw::timer t("c_style_file");
+	fast_io::c_style_file cs_file("c_style.txt","wb");
+	
+	for(std::size_t i(0);i!=N;++i)
+		println(cs_file,i);
+	}
+	{
+	cqw::timer t("c_style_file_unlocked");
+	fast_io::c_style_file_unlocked cs_file("c_style_unlocked.txt","wb");
+	
+	for(std::size_t i(0);i!=N;++i)
+		println(cs_file,i);
+	}
+	{
+	cqw::timer t("cpp_fout_view");
+	std::ofstream fout("cpp_fout_vw.txt",std::ofstream::binary);
+	fast_io::streambuf_view bfv(fout.rdbuf());
+	for(std::size_t i(0);i!=N;++i)
+		println(bfv,i);
+	}
+	{
+	cqw::timer t("cpp_fout");
+	std::ofstream fout("cpp_fout.txt",std::ofstream::binary);
+	fast_io::stream_view stm_vw(fout);
+	for(std::size_t i(0);i!=N;++i)
+		println(stm_vw,i);
+	}
+	{
 	cqw::timer t("obuf ucs_view");
 	fast_io::ucs<fast_io::obuf,char32_t> uv("obuf_ucsview.txt");
 	for(std::size_t i(0);i!=N;++i)
@@ -79,16 +108,16 @@ try
 	}
 	{
 	cqw::timer t("dynamic obuf");
-	fast_io::dynamic_output_stream dobuf(std::in_place_type<fast_io::obuf>,"dynamic_obuf.txt");
+	fast_io::dynamic_stream dobuf(fast_io::obuf("dynamic_obuf.txt"));
 	for(std::size_t i(0);i!=N;++i)
 		println(dobuf,i);
 	}
-/*	{
+	{
 	cqw::timer t("iobuf_dynamic system_file");
-	fast_io::iobuf_dynamic dobuf(std::in_place_type<fast_io::osystem_file>,"iobuf_dynamic_system_file.txt");
+	fast_io::dynamic_buf dobuf(std::in_place_type<fast_io::osystem_file>,"iobuf_dynamic_system_file.txt");
 	for(std::size_t i(0);i!=N;++i)
 		println(dobuf,i);
-	}*/
+	}
 	{
 	cqw::timer t("obuf_mutex");
 	fast_io::obuf_mutex obuf("obuf_mutex.txt");

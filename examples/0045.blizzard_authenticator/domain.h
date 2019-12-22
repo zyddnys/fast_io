@@ -23,6 +23,10 @@ inline constexpr std::string_view get_domain(std::string_view region)
 {
 	if(region=="CN"sv)
 		return "mobile-service.battlenet.com.cn"sv;
+/*	else if(region=="EU"sv)
+		return "m.eu.mobileservice.blizzard.com"sv;
+	else if(region=="US"sv)
+		return "m.us.mobileservice.blizzard.com"sv;*/
 	return "mobile-service.blizzard.com"sv;
 }
 

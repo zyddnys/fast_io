@@ -11,5 +11,5 @@ int main()
 	std::array<char,1024> arr;
 	auto p(arr.data()+d2fixed_buffered_n(v,20,arr.data()));
 	*p='\n';
-	writes(fast_io::out,arr.data(),++p);
+	send(fast_io::out,arr.data(),++p);
 }

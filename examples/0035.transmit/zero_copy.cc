@@ -21,7 +21,7 @@ try
 	}
 	fprint(fast_io::out,"Zero Copy % --> % Done (% bytes)\nTime elasped: %s\n",
 				source_filename,dest_filename,transmitted_bytes,
-				fast_io::fixed(std::chrono::duration_cast<std::chrono::duration<double>>(std::chrono::high_resolution_clock::now()-t0).count(),8));
+				std::chrono::high_resolution_clock::now()-t0);
 }
 catch(std::exception const & e)
 {

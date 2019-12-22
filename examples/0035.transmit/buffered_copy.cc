@@ -15,13 +15,13 @@ try
 	auto t0(std::chrono::high_resolution_clock::now());
 	std::size_t transmitted_bytes(0);
 	{
-		fast_io::system_file source(source_filename,fast_io::open::interface<fast_io::open::c_style("rb")>);
-		fast_io::system_file dest(dest_filename,fast_io::open::interface<fast_io::open::c_style("wbx")>);
+		fast_io::isystem_file source(source_filename);
+		fast_io::osystem_file dest(dest_filename,fast_io::open::interface<fast_io::open::c_style("x")>);
 		transmitted_bytes=bufferred_transmit(dest,source);
 	}
 	fprint(fast_io::out,"Copy % --> % Done (% bytes)\nTime elasped: %s\n",
 				source_filename,dest_filename,transmitted_bytes,
-				fast_io::fixed(std::chrono::duration_cast<std::chrono::duration<double>>(std::chrono::high_resolution_clock::now()-t0).count(),8));
+				std::chrono::high_resolution_clock::now()-t0);
 }
 catch(std::exception const & e)
 {

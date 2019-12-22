@@ -21,6 +21,7 @@ try
 	for(std::size_t i(0);i!=N;++i)
 		auto const ret(fscanf(fp.get(),"%zu",v.data()+i));
 	}
+	std::vector<std::size_t> v2(v);
 /*	{
 	cqw::timer t("std::FILE* with 1048576 buffer size + _IOFBF (Full buffering) tag");
 	std::unique_ptr<std::FILE,decltype(fclose)*> fp(std::fopen("cfilestar.txt","rb"),fclose);
@@ -66,18 +67,12 @@ try
 	for(std::size_t i(0);i!=N;++i)
 		scan(view,v[i]);
 	}
-/*	{
-	cqw::timer t("dynamic standard input stream ibuf");
-	fast_io::dynamic_character_input_stream ibuf(std::in_place_type<fast_io::ibuf>,"cfilestar.txt");
+	{
+	cqw::timer t("dynamic_buf isystem_file");
+	fast_io::dynamic_buf ibuf(std::in_place_type<fast_io::isystem_file>,"cfilestar.txt");
 	for(std::size_t i(0);i!=N;++i)
 		scan(ibuf,v[i]);
 	}
-	{
-	cqw::timer t("ibuf_dynamic isystem_file");
-	fast_io::ibuf_dynamic ibuf(std::in_place_type<fast_io::isystem_file>,"cfilestar.txt");
-	for(std::size_t i(0);i!=N;++i)
-		scan(ibuf,v[i]);
-	}*/
 	{
 	cqw::timer t("speck128/128");
 	fast_io::crypto::basic_ictr<fast_io::ibuf, fast_io::crypto::speck::speck_enc_128_128> enc_stream(

@@ -12,7 +12,7 @@ namespace details
 inline constexpr int calculate_posix_open_mode(open::mode const &om)
 {
 	using namespace open;
-	std::size_t value(remove_ate(om).value);
+	std::size_t value(remove_ate_overlapped(om).value);
 	int mode(0);
 	if(value&binary.value)
 	{
@@ -134,7 +134,7 @@ public:
 };
 
 template<std::contiguous_iterator Iter>
-inline Iter reads(posix_io_handle& h,Iter begin,Iter end)
+inline Iter receive(posix_io_handle& h,Iter begin,Iter end)
 {
 	auto read_bytes(::read(h.native_handle(),std::to_address(begin),(end-begin)*sizeof(*begin)));
 	if(read_bytes==-1)
@@ -142,7 +142,7 @@ inline Iter reads(posix_io_handle& h,Iter begin,Iter end)
 	return begin+(read_bytes/sizeof(*begin));
 }
 template<std::contiguous_iterator Iter>
-inline Iter writes(posix_io_handle& h,Iter begin,Iter end)
+inline Iter send(posix_io_handle& h,Iter begin,Iter end)
 {
 	auto write_bytes(::write(h.native_handle(),std::to_address(begin),(end-begin)*sizeof(*begin)));
 	if(write_bytes==-1)
@@ -235,7 +235,7 @@ public:
 class posix_pipe_unique:public posix_io_handle
 {
 public:
-	using char_type = char;
+	using posix_io_handle::char_type;
 	using native_handle_type = int;
 	void close()
 	{
@@ -299,14 +299,14 @@ inline void swap(posix_pipe& a,posix_pipe& b) noexcept
 }
 
 template<std::contiguous_iterator Iter>
-inline Iter reads(posix_pipe& h,Iter begin,Iter end)
+inline Iter receive(posix_pipe& h,Iter begin,Iter end)
 {
-	return reads(h.in(),begin,end);
+	return receive(h.in(),begin,end);
 }
 template<std::contiguous_iterator Iter>
-inline Iter writes(posix_pipe& h,Iter begin,Iter end)
+inline Iter send(posix_pipe& h,Iter begin,Iter end)
 {
-	return writes(h.out(),begin,end);
+	return send(h.out(),begin,end);
 }
 
 inline void flush(posix_pipe&)

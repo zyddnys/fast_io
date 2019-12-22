@@ -14,7 +14,7 @@ try
 	try
 	{
 		fast_io::crypto::basic_ocbc<fast_io::acceptor_buf, fast_io::crypto::speck::speck_enc_128_128> encrypted_accept(key, iv, hd);
-		print(encrypted_accept,"hello world\n");
+		print_flush(encrypted_accept,"hello world\n");
 	}
 	catch(std::exception const& e)
 	{

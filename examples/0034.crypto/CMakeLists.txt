@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 project(crypto_test)
-find_package(Threads)
+find_package(Threceive)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   # using Visual Studio C++

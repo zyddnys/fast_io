@@ -182,10 +182,10 @@ template<std::random_access_iterator Iter,std::unsigned_integral mantissaType>
 inline constexpr auto easy_case(Iter result,bool sign, mantissaType const& mantissa)
 {
 	if (mantissa)
-		return std::copy_n("nan",3,result);
+		return std::copy_n(u8"nan",3,result);
 	if (sign)
-		return std::copy_n("-inf",4,result);
-	return std::copy_n("inf",3,result);
+		return std::copy_n(u8"-inf",4,result);
+	return std::copy_n(u8"inf",3,result);
 }
 
 template<std::floating_point floating,std::unsigned_integral mantissaType,std::signed_integral exponentType>
@@ -202,19 +202,19 @@ requires std::same_as<T,std::int32_t>
 inline constexpr Iter output_exp(T exp,Iter result)
 {
 	if constexpr(uppercase_e)
-		*result='E';
+		*result=0X65;
 	else
-		*result='e';
+		*result=0x65;
 	++result;
 	if(exp<0)
 	{
-		*result='-';
+		*result=0x2d;
 		++result;
 		exp=-exp;
 	}
 	else
 	{
-		*result='+';
+		*result=0x2b;
 		++result;
 	}
 	using char_type = std::remove_reference_t<decltype(*result)>;
@@ -223,7 +223,7 @@ inline constexpr Iter output_exp(T exp,Iter result)
 	{
 		auto const quo(unsigned_exp/100);
 		unsigned_exp%=100;
-		*result=static_cast<char_type>(quo+'0');
+		*result=static_cast<char_type>(quo+0x30);
 		++result;
 	}
 	auto exp_tb(shared_static_base_table<10,false>::table[unsigned_exp]);
@@ -252,22 +252,22 @@ inline constexpr auto output_fixed(Iter result, F d)
 	{
 		if(sign)
 		{
-			*result='-';
+			*result=0x2d;
 			++result;
 		}
-		*result='0';
+		*result=0x30;
 		++result;
 		if constexpr(precision!=0)
 		{
-			*result='.';
+			*result=0x2E;
 			++result;
-			result=std::fill_n(result,precision,'0');
+			result=std::fill_n(result,precision,0x30);
 			if constexpr(scientific)
 			{
 				if constexpr(uppercase_e)
-					return std::copy_n("E+00",4,result);
+					return std::copy_n(u8"E+00",4,result);
 				else
-					return std::copy_n("e+00",4,result);
+					return std::copy_n(u8"e+00",4,result);
 			}
 		}
 		return result;
@@ -275,7 +275,7 @@ inline constexpr auto output_fixed(Iter result, F d)
 	auto const r2(init_rep<F>(mantissa,static_cast<signed_exponent_type>(exponent)));
 	if (sign)
 	{
-		*result='-';
+		*result=0x2d;
 		++result;
 	}
 	bool const negative_r2_e(r2.e<0);
@@ -304,7 +304,7 @@ inline constexpr auto output_fixed(Iter result, F d)
 						available_digits=9;
 						break;
 					}
-					std::fill(result,output_base_number_impl<10,false>(result+9,digits),'0');
+					std::fill(result,output_base_number_impl<10,false>(result+9,digits),0x30);
 					result+=9;
 					printed_digits+=9;
 				}
@@ -318,7 +318,7 @@ inline constexpr auto output_fixed(Iter result, F d)
 						output_base_number_impl<10,false,true>(result+=available_digits+1,digits);
 					else
 					{
-						*result=static_cast<char_type>('0'+digits);
+						*result=static_cast<char_type>(0x30+digits);
 						++result;
 					}
 					printed_digits = available_digits;
@@ -350,7 +350,7 @@ inline constexpr auto output_fixed(Iter result, F d)
 						available_digits=9;
 						break;
 					}
-					std::fill(result,output_base_number_impl<10,false>(result+9,digits),'0');
+					std::fill(result,output_base_number_impl<10,false>(result+9,digits),0x30);
 					result+=9;
 					printed_digits+=9;
 				}
@@ -364,7 +364,7 @@ inline constexpr auto output_fixed(Iter result, F d)
 						output_base_number_impl<10,false,true>(result+=available_digits+1,digits);
 					else
 					{
-						*result=static_cast<char_type>('0'+digits);
+						*result=static_cast<char_type>(0x30+digits);
 						++result;
 					}
 					printed_digits = available_digits;
@@ -398,22 +398,22 @@ inline constexpr auto output_fixed(Iter result, F d)
 		{
 			if(digits)
 			{
-				std::fill(result,output_base_number_impl<10,false>(result+maximum,digits),'0');
+				std::fill(result,output_base_number_impl<10,false>(result+maximum,digits),0x30);
 				result+=maximum;
 			}
 			else
-				result=std::fill_n(result,maximum,'0');
+				result=std::fill_n(result,maximum,0x30);
 		}
 		else
 		{
 			if constexpr(precision!=0)
 			{
-				std::fill(result,output_base_number_impl<10,false,true>(result+maximum+1,digits),'0');
+				std::fill(result,output_base_number_impl<10,false,true>(result+maximum+1,digits),0x30);
 				result+=maximum+1;
 			}
 			else
 			{
-				*result = '0' + digits;
+				*result = 0x30 + digits;
 				++result;
 			}
 		}
@@ -423,17 +423,17 @@ inline constexpr auto output_fixed(Iter result, F d)
 			while(round_index--)
 			{
 				auto c(start[round_index]);
-				if (c == '-')
+				if (c == 0x2d)
 				{
-					start[round_index+1] = '1';
+					start[round_index+1] = 0x31;
 					++exp;
 					break;
 				}
 				if constexpr(precision==0)
 				{
-					if (c == '9')
+					if (c == 0x39)
 					{
-						start[round_index] = '0';
+						start[round_index] = 0x30;
 						round_up = 1;
 						continue;
 					}
@@ -447,11 +447,11 @@ inline constexpr auto output_fixed(Iter result, F d)
 				}
 				else
 				{
-					if (c == '.')
+					if (c == 0x2E)
 						continue;
-					else if (c == '9')
+					else if (c == 0x39)
 					{
-						start[round_index] = '0';
+						start[round_index] = 0x30;
 						round_up = 1;
 						continue;
 					}
@@ -466,7 +466,7 @@ inline constexpr auto output_fixed(Iter result, F d)
 			}
 			if(round_index==static_cast<std::size_t>(-1))
 			{
-				start[round_index+1] = '1';
+				start[round_index+1] = 0x31;
 				++exp;
 			}
 		}
@@ -484,7 +484,7 @@ inline constexpr auto output_fixed(Iter result, F d)
 				exponent_type digits(mul_shift_mod_1e9(r2.m<<8,fixed_pow10<>::split[fixed_pow10<>::offset[idx]+i],p10bitsmr2e));
 				if(nonzero)
 				{
-					std::fill(result,output_base_number_impl<10,false>(result+9,digits),'0');
+					std::fill(result,output_base_number_impl<10,false>(result+9,digits),0x30);
 					result+=9;
 				}
 				else if(digits)
@@ -496,12 +496,12 @@ inline constexpr auto output_fixed(Iter result, F d)
 		}
 		if(!nonzero)
 		{
-			*result='0';
+			*result=0x30;
 			++result;
 		}
 		if constexpr(precision!=0)
 		{
-			*result='.';
+			*result=0x2E;
 			++result;
 		}
 		if(negative_r2_e)
@@ -515,10 +515,10 @@ inline constexpr auto output_fixed(Iter result, F d)
 			if (blocks<=mb2_idx)
 			{
 				i=blocks;
-				result=std::fill_n(result,precision,'0');
+				result=std::fill_n(result,precision,0x30);
 			}
 			else if(i<mb2_idx)
-				result=std::fill_n(result,9*(i=mb2_idx),'0');
+				result=std::fill_n(result,9*(i=mb2_idx),0x30);
 			signed_exponent_type j(128+(abs_e2-(idx<<4)));
 			auto const of2i(fixed_pow10<>::offset_2[idx]);
 			for(;i<blocks;++i)
@@ -527,12 +527,12 @@ inline constexpr auto output_fixed(Iter result, F d)
 				exponent_type digits(mul_shift_mod_1e9(r2.m<<8,fixed_pow10<>::split_2[p],j));
 				if (fixed_pow10<>::offset_2[idx+1]<=p)
 				{
-					result=std::fill_n(result,precision-9*i,'0');
+					result=std::fill_n(result,precision-9*i,0x30);
 					break;
 				}
 				if(i+1<blocks)
 				{
-					std::fill(result,output_base_number_impl<10,false>(result+9,digits),'0');
+					std::fill(result,output_base_number_impl<10,false>(result+9,digits),0x30);
 					result+=9;
 				}
 				else
@@ -556,7 +556,7 @@ inline constexpr auto output_fixed(Iter result, F d)
 					}
 					if(maximum)
 					{
-						std::fill(result,output_base_number_impl<10,false>(result+maximum,digits),'0');
+						std::fill(result,output_base_number_impl<10,false>(result+maximum,digits),0x30);
 						result+=maximum;
 					}
 					break;
@@ -571,25 +571,25 @@ inline constexpr auto output_fixed(Iter result, F d)
 					while(round_index--)
 					{
 						auto c(start[round_index]);
-						if (c == '-')
+						if (c == 0x2d)
 						{
-							start[round_index+1] = '1';
+							start[round_index+1] = 0x31;
 							if(dot_index)
 							{
-								start[dot_index] = '0';
-								start[dot_index+1] = '.';
+								start[dot_index] = 0x30;
+								start[dot_index+1] = 0x2E;
 							}
-							*result='0';
+							*result=0x30;
 							return ++result;
 						}
-						if (c == '.')
+						if (c == 0x2E)
 						{
 							dot_index = round_index;
 							continue;
 						}
-						else if (c == '9')
+						else if (c == 0x39)
 						{
-							start[round_index] = '0';
+							start[round_index] = 0x30;
 							round_up = 1;
 							continue;
 						}
@@ -597,11 +597,11 @@ inline constexpr auto output_fixed(Iter result, F d)
 							start[round_index]=c+1;
 						return result;
 					}
-					*start='1';
+					*start=0x31;
 					if(dot_index)
 					{
-						start[dot_index] = '0';
-						start[dot_index+1] = '.';
+						start[dot_index] = 0x30;
+						start[dot_index+1] = 0x2E;
 					}
 				}
 				else
@@ -609,15 +609,15 @@ inline constexpr auto output_fixed(Iter result, F d)
 					while(round_index--)
 					{
 						auto c(start[round_index]);
-						if (c == '-')
+						if (c == 0x2d)
 						{
-							start[round_index+1] = '1';
-							*result='0';
+							start[round_index+1] = 0x31;
+							*result=0x30;
 							return ++result;
 						}
-						if (c == '9')
+						if (c == 0x39)
 						{
-							start[round_index] = '0';
+							start[round_index] = 0x30;
 							round_up = 1;
 							continue;
 						}
@@ -625,14 +625,14 @@ inline constexpr auto output_fixed(Iter result, F d)
 							start[round_index]=c+1;
 						return result;
 					}
-					*start='1';
+					*start=0x31;
 				}
-				*result='0';
+				*result=0x30;
 				++result;
 			}
 			return result;
 		}
-		return std::fill_n(result,precision,'0');
+		return std::fill_n(result,precision,0x30);
 	}
 }
 template<std::floating_point floating,std::unsigned_integral mantissaType,std::signed_integral exponentType>
@@ -647,6 +647,7 @@ inline constexpr unrep<mantissaType,exponentType> init_repm2(mantissaType const&
 template<bool uppercase_e=false,std::size_t mode=0,std::random_access_iterator Iter,std::floating_point F>
 inline constexpr Iter output_shortest(Iter result, F d)
 {
+	using char_type = std::remove_reference_t<decltype(*result)>;
 	using floating_trait = floating_traits<F>;
 	using mantissa_type = typename floating_trait::mantissa_type;
 	using exponent_type = typename floating_trait::exponent_type;
@@ -663,17 +664,17 @@ inline constexpr Iter output_shortest(Iter result, F d)
 	{
 		if(sign)
 		{
-			*result='-';
+			*result=0x2d;
 			++result;
 		}
-		*result='0';
+		*result=0x30;
 		++result;
 		if constexpr(mode==2)
 		{
 			if constexpr(uppercase_e)
-				return std::copy_n("E+00",4,result);
+				return std::copy_n(u8"E+00",4,result);
 			else
-				return std::copy_n("e+00",4,result);
+				return std::copy_n(u8"e+00",4,result);
 		}
 		return result;
 	}
@@ -804,7 +805,7 @@ inline constexpr Iter output_shortest(Iter result, F d)
 	}
 	if(sign)
 	{
-		*result='-';
+		*result=0x2d;
 		++result;
 	}
 	std::int32_t olength(static_cast<std::int32_t>(chars_len<10,true>(v.front())));
@@ -839,7 +840,7 @@ inline constexpr Iter output_shortest(Iter result, F d)
 		{
 		case 1:
 			output_base_number_impl<10,false>(result+=olength,v.front());
-			return std::fill_n(result,real_exp+1-olength,'0');
+			return std::fill_n(result,real_exp+1-olength,0x30);
 		case 2:
 		{
 			constexpr auto &table(details::shared_static_base_table<10,uppercase_e>::table);
@@ -862,16 +863,16 @@ inline constexpr Iter output_shortest(Iter result, F d)
 				{
 					auto const rem(a%10);
 					a/=10;
-					*--iter=static_cast<char>('0'+rem);
+					*--iter=static_cast<char_type>(0x30+rem);
 				}
-				*--iter='.';
+				*--iter=0x2E;
 			}
 			output_base_number_impl<10,false>(iter,a);
 			return result;
 		}
 		default:
-			result=std::copy_n("0.",2,result);
-			result=std::fill_n(result,static_cast<exponent_type>(-real_exp-1),'0');
+			result=std::copy_n(u8"0.",2,result);
+			result=std::fill_n(result,static_cast<exponent_type>(-real_exp-1),0x30);
 			output_base_number_impl<10,false>(result+=olength,v.front());
 			return result;
 		}
@@ -881,7 +882,7 @@ inline constexpr Iter output_shortest(Iter result, F d)
 		if(olength<=real_exp)
 		{
 			output_base_number_impl<10,false>(result+=olength,v.front());
-			return std::fill_n(result,real_exp+1-olength,'0');	
+			return std::fill_n(result,real_exp+1-olength,0x30);	
 		}
 		else if(0<=real_exp&&real_exp<olength)
 		{
@@ -905,17 +906,17 @@ inline constexpr Iter output_shortest(Iter result, F d)
 				{
 					auto const rem(a%10);
 					a/=10;
-					*--iter=static_cast<char>('0'+rem);
+					*--iter=static_cast<char_type>(0x30+rem);
 				}
-				*--iter='.';
+				*--iter=0x2E;
 			}
 			output_base_number_impl<10,false>(iter,a);
 			return result;
 		}
 		else
 		{
-			result=std::copy_n("0.",2,result);
-			result=std::fill_n(result,static_cast<exponent_type>(-real_exp-1),'0');
+			result=std::copy_n(u8"0.",2,result);
+			result=std::fill_n(result,static_cast<exponent_type>(-real_exp-1),0x30);
 			output_base_number_impl<10,false>(result+=olength,v.front());
 			return result;
 		}

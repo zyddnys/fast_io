@@ -75,7 +75,7 @@ template<char fillch,character_output_stream output>
 inline constexpr void print_perm_per_check(output& out,perms p,perms checked)
 {
 	if((p&checked)==perms::none)
-		put(out,'-');
+		put(out,0x2d);
 	else
 		put(out,fillch);
 }
@@ -85,15 +85,15 @@ inline constexpr void print_perm_per_check(output& out,perms p,perms checked)
 template<character_output_stream output>
 inline constexpr void print_define(output& out,perms p)
 {
-	details::perm::print_perm_per_check<'r'>(out,p,perms::owner_read);
-	details::perm::print_perm_per_check<'w'>(out,p,perms::owner_write);
-	details::perm::print_perm_per_check<'x'>(out,p,perms::owner_exec);
-	details::perm::print_perm_per_check<'r'>(out,p,perms::group_read);
-	details::perm::print_perm_per_check<'w'>(out,p,perms::group_write);
-	details::perm::print_perm_per_check<'x'>(out,p,perms::group_exec);
-	details::perm::print_perm_per_check<'r'>(out,p,perms::others_read);
-	details::perm::print_perm_per_check<'w'>(out,p,perms::others_write);
-	details::perm::print_perm_per_check<'x'>(out,p,perms::others_exec);
+	details::perm::print_perm_per_check<0x72>(out,p,perms::owner_read);
+	details::perm::print_perm_per_check<0x77>(out,p,perms::owner_write);
+	details::perm::print_perm_per_check<0x78>(out,p,perms::owner_exec);
+	details::perm::print_perm_per_check<0x72>(out,p,perms::group_read);
+	details::perm::print_perm_per_check<0x77>(out,p,perms::group_write);
+	details::perm::print_perm_per_check<0x78>(out,p,perms::group_exec);
+	details::perm::print_perm_per_check<0x72>(out,p,perms::others_read);
+	details::perm::print_perm_per_check<0x77>(out,p,perms::others_write);
+	details::perm::print_perm_per_check<0x78>(out,p,perms::others_exec);
 }
 
 }

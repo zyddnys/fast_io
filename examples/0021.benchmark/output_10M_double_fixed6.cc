@@ -50,7 +50,7 @@ try
 		{
 			auto [p,ec]=std::to_chars(arr.data(),arr.data()+arr.size(),vec[i],std::chars_format::fixed,6);
 			*p='\n';
-			writes(obuf,arr.data(),++p);
+			send(obuf,arr.data(),++p);
 		}
 	}
 #endif

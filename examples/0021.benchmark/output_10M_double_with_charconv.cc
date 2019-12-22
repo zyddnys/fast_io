@@ -32,7 +32,7 @@ try
 	{
 		auto p(arr.data()+d2fixed_buffered_n(vec[i],static_cast<std::uint32_t>(M),arr.data()));
 		*p='\n';
-		writes(obuf,arr.data(),++p);
+		send(obuf,arr.data(),++p);
 	}
 	}
 	{

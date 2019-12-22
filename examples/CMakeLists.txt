@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 project(fastio_examples)
-find_package(Threads)
+find_package(Threceive)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   # using Visual Studio C++
@@ -59,10 +59,10 @@ add_executable(immediately_flush "./0023.flush/immediately_flush.cc")
 add_executable(line_flush "./0023.flush/line_flush.cc")
 add_executable(no_tie_immediately_line_flush "./0023.flush/no_tie_immediately_line_flush.cc")
 
-add_executable(multithreads_log "./0024.multithreads/multithreads_log.cc")
-target_link_libraries( multithreads_log ${CMAKE_THREAD_LIBS_INIT} )
-add_executable(multithreads_log_line_flush "./0024.multithreads/multithreads_log_line_flush.cc")
-target_link_libraries( multithreads_log_line_flush ${CMAKE_THREAD_LIBS_INIT} )
+add_executable(multithreceive_log "./0024.multithreceive/multithreceive_log.cc")
+target_link_libraries( multithreceive_log ${CMAKE_THREAD_LIBS_INIT} )
+add_executable(multithreceive_log_line_flush "./0024.multithreceive/multithreceive_log_line_flush.cc")
+target_link_libraries( multithreceive_log_line_flush ${CMAKE_THREAD_LIBS_INIT} )
 
 add_executable(multithread_sync "./0025.multiprocesses/multithread_sync.cc")
 target_link_libraries(multithread_sync ${CMAKE_THREAD_LIBS_INIT} )

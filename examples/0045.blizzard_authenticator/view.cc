@@ -1,7 +1,7 @@
 #include"../../include/fast_io.h"
 #include"../../include/fast_io_device.h"
 #include"../../include/fast_io_network.h"
-#include"../../include/fast_io_crypto.h"
+#include"../../include/fast_io_hash.h"
 #include"key_info.h"
 #include<vector>
 

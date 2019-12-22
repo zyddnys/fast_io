@@ -1,7 +1,7 @@
 #include"../../include/fast_io.h"
 #include"../../include/fast_io_device.h"
 #include"../../include/fast_io_network.h"
-#include"../../include/fast_io_crypto.h"
+#include"../../include/fast_io_hash.h"
 #include"domain.h"
 #include<random>
 #include"key_info.h"
@@ -43,7 +43,8 @@ try
 			"19a250fa4cc1278d12855b5b25818d162c6e6ee2ab4a350d401d78f6ddb99711"
 			"e72626b48bd8b5b0b7f3acf9ea3c9e0005fee59e19136cdb7c83f2ab8b0a2a99");
 	scan(isv,fast_io::hex(modules));
-	} 
+	
+	}
 	fast_io::natural exponent("257");
 	fast_io::natural p;
 	p.vec().resize(5);
@@ -59,25 +60,26 @@ try
 	{
 		keys.clear();
 	}
+
 	fast_io::client_buf hd(fast_io::dns_once(domain),80,fast_io::sock::type::stream);
 	print(hd,"POST ",battlenet::enroll_path," HTTP/1.1\r\n",
 		"Host: ",domain,"\r\n"
 		"Content-Type: application/octet-stream\r\n"
 		"Content-Length: ",result.vec().size()*8,"\r\n"
 		"Timeout: 10000\r\n\r\n");
-	writes(hd,result.vec().cbegin(),result.vec().cend());
+	send(hd,result.vec());
 	skip_http_header(hd);
 	std::array<std::uint8_t,8> time;
-	read(hd,time);
+	receive(hd,time);
 	std::reverse(time.begin(),time.end());
 	battlenet::key_info key;
 	key.time_difference=battlenet::to_time_difference(fast_io::bit_cast<std::uint64_t>(time));
 	std::array<std::uint8_t,17> serial;
-	read(hd,serial);
+	receive(hd,serial);
 	key.serial.resize(17);
 	std::memcpy(key.serial.data(),serial.data(),serial.size());
 	std::array<std::uint8_t,20> encrypted_key;
-	read(hd,encrypted_key);
+	receive(hd,encrypted_key);
 	for(std::size_t i(0);i!=encrypted_key.size();++i)
 		key.secret_key.push_back(encrypted_key[i]^one_time_pad_key[i]);
 	keys.emplace_back(std::move(key));

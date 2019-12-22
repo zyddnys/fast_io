@@ -16,9 +16,10 @@ try
 		fast_io::crypto::basic_ocbc<fast_io::acceptor_buf, fast_io::crypto::speck::speck_enc_128_128> accept(key, iv, hd);
 		//fast_io::acceptor_buf accept(hd);
 		std::string const str("☭🚄😀我wubi😄😊😉😍😘😚😜😝😳😁😣😢😂😭😪😥😰😩㍿🀀🀁🀂🀃🀄🀅🀆🀇🀈🀉🀊🀋🀌🀍🀎🀏");
-		print(accept,str);
+		
 //		println(accept,"☭🚄😀我wubi😄😊😉😍😘😚😜😝😳😁😣😢😂😭😪😥😰😩㍿🀀🀁🀂🀃🀄🀅🀆🀇🀈🀉🀊🀋🀌🀍🀎🀏");
 		println(fast_io::err,"a client connect to this server");
+		print_flush(accept,str);
 	}
 	catch(std::exception const& e)
 	{

@@ -212,7 +212,7 @@ inline constexpr void orelease(sha1& sh,std::size_t size)
 }
 
 template<std::contiguous_iterator Iter>
-inline constexpr void writes(sha1& sh,Iter cbegin,Iter cend)
+inline constexpr void send(sha1& sh,Iter cbegin,Iter cend)
 {
 	auto b(static_cast<char const*>(static_cast<void const*>(std::to_address(cbegin))));
 	auto e(static_cast<char const*>(static_cast<void const*>(std::to_address(cend))));
@@ -230,7 +230,7 @@ inline constexpr void writes(sha1& sh,Iter cbegin,Iter cend)
 	sh.pos+=e-b;
 }
 
-[[deprecated("sha1 is no longer a secure algorithm, see wikipedia. The SHAppening: https://en.wikipedia.org/wiki/SHA-1#The_SHAppening")]] 
+//[[deprecated("sha1 is no longer a secure algorithm, see wikipedia. The SHAppening: https://en.wikipedia.org/wiki/SHA-1#The_SHAppening")]] 
 inline constexpr void flush(sha1& sh)
 {
 	std::uint64_t const total_count((sh.transforms*64+sh.pos)<<3);
@@ -245,7 +245,7 @@ inline constexpr void flush(sha1& sh)
 }
 
 template<std::contiguous_iterator Iter>
-inline constexpr Iter reads(sha1& sh,Iter begin,Iter end)
+inline constexpr Iter receive(sha1& sh,Iter begin,Iter end)
 {
 	auto b(static_cast<char*>(static_cast<void*>(std::to_address(begin))));
 	auto e(static_cast<char*>(static_cast<void*>(std::to_address(end))));
@@ -260,7 +260,20 @@ template<buffer_output_stream output>
 inline constexpr void print_define(output& out,sha1 const& sh)
 {
 	for(auto const & e : sh.digest)
-		print(out,width<8,false,'0'>(hex(e)));
+		print(out,width<8,false,0x30>(hex(e)));
+}
+
+inline constexpr decltype(auto) get_digest(sha1& s)
+{
+	if constexpr(std::endian::native==std::endian::little)
+	{
+		auto digest(s.digest);
+		for(auto& e : digest)
+			e=details::big_endian(e);
+		return digest;
+	}
+	else
+		return s.digest;
 }
 
 }

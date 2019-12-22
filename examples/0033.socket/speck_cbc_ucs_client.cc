@@ -14,7 +14,7 @@ try
 	fast_io::osystem_file ob("speck_decrypted.txt");
 	transmit(ob,hd);
 }
-catch(std::system_error const & e)
+catch(std::exception const & e)
 {
 	println(fast_io::err,e);
 	return 1;
